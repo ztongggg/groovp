@@ -177,6 +177,15 @@ drop policy if exists "requests_read"  on public.join_requests;
 drop policy if exists "requests_write" on public.join_requests;
 create policy "requests_read"  on public.join_requests for select to authenticated using (true);
 create policy "requests_write" on public.join_requests for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- a group's leader can accept/decline requests to their group
+drop policy if exists "requests_leader_update" on public.join_requests;
+create policy "requests_leader_update" on public.join_requests for update to authenticated
+  using (exists (select 1 from public.groups g where g.id = join_requests.group_id and g.leader_id = auth.uid()));
+
+-- a group's leader can add accepted applicants as members
+drop policy if exists "members_leader_insert" on public.group_members;
+create policy "members_leader_insert" on public.group_members for insert to authenticated
+  with check (exists (select 1 from public.groups g where g.id = group_members.group_id and g.leader_id = auth.uid()));
 
 -- ratings: read all; write your own
 drop policy if exists "ratings_read"  on public.ratings;

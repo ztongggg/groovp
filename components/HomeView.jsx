@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import StatusBar from "@/components/StatusBar";
 import HomeProjectCard from "@/components/HomeProjectCard";
 
@@ -25,12 +26,19 @@ function GreetingBanner({ name }) {
   );
 }
 
-function ShortcutButton({ label, children }) {
-  return (
-    <button className="flex flex-1 items-center gap-3" style={{ height: 44, borderRadius: 14, background: "#1e1b4b", paddingLeft: 18 }}>
+function ShortcutButton({ label, href, children }) {
+  const cls = "flex flex-1 items-center gap-3";
+  const style = { height: 44, borderRadius: 14, background: "#1e1b4b", paddingLeft: 18 };
+  const inner = (
+    <>
       {children}
       <span style={{ fontSize: 12.5, fontWeight: 800, color: "#fff" }}>{label}</span>
-    </button>
+    </>
+  );
+  return href ? (
+    <Link href={href} className={cls} style={style}>{inner}</Link>
+  ) : (
+    <button className={cls} style={style}>{inner}</button>
   );
 }
 
@@ -56,7 +64,7 @@ export default function HomeView({ name = "there", projects = [] }) {
         <ShortcutButton label="Saved">
           <svg width="12" height="15" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h12v18l-6-4-6 4V3Z" /></svg>
         </ShortcutButton>
-        <ShortcutButton label="Requests">
+        <ShortcutButton label="Requests" href="/applicants">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7.5V12l3 2" /></svg>
         </ShortcutButton>
       </div>
