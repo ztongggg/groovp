@@ -36,6 +36,41 @@ export async function signUp(_prevState, formData) {
   redirect("/home");
 }
 
+// Multi-step signup: create the auth user, then fill the profile row.
+export async function signUpFull(data) {
+  const supabase = createClient();
+
+  const { data: auth, error } = await supabase.auth.signUp({
+    email: data.email,
+    password: data.password,
+    options: { data: { full_name: data.full_name, username: data.username } },
+  });
+  if (error) return { error: error.message };
+
+  const uid = auth.user?.id;
+  if (uid) {
+    await supabase
+      .from("profiles")
+      .update({
+        full_name: data.full_name,
+        username: data.username,
+        university: data.university || "SUTD",
+        major: data.major || null,
+        year: data.year || null,
+        personality: data.personality || null,
+        prefer_working: data.prefer_working || null,
+        best_work_time: data.best_work_time || null,
+        location: data.location || null,
+        skills: data.skills || [],
+        interests: data.interests || [],
+      })
+      .eq("id", uid);
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
 export async function signOut() {
   const supabase = createClient();
   await supabase.auth.signOut();
