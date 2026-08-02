@@ -1,92 +1,92 @@
-"use client";
-
+import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
+import DiscoverCard from "@/components/DiscoverCard";
+import { createClient } from "@/lib/supabase/server";
 
-function ShareIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="18" cy="5" r="2.4" /><circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="19" r="2.4" />
-      <path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4" />
-    </svg>
-  );
-}
-function HeartIcon() {
-  return (
-    <svg width="14" height="12" viewBox="0 0 24 22" fill="none" stroke="#7c3aed" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.4-7 10-7 10Z" />
-    </svg>
-  );
+function fmt(d) {
+  if (!d) return "";
+  const [y, m, day] = d.split("T")[0].split("-");
+  return `${day}/${m}/${y}`;
 }
 
-// Discover project card — exact 334x357.
-function DiscoverCard({ title, desc, skills, avatarColor, initials, count, date }) {
-  return (
-    <div className="relative" style={{ width: 334, height: 357, borderRadius: 21, background: "#fff", border: "1px solid #e4e3e3" }}>
-      <div className="absolute left-0 top-0" style={{ width: 334, height: 90, background: "#d9d9d9", borderTopLeftRadius: 21, borderTopRightRadius: 21 }} />
-      <div className="absolute flex items-center justify-center rounded-full bg-white" style={{ left: 259, top: 13, width: 27, height: 27 }}><ShareIcon /></div>
-      <div className="absolute flex items-center justify-center rounded-full bg-white" style={{ left: 294, top: 13, width: 27, height: 27 }}><HeartIcon /></div>
+const AVATAR_COLORS = ["#e8863b", "#34b9a8", "#f2a5bd", "#7c3aed"];
 
-      <div className="absolute" style={{ left: 14, top: 109, fontSize: 16, fontWeight: 800, color: "#1e1b4b" }}>{title}</div>
-      <div className="absolute" style={{ left: 15, top: 130, width: 303, fontSize: 13, fontWeight: 600, color: "#4b5563", lineHeight: "16px" }}>{desc}</div>
-
-      <div className="absolute flex gap-[5px]" style={{ left: 15, top: 175 }}>
-        {skills.map((s, i) => (
-          <span key={s} className="inline-flex items-center" style={{ height: 23, padding: "0 12px", borderRadius: 16, fontSize: 10, fontWeight: 800, background: i === 0 ? "#7c3aed" : "#f5f0ff", color: i === 0 ? "#fff" : "#7c3aed" }}>{s}</span>
-        ))}
-      </div>
-
-      <div className="absolute flex -space-x-1.5" style={{ left: 16, top: 211 }}>
-        <span style={{ width: 23, height: 23, borderRadius: 999, background: avatarColor, border: "1px solid #fff" }} />
-        <span className="inline-flex items-center justify-center" style={{ width: 23, height: 23, borderRadius: 999, background: "#7c3aed", border: "1px solid #fff", fontSize: 10, fontWeight: 800, color: "#fff" }}>{initials}</span>
-      </div>
-      <div className="absolute" style={{ right: 12, top: 215, fontSize: 10, fontWeight: 700, color: "#6b7280" }}>{count} members</div>
-
-      <div className="absolute" style={{ left: 15, top: 250, width: 307, height: 2, background: "#e5e7eb", borderRadius: 2 }}>
-        <div style={{ width: 118, height: 2, background: "#7c3aed", borderRadius: 2 }} />
-      </div>
-      <div className="absolute" style={{ left: 15, top: 261, fontSize: 12, fontWeight: 700, color: "#6b7280" }}>{date}</div>
-
-      <button className="absolute flex items-center justify-center" style={{ left: 15, top: 294, width: 306, height: 42, borderRadius: 14, background: "#dcf674" }}>
-        <span style={{ fontSize: 13, fontWeight: 800, color: "#5f7900" }}>Request</span>
-      </button>
-    </div>
-  );
+// Resilient: on any failure (e.g. local corp-proxy TLS) return [] so the page
+// still renders. Real data loads on Vercel.
+async function getProjects() {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("projects")
+      .select(
+        "id,name,description,skills_needed,timeline_start,timeline_end,min_size,max_size, groups(id, group_members(count))"
+      )
+      .order("created_at", { ascending: false });
+    if (error) return [];
+    return data || [];
+  } catch {
+    return [];
+  }
 }
 
-export default function DiscoverPage() {
+export default async function DiscoverPage() {
+  const projects = await getProjects();
+
   return (
     <AppShell>
-      <div className="relative w-[402px] bg-white" style={{ height: 925 }}>
-        <div className="absolute inset-x-0 top-0"><StatusBar /></div>
+      <div className="min-h-full bg-white pb-6">
+        <StatusBar />
 
-        {/* Heading */}
-        <div className="absolute" style={{ left: 24, top: 59, fontSize: 24, fontWeight: 900, color: "#1e1b4b" }}>Discover</div>
-        {/* Add */}
-        <button className="absolute flex items-center justify-center rounded-full" style={{ left: 341, top: 60, width: 32, height: 32, background: "#7c3aed" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
-        </button>
+        {/* Header */}
+        <div className="flex items-center justify-between px-6">
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1e1b4b" }}>Discover</h1>
+          <Link href="/create" aria-label="Create project" className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: "#7c3aed" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+          </Link>
+        </div>
 
-        {/* Search */}
-        <div className="absolute flex items-center" style={{ left: 30, top: 106, width: 296, height: 42, borderRadius: 14, background: "#f5f0ff", border: "1px solid #ede9fe", paddingLeft: 15 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
-          <input placeholder="Search projects…" className="ml-2.5 w-full bg-transparent focus:outline-none" style={{ fontSize: 13, fontWeight: 600, color: "#1e1b4b" }} />
+        {/* Search + filter */}
+        <div className="mt-4 flex items-center gap-3 px-[30px]">
+          <div className="flex flex-1 items-center" style={{ height: 42, borderRadius: 14, background: "#f5f0ff", border: "1px solid #ede9fe", paddingLeft: 15 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
+            <input placeholder="Search projects…" className="ml-2.5 w-full bg-transparent focus:outline-none" style={{ fontSize: 13, fontWeight: 600, color: "#1e1b4b" }} />
+          </div>
+          <button className="flex items-center justify-center" style={{ width: 42, height: 42, borderRadius: 14, background: "#7c3aed" }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M4 8h16M4 16h16" /><circle cx="15" cy="8" r="2.4" fill="#7c3aed" /><circle cx="9" cy="16" r="2.4" fill="#7c3aed" /></svg>
+          </button>
         </div>
-        {/* Filter */}
-        <button className="absolute flex items-center justify-center" style={{ left: 336, top: 106, width: 42, height: 42, borderRadius: 14, background: "#7c3aed" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
-            <path d="M4 8h16M4 16h16" />
-            <circle cx="15" cy="8" r="2.4" fill="#7c3aed" /><circle cx="9" cy="16" r="2.4" fill="#7c3aed" />
-          </svg>
-        </button>
 
-        {/* Cards */}
-        <div className="absolute" style={{ left: 34, top: 184 }}>
-          <DiscoverCard title="NeuralLink Study Bot" desc="Building an AI-driven study companion using Python and OpenAI for local university students." skills={["Python", "AI/ML", "FastAPI"]} avatarColor="#e8863b" initials="JK" count="2/5" date="01/08/2026 - 15/12/2026" />
-        </div>
-        <div className="absolute" style={{ left: 34, top: 560 }}>
-          <DiscoverCard title="HealthMate Platform" desc="Creating a web platform for remote health monitoring using IoT devices for better patient care." skills={["Java", "HealthTech", "Spring Boot"]} avatarColor="#e8863b" initials="AB" count="4/8" date="15/02/2027 - 15/11/2027" />
-        </div>
+        {/* Projects */}
+        {projects.length === 0 ? (
+          <div className="mt-24 flex flex-col items-center px-8 text-center">
+            <p className="text-[16px] font-semibold text-navy">No projects yet</p>
+            <p className="mt-1 text-[14px] text-muted">Be the first to create one.</p>
+            <Link href="/create" className="mt-5 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 text-[15px] font-bold text-white">
+              Create a project
+            </Link>
+          </div>
+        ) : (
+          <div className="mt-5 flex flex-col items-center gap-6">
+            {projects.map((p, i) => {
+              const group = p.groups?.[0];
+              const members = group?.group_members?.[0]?.count ?? 0;
+              return (
+                <DiscoverCard
+                  key={p.id}
+                  title={p.name}
+                  desc={p.description || ""}
+                  skills={p.skills_needed || []}
+                  count={`${members}/${p.max_size || 0}`}
+                  date={`${fmt(p.timeline_start)} - ${fmt(p.timeline_end)}`}
+                  avatarColor={AVATAR_COLORS[i % AVATAR_COLORS.length]}
+                  initials={(p.name || "P").slice(0, 2).toUpperCase()}
+                  groupId={group?.id}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
     </AppShell>
   );
