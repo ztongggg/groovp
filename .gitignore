@@ -1,0 +1,11 @@
+.env.local
+.env*.local
+node_modules/
+.next/
+
+# Figma reference pulls / scratch (local only)
+*.png
+figma_tree.json
+node_*.json
+*_tree.txt
+parse.js
