@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
+import { signOut } from "@/app/auth/actions";
 
 /* ---------- icons (sized per Figma) ---------- */
 const GearIcon = () => (
@@ -111,7 +112,7 @@ export default function ProfilePage() {
 
   return (
     <AppShell>
-      <div className="relative w-[402px] bg-white" style={{ height: 1011 }}>
+      <div className="relative w-[402px] bg-white" style={{ height: 1085 }}>
         {/* Banner */}
         <div
           className="absolute inset-x-0 top-0"
@@ -237,6 +238,15 @@ export default function ProfilePage() {
               <div className="absolute" style={{ left: 327, top: 16 }}><EditIcon /></div>
             </Box>
             {INTERESTS.map((c) => <Chip key={c.txt} {...c} />)}
+
+            {/* Log out */}
+            <Box l={26} t={1005} w={362} h={52}>
+              <form action={signOut} className="h-full w-full">
+                <button type="submit" className="h-full w-full rounded-2xl" style={{ background: "#fae0e0" }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: "#bf4247" }}>Log Out</span>
+                </button>
+              </form>
+            </Box>
           </>
         )}
       </div>
