@@ -9,3 +9,7 @@ figma_tree.json
 node_*.json
 *_tree.txt
 parse.js
+
+# ...but real app assets under public/ must be committed
+!public/*.png
+!public/**/*.png

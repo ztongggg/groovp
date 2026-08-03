@@ -79,15 +79,9 @@ export default function SignupPage() {
       <div className="relative w-[402px] overflow-hidden bg-white" style={{ height: 874 }}>
         <div className="absolute" style={{ left: 296, top: 112, width: 87, height: 87, borderRadius: 11, background: "#f2a5bd" }} />
         <div className="absolute rounded-full" style={{ left: 20, top: 469, width: 62, height: 62, background: "#4ac7b2" }} />
-        {/* cloud blob mascot */}
-        <div className="absolute" style={{ left: 90, top: 200, width: 220, height: 200 }}>
-          <div className="absolute rounded-full" style={{ left: 20, top: 40, width: 180, height: 150, background: "#35d7ff" }} />
-          <div className="absolute rounded-full" style={{ left: 0, top: 70, width: 90, height: 90, background: "#35d7ff" }} />
-          <div className="absolute rounded-full" style={{ right: 0, top: 70, width: 90, height: 90, background: "#35d7ff" }} />
-          <span className="absolute rounded-full" style={{ left: 78, top: 100, width: 22, height: 30, background: "#0b2a5b" }} />
-          <span className="absolute rounded-full" style={{ right: 78, top: 100, width: 22, height: 30, background: "#0b2a5b" }} />
-          <span className="absolute rounded-full" style={{ left: "50%", transform: "translateX(-50%)", top: 140, width: 16, height: 22, background: "#1d4ed8" }} />
-        </div>
+        {/* real Figma illustration (node 570:15162), exact position */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/signup-cloud.png" alt="" className="pointer-events-none absolute" style={{ left: -48, top: 88, width: 500, height: 500 }} />
         <div className="absolute" style={{ left: 32, top: 600, width: 340, fontSize: 28, fontWeight: 800, color: "#1e1b4b", lineHeight: "34px" }}>Just a few questions before you start!</div>
         <div className="absolute" style={{ left: 32, top: 700, width: 340, fontSize: 14, fontWeight: 400, color: "#6b6678", lineHeight: "17px" }}>Tell us a bit about yourself so we can match you with teammates who fit — from skills to working style.</div>
         <button onClick={() => setIntro(false)} className="absolute flex items-center justify-center" style={{ left: 32, top: 800, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
