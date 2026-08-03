@@ -3,14 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 
+const BLOB_IMG = { "#4ac7b2": "teal", "#f2a5bd": "pink", "#f29c38": "orange", "#7c3aed": "teal" };
 function AvatarBlob({ color }) {
-  return (
-    <div className="relative" style={{ width: 48, height: 48, borderRadius: 14, background: color }}>
-      <span className="absolute rounded-full bg-white" style={{ left: 9, top: 18, width: 7, height: 7 }} />
-      <span className="absolute rounded-full bg-white" style={{ left: 33, top: 18, width: 7, height: 7 }} />
-      <span className="absolute rounded-full bg-white" style={{ left: 17, top: 28, width: 14, height: 3 }} />
-    </div>
-  );
+  const name = BLOB_IMG[color] || "teal";
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={`/blob-${name}.png`} alt="" style={{ width: 48, height: 48, borderRadius: 14 }} />;
 }
 
 const STATUS = {
