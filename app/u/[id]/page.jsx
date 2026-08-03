@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import RateForm from "@/components/RateForm";
+import ModerationMenu from "@/components/ModerationMenu";
 import { createClient } from "@/lib/supabase/server";
 
 async function getData(id) {
@@ -15,14 +16,22 @@ async function getData(id) {
       .select("id, stars, comment, created_at, rater:profiles!ratings_rater_id_fkey(full_name, username)")
       .eq("ratee_id", id)
       .order("created_at", { ascending: false });
-    return { me: user?.id || null, p, ratings: ratings || [] };
+
+    let blocked = false;
+    if (user) {
+      try {
+        const { data: b } = await supabase.from("blocks").select("blocked_id").eq("blocker_id", user.id).eq("blocked_id", id).maybeSingle();
+        blocked = !!b;
+      } catch {}
+    }
+    return { me: user?.id || null, p, ratings: ratings || [], blocked };
   } catch {
-    return { me: null, p: null, ratings: [] };
+    return { me: null, p: null, ratings: [], blocked: false };
   }
 }
 
 export default async function UserProfilePage({ params }) {
-  const { me, p, ratings } = await getData(params.id);
+  const { me, p, ratings, blocked } = await getData(params.id);
 
   if (!p) {
     return (
@@ -43,7 +52,17 @@ export default async function UserProfilePage({ params }) {
       <div className="min-h-full bg-white pb-8">
         <div className="relative h-32" style={{ background: "linear-gradient(135deg,#2d1a6b,#5929bf)" }}>
           <Link href="/applicants" className="absolute left-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/85 text-[18px] text-navy">‹</Link>
+          {me && me !== p.id && (
+            <div className="absolute right-5 top-5">
+              <ModerationMenu userId={p.id} name={name} blocked={blocked} />
+            </div>
+          )}
         </div>
+        {blocked && (
+          <div className="mx-6 mt-4 rounded-xl bg-[#fae0e0] px-4 py-3 text-[13px] font-semibold text-[#bf4247]">
+            You've blocked this user. Open the ⋯ menu to unblock.
+          </div>
+        )}
 
         <div className="px-6">
           <div className="-mt-12 flex items-end gap-4">
