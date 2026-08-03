@@ -2,17 +2,14 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
+import StatusBar from "@/components/StatusBar";
 import { signIn } from "@/app/auth/actions";
 
-function SubmitButton({ children }) {
+function LoginButton() {
   const { pending } = useFormStatus();
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="mt-2 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white disabled:opacity-60"
-    >
-      {pending ? "…" : children}
+    <button type="submit" disabled={pending} className="absolute flex items-center justify-center disabled:opacity-70" style={{ left: 32, top: 513, width: 337, height: 56, borderRadius: 20, background: "#7c3aed" }}>
+      <span style={{ fontSize: 16, fontWeight: 900, color: "#fff" }}>{pending ? "…" : "Log in"}</span>
     </button>
   );
 }
@@ -21,39 +18,50 @@ export default function LoginPage() {
   const [state, formAction] = useFormState(signIn, {});
 
   return (
-    <div className="flex min-h-full flex-col bg-white px-6 pt-24">
-      <h1 className="text-[34px] font-extrabold text-purple-600">Groovp</h1>
-      <p className="mt-2 text-[16px] text-muted">Welcome back — log in to find your next team.</p>
+    <form action={formAction} className="relative w-[402px] bg-white" style={{ height: 874 }}>
+      <div className="absolute inset-x-0 top-0"><StatusBar /></div>
 
-      <form action={formAction} className="mt-8 flex flex-col gap-3">
-        <input
-          name="email"
-          type="email"
-          required
-          placeholder="Email"
-          className="rounded-2xl border border-line bg-bgapp px-4 py-4 text-[15px] text-navy focus:border-purple-600 focus:outline-none"
-        />
-        <input
-          name="password"
-          type="password"
-          required
-          placeholder="Password"
-          className="rounded-2xl border border-line bg-bgapp px-4 py-4 text-[15px] text-navy focus:border-purple-600 focus:outline-none"
-        />
+      {/* glow + mascot */}
+      <div className="absolute" style={{ left: 71, top: 40, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.35), rgba(124,58,237,0))" }} />
+      <div className="absolute" style={{ left: 148, top: 120, width: 106, height: 116, borderRadius: 60, background: "#7c3aed" }}>
+        <span className="absolute rounded-full bg-white" style={{ left: 30, top: 48, width: 12, height: 12 }} />
+        <span className="absolute rounded-full bg-white" style={{ right: 30, top: 48, width: 12, height: 12 }} />
+        <span className="absolute" style={{ left: "50%", transform: "translateX(-50%)", bottom: 32, width: 30, height: 14, borderBottom: "4px solid #fff", borderRadius: "0 0 16px 16px" }} />
+      </div>
 
-        {state?.error && (
-          <p className="text-[14px] font-medium text-badge-declinedText">{state.error}</p>
-        )}
+      <div className="absolute w-full text-center" style={{ top: 290, fontSize: 30, fontWeight: 900, color: "#1e1b4b" }}>Welcome back!</div>
 
-        <SubmitButton>Log In</SubmitButton>
-      </form>
+      {/* email */}
+      <div className="absolute flex items-center" style={{ left: 32, top: 346, width: 337, height: 49, borderRadius: 16, background: "#f3f1f8", paddingLeft: 44 }}>
+        <svg className="absolute" style={{ left: 16, top: 15 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="12" rx="2" /><path d="m4 8 8 5 8-5" /></svg>
+        <input name="email" type="text" required placeholder="Username or email" className="w-full bg-transparent focus:outline-none" style={{ fontSize: 15, fontWeight: 600, color: "#1e1b4b" }} />
+      </div>
 
-      <p className="mt-6 text-center text-[15px] text-muted">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-bold text-purple-600">
-          Sign up
-        </Link>
-      </p>
-    </div>
+      {/* password */}
+      <div className="absolute flex items-center" style={{ left: 32, top: 412, width: 337, height: 49, borderRadius: 16, background: "#f3f1f8", paddingLeft: 44, paddingRight: 44 }}>
+        <svg className="absolute" style={{ left: 16, top: 15 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+        <input name="password" type="password" required placeholder="Password" className="w-full bg-transparent focus:outline-none" style={{ fontSize: 15, fontWeight: 600, color: "#1e1b4b" }} />
+      </div>
+
+      <Link href="/signup" className="absolute" style={{ right: 33, top: 474, fontSize: 12, fontWeight: 700, color: "#7c3aed" }}>Forgot password?</Link>
+
+      {state?.error && (
+        <p className="absolute w-full text-center" style={{ top: 484, fontSize: 13, fontWeight: 600, color: "#bf4247" }}>{state.error}</p>
+      )}
+
+      <LoginButton />
+
+      {/* LinkedIn (visual only) */}
+      <button type="button" className="absolute flex items-center justify-center gap-2" style={{ left: 32, top: 588, width: 337, height: 49, borderRadius: 20, background: "#7c3aed" }}>
+        <span className="flex h-5 w-5 items-center justify-center rounded" style={{ background: "#fff" }}><span style={{ fontSize: 11, fontWeight: 900, color: "#0a66c2" }}>in</span></span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Verify with LinkedIn</span>
+      </button>
+
+      {/* sign up */}
+      <div className="absolute flex w-full items-center justify-center gap-1.5" style={{ top: 651 }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#6d7280" }}>Don&apos;t have an account?</span>
+        <Link href="/signup" style={{ fontSize: 13, fontWeight: 800, color: "#7c3aed" }}>Sign up</Link>
+      </div>
+    </form>
   );
 }
