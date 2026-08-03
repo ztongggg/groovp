@@ -49,11 +49,15 @@ export async function signUpFull(data) {
 
   const uid = auth.user?.id;
   if (uid) {
+    // skills may be strings (legacy) or { name, level } objects
+    const skillList = (data.skills || []).map((s) => (typeof s === "string" ? { name: s, level: "Basic" } : s));
+
     await supabase
       .from("profiles")
       .update({
         full_name: data.full_name,
         username: data.username,
+        gender: data.gender || null,
         university: data.university || "SUTD",
         major: data.major || null,
         year: data.year || null,
@@ -61,10 +65,18 @@ export async function signUpFull(data) {
         prefer_working: data.prefer_working || null,
         best_work_time: data.best_work_time || null,
         location: data.location || null,
-        skills: data.skills || [],
+        skills: skillList.map((s) => s.name),
         interests: data.interests || [],
       })
       .eq("id", uid);
+
+    // proficiency detail — needs the v2 migration; ignore if the table isn't there yet
+    if (skillList.length) {
+      await supabase
+        .from("user_skills")
+        .insert(skillList.map((s) => ({ user_id: uid, skill_name: s.name, proficiency: s.level })))
+        .then(() => {}, () => {});
+    }
   }
 
   revalidatePath("/", "layout");

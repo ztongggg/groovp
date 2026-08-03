@@ -50,10 +50,13 @@ export default function SignupPage() {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [] });
+  const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [] });
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
+  const hasSkill = (n) => d.skills.some((s) => s.name === n);
+  const toggleSkill = (n) => setD((s) => ({ ...s, skills: s.skills.some((x) => x.name === n) ? s.skills.filter((x) => x.name !== n) : [...s.skills, { name: n, level: "Basic" }] }));
+  const setSkillLevel = (n, level) => setD((s) => ({ ...s, skills: s.skills.map((x) => (x.name === n ? { ...x, level } : x)) }));
   const canNext = () => {
     if (step === 0) return d.full_name && d.username && d.email && d.password.length >= 6;
     if (step === 1) return d.major && d.year;
@@ -138,6 +141,8 @@ export default function SignupPage() {
             <Field icon={I.book} placeholder="Major (e.g. Computer Science)" value={d.major} onChange={(e) => set("major", e.target.value)} />
             <p className="mt-2 text-[13px] font-bold uppercase tracking-wide text-muted">Year of study</p>
             <div className="flex flex-wrap gap-2">{YEARS.map((y) => <Chip key={y} active={d.year === y} onClick={() => set("year", y)}>{y}</Chip>)}</div>
+            <p className="mt-2 text-[13px] font-bold uppercase tracking-wide text-muted">How do you identify?</p>
+            <div className="flex flex-wrap gap-2">{["Woman", "Man", "Non-binary", "Prefer not to say"].map((g) => <Chip key={g} active={d.gender === g} onClick={() => set("gender", g)}>{g}</Chip>)}</div>
           </div>
         )}
         {step === 2 && (
@@ -150,7 +155,28 @@ export default function SignupPage() {
             ))}
           </div>
         )}
-        {step === 3 && <div className="flex flex-wrap gap-2.5">{SKILL_OPTIONS.map((x) => <Chip key={x} active={d.skills.includes(x)} onClick={() => toggle("skills", x)}>{x}</Chip>)}</div>}
+        {step === 3 && (
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-2.5">
+              {SKILL_OPTIONS.map((x) => <Chip key={x} active={hasSkill(x)} onClick={() => toggleSkill(x)}>{x}</Chip>)}
+            </div>
+            {d.skills.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <p className="text-[13px] font-bold uppercase tracking-wide text-muted">Set your level</p>
+                {d.skills.map((s) => (
+                  <div key={s.name} className="flex items-center justify-between rounded-xl bg-[#f3f1f8] px-3 py-2">
+                    <span className="text-[14px] font-semibold text-navy">{s.name}</span>
+                    <div className="flex gap-1">
+                      {["Basic", "Pro", "Expert"].map((lv) => (
+                        <button key={lv} type="button" onClick={() => setSkillLevel(s.name, lv)} className="rounded-md px-2.5 py-1 text-[11px] font-bold" style={{ background: s.level === lv ? "#7c3aed" : "#fff", color: s.level === lv ? "#fff" : "#757080" }}>{lv}</button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         {step === 4 && <div className="flex flex-wrap gap-2.5">{INTEREST_OPTIONS.map((x) => <Chip key={x} active={d.interests.includes(x)} onClick={() => toggle("interests", x)}>{x}</Chip>)}</div>}
         {error && <p className="mt-4 text-[14px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
       </div>

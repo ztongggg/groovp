@@ -37,6 +37,26 @@ function TagCard({ label, tags }) {
   );
 }
 
+function SkillsCard({ skills }) {
+  return (
+    <div className="rounded-2xl border border-[#ede9fe] bg-white p-5">
+      <p className="mb-3 text-[13px] font-bold uppercase tracking-wide text-muted">Skills</p>
+      {skills.length === 0 ? (
+        <p className="text-[14px] text-muted">Nothing added yet.</p>
+      ) : (
+        <div className="flex flex-wrap gap-2.5">
+          {skills.map((s) => (
+            <span key={s.name} className="inline-flex items-center gap-1.5 rounded-full bg-[#f0eef5] py-2 pl-4 pr-2 text-[14px] font-semibold text-navy">
+              {s.name}
+              {s.level && <span className="rounded-full bg-[#e2dfea] px-2 py-0.5 text-[11px] font-bold text-[#6b6678]">{s.level}</span>}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ProfileView({ name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [] }) {
   const [tab, setTab] = useState("about");
 
@@ -87,7 +107,7 @@ export default function ProfileView({ name, username, subtitle, ratingLabel, rat
               </div>
             </div>
 
-            <TagCard label="Skills" tags={skills} />
+            <SkillsCard skills={skills} />
             <TagCard label="Interests" tags={interests} />
 
             <form action={signOut}>
