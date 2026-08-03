@@ -19,15 +19,22 @@ function GreetingBanner({ name, unread = 0 }) {
       </Link>
       <div className="absolute" style={{ left: 20, top: 90, width: 210, fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: "32px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</div>
       <div className="absolute" style={{ left: 20, top: 130, fontSize: 12.5, fontWeight: 600, color: "#c7c3e0" }}>Ready to find your next project?</div>
-      <div className="absolute rounded-full" style={{ left: 222, top: 50, width: 150, height: 150, background: "#e8a99f" }} />
-      <span className="absolute" style={{ left: 300, top: 40, width: 2, height: 14, background: "#1f1a26" }} />
-      <span className="absolute rounded-full" style={{ left: 296, top: 34, width: 10, height: 10, background: "#e8a99f", border: "2px solid #1f1a26" }} />
-      <span className="absolute rounded-full" style={{ left: 266, top: 85, width: 30, height: 30, border: "2px solid #14121a" }} />
-      <span className="absolute rounded-full" style={{ left: 298, top: 83, width: 34, height: 34, border: "2px solid #14121a" }} />
-      <span className="absolute" style={{ left: 296, top: 99, width: 4, height: 2, background: "#14121a" }} />
+      {/* skin (exact: #c4b5fd) */}
+      <div className="absolute rounded-full" style={{ left: 222, top: 50, width: 150, height: 150, background: "#c4b5fd" }} />
+      {/* antenna curl */}
+      <span className="absolute" style={{ left: 204, top: 50, width: 18, height: 42, borderLeft: "2px solid #1f1a26", borderTop: "2px solid #1f1a26", borderTopLeftRadius: 18 }} />
+      {/* legs */}
+      <span className="absolute" style={{ left: 279, top: 173, width: 0, height: 22, borderLeft: "2px solid #1f1a26" }} />
+      <span className="absolute" style={{ left: 315, top: 173, width: 0, height: 22, borderLeft: "2px solid #1f1a26" }} />
+      {/* white glasses */}
+      <span className="absolute rounded-full" style={{ left: 266, top: 85, width: 30, height: 30, border: "3px solid #fff" }} />
+      <span className="absolute rounded-full" style={{ left: 298, top: 83, width: 34, height: 34, border: "3px solid #fff" }} />
+      <span className="absolute" style={{ left: 296, top: 99, width: 4, height: 3, background: "#fff" }} />
+      {/* eyes */}
       <span className="absolute rounded-full" style={{ left: 279, top: 98, width: 5, height: 5, background: "#14121a" }} />
       <span className="absolute rounded-full" style={{ left: 313, top: 98, width: 5, height: 5, background: "#14121a" }} />
-      <span className="absolute" style={{ left: 291, top: 120, width: 12, height: 6, borderBottom: "2px solid #14121a", borderRadius: "0 0 8px 8px" }} />
+      {/* smile */}
+      <span className="absolute" style={{ left: 291, top: 118, width: 12, height: 6, borderBottom: "2px solid #14121a", borderRadius: "0 0 8px 8px" }} />
     </div>
   );
 }

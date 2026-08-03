@@ -46,11 +46,8 @@ export default function CreateProjectPage() {
   if (done) {
     return (
       <div className="relative flex w-[402px] flex-col items-center bg-white px-8 pt-40 text-center" style={{ height: 874 }}>
-        <div className="relative mb-8 h-32 w-32 rounded-full" style={{ background: "#4ac7b2" }}>
-          <span className="absolute rounded-full bg-white" style={{ left: 38, top: 52, width: 14, height: 14 }} />
-          <span className="absolute rounded-full bg-white" style={{ right: 38, top: 52, width: 14, height: 14 }} />
-          <span className="absolute" style={{ left: "50%", transform: "translateX(-50%)", bottom: 40, width: 34, height: 16, borderBottom: "4px solid #fff", borderRadius: "0 0 18px 18px" }} />
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/blob-teal.png" alt="" className="mb-8 h-32 w-32" style={{ borderRadius: 28 }} />
         <h1 className="text-[26px] font-extrabold text-navy">Congrats! 🎉</h1>
         <p className="mt-2 text-[16px] text-muted">You created <span className="font-bold text-navy">{done.name}</span>.</p>
         <Link href={`/project/${done.projectId}`} className="mt-8 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white">Go to project</Link>
