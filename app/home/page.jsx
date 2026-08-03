@@ -27,17 +27,20 @@ async function getData() {
 
     const { data: rows } = await supabase
       .from("projects")
-      .select("id,name,description,skills_needed,timeline_start,timeline_end,max_size")
+      .select("id,name,description,skills_needed,timeline_start,timeline_end,max_size, groups(group_members(count))")
       .order("created_at", { ascending: false });
 
-    const projects = (rows || []).map((p) => ({
-      id: p.id,
-      title: p.name,
-      desc: p.description || "",
-      skills: p.skills_needed || [],
-      count: `1/${p.max_size || 0}`,
-      date: `${fmt(p.timeline_start)} - ${fmt(p.timeline_end)}`,
-    }));
+    const projects = (rows || []).map((p) => {
+      const members = p.groups?.[0]?.group_members?.[0]?.count ?? 0;
+      return {
+        id: p.id,
+        title: p.name,
+        desc: p.description || "",
+        skills: p.skills_needed || [],
+        count: `${members}/${p.max_size || 0}`,
+        date: `${fmt(p.timeline_start)} - ${fmt(p.timeline_end)}`,
+      };
+    });
 
     return { name, projects };
   } catch {
