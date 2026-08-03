@@ -45,6 +45,11 @@ export default async function SettingsPage() {
             <span className="text-[18px] text-muted">›</span>
           </Link>
 
+          <Link href="/edit-profile" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
+            <span className="text-[15px] font-semibold text-navy">Edit Profile</span>
+            <span className="text-[18px] text-muted">›</span>
+          </Link>
+
           <ChangePasswordForm />
 
           {/* cosmetic section */}

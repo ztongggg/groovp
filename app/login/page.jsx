@@ -43,7 +43,7 @@ export default function LoginPage() {
         <input name="password" type="password" required placeholder="Password" className="w-full bg-transparent focus:outline-none" style={{ fontSize: 15, fontWeight: 600, color: "#1e1b4b" }} />
       </div>
 
-      <Link href="/signup" className="absolute" style={{ right: 33, top: 474, fontSize: 12, fontWeight: 700, color: "#7c3aed" }}>Forgot password?</Link>
+      <Link href="/forgot-password" className="absolute" style={{ right: 33, top: 474, fontSize: 12, fontWeight: 700, color: "#7c3aed" }}>Forgot password?</Link>
 
       {state?.error && (
         <p className="absolute w-full text-center" style={{ top: 484, fontSize: 13, fontWeight: 600, color: "#bf4247" }}>{state.error}</p>
