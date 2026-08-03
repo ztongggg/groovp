@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 function AvatarBlob({ color }) {
   return (
@@ -36,7 +37,17 @@ function RequestRow({ top, color, title, subtitle, applied, status }) {
   );
 }
 
-export default function TeamsView({ requests = [] }) {
+function TeamRow({ top, color, title, subtitle, href }) {
+  return (
+    <Link href={href} className="absolute" style={{ left: 24, top, width: 354, height: 92, borderRadius: 18, background: "#fff", border: "1px solid #f3f1f8" }}>
+      <div className="absolute" style={{ left: 16, top: 22 }}><AvatarBlob color={color} /></div>
+      <div className="absolute" style={{ left: 76, top: 24, fontSize: 14, fontWeight: 700, color: "#1d1b44" }}>{title}</div>
+      <div className="absolute" style={{ left: 76, top: 46, fontSize: 11, fontWeight: 400, color: "#757080" }}>{subtitle} · open chat ›</div>
+    </Link>
+  );
+}
+
+export default function TeamsView({ requests = [], teams = [] }) {
   const [tab, setTab] = useState("requested");
 
   return (
@@ -61,8 +72,12 @@ export default function TeamsView({ requests = [] }) {
             <RequestRow key={r.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={r.title} subtitle={r.subtitle} applied={r.applied} status={r.status} />
           ))
         )
+      ) : teams.length === 0 ? (
+        <div className="absolute" style={{ left: 24, top: 200, fontSize: 13, color: "#757080" }}>You&apos;re not in any teams yet.</div>
       ) : (
-        <div className="absolute" style={{ left: 24, top: 200, fontSize: 13, color: "#757080" }}>Your teams will appear here.</div>
+        teams.map((t, i) => (
+          <TeamRow key={t.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={t.title} subtitle={t.subtitle} href={`/chat/${t.id}`} />
+        ))
       )}
     </div>
   );

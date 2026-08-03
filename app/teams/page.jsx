@@ -12,38 +12,50 @@ function relTime(iso) {
   return w === 1 ? "Applied 1 week ago" : `Applied ${w} weeks ago`;
 }
 
-async function getRequests() {
+async function getData() {
   try {
     const supabase = createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return [];
+    if (!user) return { requests: [], teams: [] };
 
-    const { data, error } = await supabase
+    const { data: reqs } = await supabase
       .from("join_requests")
       .select("id,status,created_at, groups(name, projects(name))")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
-    if (error) return [];
 
-    return (data || []).map((r) => ({
+    const requests = (reqs || []).map((r) => ({
       id: r.id,
       status: r.status,
       title: r.groups?.projects?.name || "Project",
       subtitle: r.groups?.name || "Group",
       applied: relTime(r.created_at),
     }));
+
+    const { data: mem } = await supabase
+      .from("group_members")
+      .select("group_id, groups(id, name, projects(name))")
+      .eq("user_id", user.id);
+
+    const teams = (mem || []).map((m) => ({
+      id: m.groups?.id || m.group_id,
+      title: m.groups?.projects?.name || "Project",
+      subtitle: m.groups?.name || "Group",
+    }));
+
+    return { requests, teams };
   } catch {
-    return [];
+    return { requests: [], teams: [] };
   }
 }
 
 export default async function TeamsPage() {
-  const requests = await getRequests();
+  const { requests, teams } = await getData();
   return (
     <AppShell>
-      <TeamsView requests={requests} />
+      <TeamsView requests={requests} teams={teams} />
     </AppShell>
   );
 }
