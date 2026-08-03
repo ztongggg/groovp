@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { signOut } from "@/app/auth/actions";
 
 const PersonIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e1e1e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" /></svg>);
@@ -43,7 +44,7 @@ export default function ProfileView({ name, username, subtitle, ratingLabel, rat
     <div className="min-h-full w-[402px] bg-white pb-8">
       {/* Banner */}
       <div className="relative h-36" style={{ background: "linear-gradient(135deg,#2d1a6b,#5929bf)" }}>
-        <span className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/85 text-[18px]">⚙</span>
+        <Link href="/settings" aria-label="Settings" className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/85 text-[18px]">⚙</Link>
       </div>
 
       <div className="px-5">
