@@ -22,13 +22,13 @@ export async function requestToJoin(groupId) {
     return { error: error.message };
   }
 
-  // notify the group's leader
-  const { data: g } = await supabase.from("groups").select("leader_id, name, projects(name)").eq("id", groupId).single();
-  if (g?.leader_id && g.leader_id !== user.id) {
-    await supabase
-      .from("notifications")
-      .insert({ user_id: g.leader_id, type: "new_join_requests", related_id: groupId, body: `New request to join ${g.projects?.name || g.name}` })
-      .then(() => {}, () => {});
-  }
+  // notify the group's leader (two plain queries — no embed, which was failing)
+  try {
+    const { data: g } = await supabase.from("groups").select("leader_id, project_id, name").eq("id", groupId).single();
+    if (g?.leader_id && g.leader_id !== user.id) {
+      const { data: proj } = await supabase.from("projects").select("name").eq("id", g.project_id).single();
+      await supabase.from("notifications").insert({ user_id: g.leader_id, type: "new_join_requests", related_id: groupId, body: `New request to join ${proj?.name || g.name}` });
+    }
+  } catch {}
   return { ok: true };
 }
