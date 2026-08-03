@@ -16,6 +16,7 @@ async function getData() {
     } = await supabase.auth.getUser();
 
     let name = "there";
+    let unread = 0;
     if (user) {
       const { data: profile } = await supabase
         .from("profiles")
@@ -23,6 +24,10 @@ async function getData() {
         .eq("id", user.id)
         .single();
       name = profile?.full_name || (user.email || "there").split("@")[0];
+      try {
+        const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("read", false);
+        unread = count || 0;
+      } catch {}
     }
 
     const { data: rows } = await supabase
@@ -42,17 +47,17 @@ async function getData() {
       };
     });
 
-    return { name, projects };
+    return { name, projects, unread };
   } catch {
-    return { name: "there", projects: [] };
+    return { name: "there", projects: [], unread: 0 };
   }
 }
 
 export default async function HomePage() {
-  const { name, projects } = await getData();
+  const { name, projects, unread } = await getData();
   return (
     <AppShell>
-      <HomeView name={name} projects={projects} />
+      <HomeView name={name} projects={projects} unread={unread} />
     </AppShell>
   );
 }

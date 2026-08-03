@@ -17,6 +17,13 @@ export async function acceptRequest(id, groupId, applicantId) {
     .from("group_members")
     .insert({ group_id: groupId, user_id: applicantId, role: "member" });
 
+  // notify the accepted applicant
+  const { data: g } = await supabase.from("groups").select("name, projects(name)").eq("id", groupId).single();
+  await supabase
+    .from("notifications")
+    .insert({ user_id: applicantId, type: "join_accepted", related_id: groupId, body: `You're in! Accepted into ${g?.projects?.name || g?.name || "a group"}` })
+    .then(() => {}, () => {});
+
   revalidatePath("/applicants");
   return { ok: true };
 }

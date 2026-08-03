@@ -5,12 +5,18 @@ import Link from "next/link";
 import StatusBar from "@/components/StatusBar";
 import HomeProjectCard from "@/components/HomeProjectCard";
 
-function GreetingBanner({ name }) {
+function GreetingBanner({ name, unread = 0 }) {
   return (
     <div className="relative overflow-hidden" style={{ height: 178, borderRadius: 24, background: "#1e1b4b" }}>
       {[[20, 22], [38, 22], [20, 40], [38, 40]].map(([l, t], i) => (
         <span key={i} className="absolute rounded-full" style={{ left: l, top: t, width: 9, height: 9, background: "#f472b6" }} />
       ))}
+      <Link href="/notifications" aria-label="Notifications" className="absolute" style={{ right: 18, top: 18, zIndex: 3 }}>
+        <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+          {unread > 0 && <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full border-2 border-[#1e1b4b] bg-[#f472b6]" />}
+        </span>
+      </Link>
       <div className="absolute" style={{ left: 20, top: 90, width: 210, fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: "32px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</div>
       <div className="absolute" style={{ left: 20, top: 130, fontSize: 12.5, fontWeight: 600, color: "#c7c3e0" }}>Ready to find your next project?</div>
       <div className="absolute rounded-full" style={{ left: 222, top: 50, width: 150, height: 150, background: "#e8a99f" }} />
@@ -46,7 +52,7 @@ function EmptyRow() {
   return <div className="px-[30px] py-6 text-[14px] text-muted">No projects yet — create one from Discover.</div>;
 }
 
-export default function HomeView({ name = "there", projects = [] }) {
+export default function HomeView({ name = "there", projects = [], unread = 0 }) {
   const [feed, setFeed] = useState("popular");
   const latest = [...projects].reverse();
 
@@ -56,7 +62,7 @@ export default function HomeView({ name = "there", projects = [] }) {
 
       <div className="px-5">
         <div className="mt-2">
-          <GreetingBanner name={name} />
+          <GreetingBanner name={name} unread={unread} />
         </div>
       </div>
 

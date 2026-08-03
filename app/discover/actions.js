@@ -21,5 +21,14 @@ export async function requestToJoin(groupId) {
     if (error.code === "23505") return { ok: true, already: true }; // unique violation
     return { error: error.message };
   }
+
+  // notify the group's leader
+  const { data: g } = await supabase.from("groups").select("leader_id, name, projects(name)").eq("id", groupId).single();
+  if (g?.leader_id && g.leader_id !== user.id) {
+    await supabase
+      .from("notifications")
+      .insert({ user_id: g.leader_id, type: "new_join_requests", related_id: groupId, body: `New request to join ${g.projects?.name || g.name}` })
+      .then(() => {}, () => {});
+  }
   return { ok: true };
 }
