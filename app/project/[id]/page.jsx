@@ -89,9 +89,9 @@ export default async function ProjectDetailPage({ params }) {
                     <div className="mt-3 flex items-center justify-between">
                       <div className="flex -space-x-2">
                         {members.slice(0, 5).map((m, i) => (
-                          <span key={m.user_id} className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-[11px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
+                          <Link key={m.user_id} href={`/u/${m.user_id}`} className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-[11px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
                             {(m.profiles?.full_name || m.profiles?.username || "?").slice(0, 2).toUpperCase()}
-                          </span>
+                          </Link>
                         ))}
                       </div>
                       <JoinGroupButton groupId={g.id} full={full} />

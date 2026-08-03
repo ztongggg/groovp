@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { acceptRequest, declineRequest } from "@/app/applicants/actions";
 
 export default function ApplicantCard({ id, groupId, applicantId, name, username, skills = [], project, group, comment }) {
@@ -27,7 +28,7 @@ export default function ApplicantCard({ id, groupId, applicantId, name, username
 
   return (
     <div className="rounded-2xl border border-line bg-white p-4 shadow-card">
-      <div className="flex items-center gap-3">
+      <Link href={`/u/${applicantId}`} className="flex items-center gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-full text-[13px] font-bold text-white" style={{ background: "#7c3aed" }}>
           {(name || "?").slice(0, 2).toUpperCase()}
         </span>
@@ -35,7 +36,8 @@ export default function ApplicantCard({ id, groupId, applicantId, name, username
           <p className="truncate text-[15px] font-bold text-navy">{name}</p>
           <p className="truncate text-[12px] text-muted">@{username} · wants to join {project}</p>
         </div>
-      </div>
+        <span className="text-[18px] text-muted">›</span>
+      </Link>
 
       {skills.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
