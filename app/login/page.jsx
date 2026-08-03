@@ -23,11 +23,8 @@ export default function LoginPage() {
 
       {/* glow + mascot */}
       <div className="absolute" style={{ left: 71, top: 40, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.35), rgba(124,58,237,0))" }} />
-      <div className="absolute" style={{ left: 148, top: 120, width: 106, height: 116, borderRadius: 60, background: "#7c3aed" }}>
-        <span className="absolute rounded-full bg-white" style={{ left: 30, top: 48, width: 12, height: 12 }} />
-        <span className="absolute rounded-full bg-white" style={{ right: 30, top: 48, width: 12, height: 12 }} />
-        <span className="absolute" style={{ left: "50%", transform: "translateX(-50%)", bottom: 32, width: 30, height: 14, borderBottom: "4px solid #fff", borderRadius: "0 0 16px 16px" }} />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/login-mascot.png" alt="" className="pointer-events-none absolute" style={{ left: 128, top: 105, width: 145, height: 147 }} />
 
       <div className="absolute w-full text-center" style={{ top: 290, fontSize: 30, fontWeight: 900, color: "#1e1b4b" }}>Welcome back!</div>
 
