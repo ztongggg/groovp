@@ -14,24 +14,32 @@ const AVATAR_COLORS = ["#e8863b", "#34b9a8", "#f2a5bd", "#7c3aed"];
 
 // Resilient: on any failure (e.g. local corp-proxy TLS) return [] so the page
 // still renders. Real data loads on Vercel.
-async function getProjects() {
+async function getData() {
   try {
     const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    let mine = new Set();
+    if (user) {
+      const { data: p } = await supabase.from("profiles").select("skills, interests").eq("id", user.id).single();
+      mine = new Set([...(p?.skills || []), ...(p?.interests || [])].map((s) => s.toLowerCase()));
+    }
+
     const { data, error } = await supabase
       .from("projects")
-      .select(
-        "id,name,description,skills_needed,timeline_start,timeline_end,min_size,max_size, groups(id, group_members(count))"
-      )
+      .select("id,name,description,skills_needed,interests,timeline_start,timeline_end,min_size,max_size, groups(id, group_members(count))")
       .order("created_at", { ascending: false });
-    if (error) return [];
-    return data || [];
+    if (error) return { projects: [], mine };
+    return { projects: data || [], mine };
   } catch {
-    return [];
+    return { projects: [], mine: new Set() };
   }
 }
 
 export default async function DiscoverPage() {
-  const projects = await getProjects();
+  const { projects, mine } = await getData();
 
   return (
     <AppShell>
@@ -71,6 +79,8 @@ export default async function DiscoverPage() {
             {projects.map((p, i) => {
               const group = p.groups?.[0];
               const members = group?.group_members?.[0]?.count ?? 0;
+              const tags = [...(p.skills_needed || []), ...(p.interests || [])];
+              const shared = tags.filter((t) => mine.has((t || "").toLowerCase())).length;
               return (
                 <DiscoverCard
                   key={p.id}
@@ -82,6 +92,8 @@ export default async function DiscoverPage() {
                   avatarColor={AVATAR_COLORS[i % AVATAR_COLORS.length]}
                   initials={(p.name || "P").slice(0, 2).toUpperCase()}
                   groupId={group?.id}
+                  projectId={p.id}
+                  strongMatch={shared >= 2}
                 />
               );
             })}
