@@ -52,12 +52,12 @@ export async function signUpFull(data) {
     // skills may be strings (legacy) or { name, level } objects
     const skillList = (data.skills || []).map((s) => (typeof s === "string" ? { name: s, level: "Basic" } : s));
 
+    // Core fields (exist pre-v2) — must always save.
     await supabase
       .from("profiles")
       .update({
         full_name: data.full_name,
         username: data.username,
-        gender: data.gender || null,
         university: data.university || "SUTD",
         major: data.major || null,
         year: data.year || null,
@@ -69,6 +69,11 @@ export async function signUpFull(data) {
         interests: data.interests || [],
       })
       .eq("id", uid);
+
+    // v2-only column — separate call so a missing column can't reject the core update.
+    if (data.gender) {
+      await supabase.from("profiles").update({ gender: data.gender }).eq("id", uid).then(() => {}, () => {});
+    }
 
     // proficiency detail — needs the v2 migration; ignore if the table isn't there yet
     if (skillList.length) {
