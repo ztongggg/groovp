@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { sendMessage } from "@/app/chat/actions";
+import { sendMessage, sendDM } from "@/app/chat/actions";
 
-export default function ChatView({ groupId, title, meId, messages = [] }) {
+export default function ChatView({ groupId, conversationId, title, meId, messages = [], backHref = "/teams" }) {
   const router = useRouter();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -16,7 +16,7 @@ export default function ChatView({ groupId, title, meId, messages = [] }) {
     if (!body || sending) return;
     setSending(true);
     setText("");
-    const res = await sendMessage(groupId, body);
+    const res = conversationId ? await sendDM(conversationId, body) : await sendMessage(groupId, body);
     setSending(false);
     if (res?.error) {
       setText(body);
@@ -29,7 +29,7 @@ export default function ChatView({ groupId, title, meId, messages = [] }) {
     <div className="flex h-full w-[402px] flex-col bg-bgapp">
       {/* header */}
       <div className="flex items-center gap-3 border-b border-line bg-white px-5 py-4">
-        <Link href="/teams" className="text-[22px] text-navy">‹</Link>
+        <Link href={backHref} className="text-[22px] text-navy">‹</Link>
         <p className="text-[17px] font-bold text-navy">{title}</p>
       </div>
 

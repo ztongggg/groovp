@@ -43,9 +43,28 @@ async function getData() {
       id: m.groups?.id || m.group_id,
       title: m.groups?.projects?.name || "Project",
       subtitle: m.groups?.name || "Group",
+      kind: "group",
     }));
 
-    return { requests, teams };
+    // private conversations (merged into the inbox per spec)
+    let dms = [];
+    try {
+      const { data: myParts } = await supabase.from("conversation_participants").select("conversation_id").eq("user_id", user.id);
+      const convIds = (myParts || []).map((r) => r.conversation_id);
+      if (convIds.length) {
+        const { data: convs } = await supabase.from("conversations").select("id").eq("type", "private").in("id", convIds);
+        const privIds = (convs || []).map((c) => c.id);
+        if (privIds.length) {
+          const { data: others } = await supabase.from("conversation_participants").select("conversation_id, user_id").in("conversation_id", privIds).neq("user_id", user.id);
+          const otherIds = [...new Set((others || []).map((o) => o.user_id))];
+          const { data: profs } = await supabase.from("profiles").select("id, full_name, username").in("id", otherIds);
+          const pmap = Object.fromEntries((profs || []).map((p) => [p.id, p.full_name || p.username || "User"]));
+          dms = (others || []).map((o) => ({ id: o.conversation_id, title: pmap[o.user_id] || "User", subtitle: "Direct message", kind: "dm" }));
+        }
+      }
+    } catch {}
+
+    return { requests, teams: [...teams, ...dms] };
   } catch {
     return { requests: [], teams: [] };
   }

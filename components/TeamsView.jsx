@@ -76,7 +76,7 @@ export default function TeamsView({ requests = [], teams = [] }) {
         <div className="absolute" style={{ left: 24, top: 200, fontSize: 13, color: "#757080" }}>You&apos;re not in any teams yet.</div>
       ) : (
         teams.map((t, i) => (
-          <TeamRow key={t.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={t.title} subtitle={t.subtitle} href={`/chat/${t.id}`} />
+          <TeamRow key={t.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={t.title} subtitle={t.subtitle} href={t.kind === "dm" ? `/dm/${t.id}` : `/chat/${t.id}`} />
         ))
       )}
     </div>

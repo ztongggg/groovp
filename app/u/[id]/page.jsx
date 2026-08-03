@@ -2,6 +2,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import RateForm from "@/components/RateForm";
 import ModerationMenu from "@/components/ModerationMenu";
+import MessageButton from "@/components/MessageButton";
 import { createClient } from "@/lib/supabase/server";
 
 async function getData(id) {
@@ -78,7 +79,10 @@ export default async function UserProfilePage({ params }) {
           </div>
 
           <p className="mt-3 text-[15px] text-muted">{subtitle}</p>
-          <p className="mt-1 text-[16px] font-extrabold text-navy">★ {avg || "New"} <span className="text-[13px] font-normal text-muted">({count} Ratings)</span></p>
+          <div className="mt-1 flex items-center justify-between">
+            <p className="text-[16px] font-extrabold text-navy">★ {avg || "New"} <span className="text-[13px] font-normal text-muted">({count} Ratings)</span></p>
+            {me && me !== p.id && !blocked && <MessageButton userId={p.id} />}
+          </div>
 
           {personality.length > 0 && (
             <div className="mt-5 flex flex-wrap gap-2">
