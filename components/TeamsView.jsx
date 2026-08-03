@@ -70,7 +70,12 @@ export default function TeamsView({ requests = [], teams = [] }) {
           ))
         )
       ) : teams.length === 0 ? (
-        <div className="absolute" style={{ left: 24, top: 200, fontSize: 13, color: "#757080" }}>You&apos;re not in any teams yet.</div>
+        <div className="absolute flex w-full flex-col items-center px-8 text-center" style={{ top: 190 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/empty-teams.png" alt="" className="mb-4 h-40 w-40" />
+          <p className="text-[16px] font-semibold text-navy">You&apos;re not on a team yet</p>
+          <p className="mt-1 text-[14px] text-muted">Browse Discover to find a project, or start your own.</p>
+        </div>
       ) : (
         teams.map((t, i) => (
           <TeamRow key={t.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={t.title} subtitle={t.subtitle} href={t.kind === "dm" ? `/dm/${t.id}` : `/chat/${t.id}`} />

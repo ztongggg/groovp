@@ -52,7 +52,9 @@ export default async function NotificationsPage() {
         </div>
 
         {notifs.length === 0 ? (
-          <div className="mt-24 px-8 text-center">
+          <div className="mt-16 flex flex-col items-center px-8 text-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/empty-notif.png" alt="" className="mb-4 h-36 w-36" />
             <p className="text-[16px] font-semibold text-navy">You're all caught up</p>
             <p className="mt-1 text-[14px] text-muted">New activity on your projects shows up here.</p>
           </div>
