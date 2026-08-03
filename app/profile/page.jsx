@@ -12,6 +12,7 @@ async function getProfile() {
     personality: {},
     skills: [],
     interests: [],
+    pastProjects: [],
   };
   try {
     const supabase = createClient();
@@ -34,6 +35,12 @@ async function getProfile() {
     const avg = count ? (ratings.reduce((s, r) => s + r.stars, 0) / count).toFixed(1) : null;
     const emailName = (user.email || "student").split("@")[0];
 
+    let pastProjects = [];
+    try {
+      const { data: pp } = await supabase.from("past_projects").select("id, role, write_up, created_at").eq("user_id", user.id).order("created_at", { ascending: false });
+      pastProjects = pp || [];
+    } catch {}
+
     const subtitleParts = [p?.year, p?.major, p?.university || "SUTD"].filter(Boolean);
 
     return {
@@ -50,6 +57,7 @@ async function getProfile() {
       },
       skills,
       interests: p?.interests || [],
+      pastProjects,
     };
   } catch {
     return fallback;

@@ -18,7 +18,14 @@ async function getProject(id) {
       .eq("id", id)
       .single();
     if (error) return null;
-    return { ...data, meId: user?.id || null };
+    let favorited = false;
+    if (user) {
+      try {
+        const { data: f } = await supabase.from("project_favorites").select("project_id").eq("user_id", user.id).eq("project_id", id).maybeSingle();
+        favorited = !!f;
+      } catch {}
+    }
+    return { ...data, meId: user?.id || null, favorited };
   } catch {
     return null;
   }
@@ -57,6 +64,8 @@ export default async function ProjectDetailPage({ params }) {
       maxSize={p.max_size}
       groups={groups}
       meId={p.meId}
+      projectId={p.id}
+      favorited={p.favorited}
     />
   );
 }

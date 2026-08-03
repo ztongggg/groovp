@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import JoinGroupButton from "@/components/JoinGroupButton";
+import FavoriteButton from "@/components/FavoriteButton";
 
 const AVATAR = ["#e8863b", "#34b9a8", "#f2a5bd", "#7c3aed", "#4ac7b2"];
 
-export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId }) {
+export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId, projectId, favorited }) {
   const [tab, setTab] = useState("info");
   const totalMembers = groups.reduce((n, g) => n + (g.members?.length || 0), 0);
 
@@ -15,9 +16,9 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
       {/* navy cover banner */}
       <div className="relative" style={{ height: 260, background: "#1e1b4b" }}>
         <Link href="/discover" className="absolute left-5 top-14 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-[18px] text-white">‹</Link>
-        <span className="absolute right-5 top-14 flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="2.4" /><circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="19" r="2.4" /><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4" /></svg>
-        </span>
+        <div className="absolute right-5 top-14">
+          <FavoriteButton projectId={projectId} initial={favorited} />
+        </div>
         <div className="absolute" style={{ left: 34, top: 103, width: 334, height: 130, borderRadius: 16, background: "#d9d9d9" }} />
       </div>
 

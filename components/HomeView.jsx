@@ -67,7 +67,7 @@ export default function HomeView({ name = "there", projects = [], unread = 0 }) 
       </div>
 
       <div className="mt-3 flex gap-4 px-[30px]">
-        <ShortcutButton label="Saved">
+        <ShortcutButton label="Saved" href="/saved">
           <svg width="12" height="15" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h12v18l-6-4-6 4V3Z" /></svg>
         </ShortcutButton>
         <ShortcutButton label="Requests" href="/applicants">

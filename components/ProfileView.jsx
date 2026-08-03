@@ -57,7 +57,7 @@ function SkillsCard({ skills }) {
   );
 }
 
-export default function ProfileView({ name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [] }) {
+export default function ProfileView({ name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [], pastProjects = [] }) {
   const [tab, setTab] = useState("about");
 
   return (
@@ -115,7 +115,19 @@ export default function ProfileView({ name, username, subtitle, ratingLabel, rat
             </form>
           </div>
         ) : (
-          <div className="py-16 text-center text-muted">Projects will appear here.</div>
+          <div className="mt-6 flex flex-col gap-3 pb-6">
+            <Link href="/past-projects/add" className="rounded-2xl border-2 border-dashed border-line py-4 text-center text-[15px] font-bold text-purple-600">+ Add a past project</Link>
+            {pastProjects.length === 0 ? (
+              <p className="py-8 text-center text-[14px] text-muted">No past projects yet.</p>
+            ) : (
+              pastProjects.map((pp) => (
+                <div key={pp.id} className="rounded-2xl border border-line bg-white p-4">
+                  <p className="text-[15px] font-bold text-navy">{pp.role}</p>
+                  {pp.write_up && <p className="mt-1 text-[13px] text-muted">{pp.write_up}</p>}
+                </div>
+              ))
+            )}
+          </div>
         )}
       </div>
     </div>
