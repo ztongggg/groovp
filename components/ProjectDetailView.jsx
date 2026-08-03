@@ -6,7 +6,7 @@ import JoinGroupButton from "@/components/JoinGroupButton";
 
 const AVATAR = ["#e8863b", "#34b9a8", "#f2a5bd", "#7c3aed", "#4ac7b2"];
 
-export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [] }) {
+export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId }) {
   const [tab, setTab] = useState("info");
   const totalMembers = groups.reduce((n, g) => n + (g.members?.length || 0), 0);
 
@@ -63,12 +63,16 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
             {groups.map((g) => {
               const members = g.members || [];
               const full = members.length >= (maxSize || 99);
+              const isLeader = meId && meId === g.leaderId;
               return (
                 <div key={g.id} className="rounded-2xl border border-line bg-white p-4 shadow-card">
                   <div className="flex items-center justify-between">
                     <p className="text-[16px] font-bold text-navy">{g.name}</p>
                     <span className="text-[13px] font-semibold text-muted">{members.length}/{maxSize} members</span>
                   </div>
+                  <p className="mt-1 text-[12px] font-semibold" style={{ color: g.recruiting ? "#298c52" : "#9ca3af" }}>
+                    {g.recruiting ? (g.membersWanted > 0 ? `Open — looking for ${g.membersWanted} more` : "Open to requests") : "Not recruiting"}
+                  </p>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex -space-x-2">
                       {members.slice(0, 5).map((m, i) => (
@@ -77,7 +81,13 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
                         </Link>
                       ))}
                     </div>
-                    <JoinGroupButton groupId={g.id} full={full} />
+                    {isLeader ? (
+                      <Link href={`/recruiting/${g.id}`} className="rounded-xl bg-[#f3f1f8] px-4 py-2 text-[13px] font-bold text-purple-600">Manage ›</Link>
+                    ) : !g.recruiting ? (
+                      <span className="rounded-xl bg-[#f3f1f8] px-4 py-2 text-[13px] font-bold text-muted">Closed</span>
+                    ) : (
+                      <JoinGroupButton groupId={g.id} full={full} />
+                    )}
                   </div>
                 </div>
               );

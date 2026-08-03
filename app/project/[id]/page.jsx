@@ -11,13 +11,14 @@ function fmt(d) {
 async function getProject(id) {
   try {
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("projects")
-      .select("id,name,description,type,skills_needed,timeline_start,timeline_end,max_size, owner:profiles!projects_owner_id_fkey(username), groups(id,name, group_members(user_id, profiles(full_name,username)))")
+      .select("id,name,description,type,skills_needed,timeline_start,timeline_end,max_size, owner:profiles!projects_owner_id_fkey(username), groups(id,name,leader_id,recruiting,members_wanted, group_members(user_id, profiles(full_name,username)))")
       .eq("id", id)
       .single();
     if (error) return null;
-    return data;
+    return { ...data, meId: user?.id || null };
   } catch {
     return null;
   }
@@ -37,6 +38,9 @@ export default async function ProjectDetailPage({ params }) {
   const groups = (p.groups || []).map((g) => ({
     id: g.id,
     name: g.name,
+    leaderId: g.leader_id,
+    recruiting: g.recruiting !== false,
+    membersWanted: g.members_wanted || 0,
     members: (g.group_members || []).map((m) => ({ user_id: m.user_id, name: m.profiles?.full_name || m.profiles?.username || "?" })),
   }));
   const total = groups.reduce((n, g) => n + g.members.length, 0);
@@ -52,6 +56,7 @@ export default async function ProjectDetailPage({ params }) {
       memberCount={`${total}/${p.max_size || 0}`}
       maxSize={p.max_size}
       groups={groups}
+      meId={p.meId}
     />
   );
 }

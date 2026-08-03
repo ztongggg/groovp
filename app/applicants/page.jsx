@@ -24,15 +24,15 @@ async function getApplicants() {
 
     const { data: reqs } = await supabase
       .from("join_requests")
-      .select("id, group_id, user_id, comment, created_at, profiles:user_id(full_name, username, skills)")
+      .select("id, group_id, user_id, status, comment, created_at, profiles:user_id(full_name, username, skills)")
       .in("group_id", groupIds)
-      .eq("status", "pending")
       .order("created_at", { ascending: false });
 
     return (reqs || []).map((r) => ({
       id: r.id,
       groupId: r.group_id,
       applicantId: r.user_id,
+      status: r.status,
       name: r.profiles?.full_name || r.profiles?.username || "Someone",
       username: r.profiles?.username || "user",
       skills: r.profiles?.skills || [],
@@ -45,8 +45,15 @@ async function getApplicants() {
   }
 }
 
+const HISTORY_STYLE = {
+  accepted: { label: "Accepted", bg: "#d4f2de", color: "#298c52" },
+  declined: { label: "Declined", bg: "#fae0e0", color: "#bf4247" },
+};
+
 export default async function ApplicantsPage() {
-  const applicants = await getApplicants();
+  const all = await getApplicants();
+  const pending = all.filter((a) => a.status === "pending");
+  const history = all.filter((a) => a.status !== "pending");
 
   return (
     <AppShell>
@@ -57,14 +64,34 @@ export default async function ApplicantsPage() {
           <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1e1b4b" }}>Requests</h1>
         </div>
 
-        {applicants.length === 0 ? (
+        {all.length === 0 ? (
           <div className="mt-24 px-8 text-center">
-            <p className="text-[16px] font-semibold text-navy">No pending requests</p>
+            <p className="text-[16px] font-semibold text-navy">No requests yet</p>
             <p className="mt-1 text-[14px] text-muted">When people ask to join your projects, they show up here.</p>
           </div>
         ) : (
           <div className="mt-5 flex flex-col gap-4 px-6">
-            {applicants.map((a) => <ApplicantCard key={a.id} {...a} />)}
+            {pending.length > 0 && <p className="text-[12px] font-bold uppercase tracking-wide text-muted">Pending · {pending.length}</p>}
+            {pending.map((a) => <ApplicantCard key={a.id} {...a} />)}
+
+            {history.length > 0 && (
+              <>
+                <p className="mt-2 text-[12px] font-bold uppercase tracking-wide text-muted">History</p>
+                {history.map((a) => {
+                  const s = HISTORY_STYLE[a.status] || HISTORY_STYLE.declined;
+                  return (
+                    <Link key={a.id} href={`/u/${a.applicantId}`} className="flex items-center gap-3 rounded-2xl border border-line bg-white p-4">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: "#7c3aed" }}>{(a.name || "?").slice(0, 2).toUpperCase()}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[14px] font-bold text-navy">{a.name}</p>
+                        <p className="truncate text-[12px] text-muted">{a.project}</p>
+                      </div>
+                      <span className="rounded-full px-3 py-1 text-[12px] font-bold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            )}
           </div>
         )}
       </div>
