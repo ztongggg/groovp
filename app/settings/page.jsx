@@ -11,17 +11,17 @@ async function getAccount() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { name: "Student", handle: "student" };
-    const { data: p } = await supabase.from("profiles").select("full_name, username").eq("id", user.id).single();
+    if (!user) return { name: "Student", handle: "student", isAdmin: false };
+    const { data: p } = await supabase.from("profiles").select("full_name, username, is_admin").eq("id", user.id).single();
     const emailName = (user.email || "student").split("@")[0];
-    return { name: p?.full_name || emailName, handle: p?.username || emailName };
+    return { name: p?.full_name || emailName, handle: p?.username || emailName, isAdmin: !!p?.is_admin };
   } catch {
-    return { name: "Student", handle: "student" };
+    return { name: "Student", handle: "student", isAdmin: false };
   }
 }
 
 export default async function SettingsPage() {
-  const { name, handle } = await getAccount();
+  const { name, handle, isAdmin } = await getAccount();
 
   return (
     <AppShell>
@@ -51,6 +51,13 @@ export default async function SettingsPage() {
           </Link>
 
           <ChangePasswordForm />
+
+          {isAdmin && (
+            <Link href="/moderation" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
+              <span className="text-[15px] font-semibold text-navy">Moderation queue</span>
+              <span className="text-[18px] text-muted">›</span>
+            </Link>
+          )}
 
           {/* cosmetic section */}
           <div className="rounded-2xl border border-line bg-white">

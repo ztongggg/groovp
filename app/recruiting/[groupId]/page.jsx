@@ -2,6 +2,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
 import RecruitingForm from "@/components/RecruitingForm";
+import InviteByUsername from "@/components/InviteByUsername";
 import { createClient } from "@/lib/supabase/server";
 
 async function getGroup(groupId) {
@@ -36,7 +37,12 @@ export default async function RecruitingPage({ params }) {
         ) : me !== g.leader_id ? (
           <p className="mt-24 px-8 text-center text-muted">Only the group leader can manage recruiting.</p>
         ) : (
-          <RecruitingForm groupId={g.id} initial={g} />
+          <>
+            <RecruitingForm groupId={g.id} initial={g} />
+            <div className="px-6">
+              <InviteByUsername groupId={g.id} />
+            </div>
+          </>
         )}
       </div>
     </AppShell>

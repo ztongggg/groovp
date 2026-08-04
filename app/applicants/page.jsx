@@ -48,12 +48,14 @@ async function getApplicants() {
 const HISTORY_STYLE = {
   accepted: { label: "Accepted", bg: "#d4f2de", color: "#298c52" },
   declined: { label: "Declined", bg: "#fae0e0", color: "#bf4247" },
+  invited: { label: "Invited", bg: "#fce5b8", color: "#99730d" },
 };
 
 export default async function ApplicantsPage() {
   const all = await getApplicants();
   const pending = all.filter((a) => a.status === "pending");
-  const history = all.filter((a) => a.status !== "pending");
+  const invited = all.filter((a) => a.status === "invited");
+  const history = all.filter((a) => a.status === "accepted" || a.status === "declined");
 
   return (
     <AppShell>
@@ -73,6 +75,25 @@ export default async function ApplicantsPage() {
           <div className="mt-5 flex flex-col gap-4 px-6">
             {pending.length > 0 && <p className="text-[12px] font-bold uppercase tracking-wide text-muted">Pending · {pending.length}</p>}
             {pending.map((a) => <ApplicantCard key={a.id} {...a} />)}
+
+            {invited.length > 0 && (
+              <>
+                <p className="mt-2 text-[12px] font-bold uppercase tracking-wide text-muted">Invited · {invited.length}</p>
+                {invited.map((a) => {
+                  const s = HISTORY_STYLE.invited;
+                  return (
+                    <Link key={a.id} href={`/u/${a.applicantId}`} className="flex items-center gap-3 rounded-2xl border border-line bg-white p-4">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: "#7c3aed" }}>{(a.name || "?").slice(0, 2).toUpperCase()}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[14px] font-bold text-navy">{a.name}</p>
+                        <p className="truncate text-[12px] text-muted">{a.project}</p>
+                      </div>
+                      <span className="rounded-full px-3 py-1 text-[12px] font-bold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            )}
 
             {history.length > 0 && (
               <>

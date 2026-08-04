@@ -59,7 +59,7 @@ function EmptyRow() {
   return <div className="px-[30px] py-6 text-[14px] text-muted">No projects yet — create one from Discover.</div>;
 }
 
-export default function HomeView({ name = "there", projects = [], unread = 0 }) {
+export default function HomeView({ name = "there", projects = [], unread = 0, invites = 0 }) {
   const [feed, setFeed] = useState("popular");
   const latest = [...projects].reverse();
 
@@ -80,6 +80,11 @@ export default function HomeView({ name = "there", projects = [], unread = 0 }) 
         <ShortcutButton label="Requests" href="/applicants">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7.5V12l3 2" /></svg>
         </ShortcutButton>
+        {invites > 0 && (
+          <ShortcutButton label={`Invites (${invites})`} href="/invites">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16v12H4z" /><path d="m4 7 8 6 8-6" /></svg>
+          </ShortcutButton>
+        )}
       </div>
 
       <h2 className="mt-4 px-[30px]" style={{ fontSize: 20, fontWeight: 800, color: "#434343" }}>Recently viewed</h2>

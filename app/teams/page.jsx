@@ -26,7 +26,7 @@ async function getData() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    const requests = (reqs || []).map((r) => ({
+    const requests = (reqs || []).filter((r) => r.status !== "invited").map((r) => ({
       id: r.id,
       status: r.status,
       title: r.groups?.projects?.name || "Project",
