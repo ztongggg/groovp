@@ -3,6 +3,7 @@ import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
 import ConnectLinkedIn from "@/components/ConnectLinkedIn";
+import ConnectGitHub from "@/components/ConnectGitHub";
 import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -13,16 +14,16 @@ async function getAccount() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return { name: "Student", handle: "student", isAdmin: false, linkedin: false };
-    const { data: p } = await supabase.from("profiles").select("full_name, username, is_admin, linkedin_verified").eq("id", user.id).single();
+    const { data: p } = await supabase.from("profiles").select("full_name, username, is_admin, linkedin_verified, github_verified").eq("id", user.id).single();
     const emailName = (user.email || "student").split("@")[0];
-    return { name: p?.full_name || emailName, handle: p?.username || emailName, isAdmin: !!p?.is_admin, linkedin: !!p?.linkedin_verified };
+    return { name: p?.full_name || emailName, handle: p?.username || emailName, isAdmin: !!p?.is_admin, linkedin: !!p?.linkedin_verified, github: !!p?.github_verified };
   } catch {
-    return { name: "Student", handle: "student", isAdmin: false, linkedin: false };
+    return { name: "Student", handle: "student", isAdmin: false, linkedin: false, github: false };
   }
 }
 
 export default async function SettingsPage() {
-  const { name, handle, isAdmin, linkedin } = await getAccount();
+  const { name, handle, isAdmin, linkedin, github } = await getAccount();
 
   return (
     <AppShell>
@@ -54,6 +55,7 @@ export default async function SettingsPage() {
           <ChangePasswordForm />
 
           <ConnectLinkedIn verified={linkedin} />
+          <ConnectGitHub verified={github} />
 
           {isAdmin && (
             <Link href="/moderation" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">

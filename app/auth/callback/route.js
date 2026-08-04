@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// OAuth return point. Used by LinkedIn identity-linking (Connect LinkedIn).
-// Exchanges the code for a session, then — if a LinkedIn identity is now
-// attached to the user — marks the profile as verified.
+// OAuth return point for identity-linking (Connect LinkedIn / GitHub).
+// Exchanges the code for a session, then syncs the verified flags from whatever
+// identities are now attached to the user.
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
@@ -11,7 +11,7 @@ export async function GET(request) {
   const errorDesc = searchParams.get("error_description");
 
   if (errorDesc) {
-    return NextResponse.redirect(`${origin}${next}?linkedin=error`);
+    return NextResponse.redirect(`${origin}${next}?verify=error`);
   }
 
   if (code) {
@@ -20,17 +20,27 @@ export async function GET(request) {
     if (!error) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        const li = user?.identities?.find((i) => i.provider === "linkedin_oidc");
-        if (user && li) {
-          await supabase
-            .from("profiles")
-            .update({ linkedin_verified: true, linkedin_sub: li.identity_data?.sub || li.id || null })
-            .eq("id", user.id);
+        if (user) {
+          const ids = user.identities || [];
+          const li = ids.find((i) => i.provider === "linkedin_oidc");
+          const gh = ids.find((i) => i.provider === "github");
+          const patch = {};
+          if (li) {
+            patch.linkedin_verified = true;
+            patch.linkedin_sub = li.identity_data?.sub || li.id || null;
+          }
+          if (gh) {
+            patch.github_verified = true;
+            patch.github_username = gh.identity_data?.user_name || gh.identity_data?.preferred_username || null;
+          }
+          if (Object.keys(patch).length) {
+            await supabase.from("profiles").update(patch).eq("id", user.id);
+          }
         }
       } catch {}
-      return NextResponse.redirect(`${origin}${next}?linkedin=connected`);
+      return NextResponse.redirect(`${origin}${next}?verify=connected`);
     }
   }
 
-  return NextResponse.redirect(`${origin}${next}?linkedin=error`);
+  return NextResponse.redirect(`${origin}${next}?verify=error`);
 }
