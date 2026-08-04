@@ -49,9 +49,12 @@ export default async function DiscoverPage() {
         {/* Header */}
         <div className="flex items-center justify-between px-6">
           <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1e1b4b" }}>Discover</h1>
-          <Link href="/create" aria-label="Create project" className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: "#7c3aed" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/join" className="rounded-full px-3 py-1.5 text-[12px] font-bold text-purple-600" style={{ background: "#ece8fc" }}>Join with code</Link>
+            <Link href="/create" aria-label="Create project" className="flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: "#7c3aed" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+            </Link>
+          </div>
         </div>
 
         {/* Search + filter */}

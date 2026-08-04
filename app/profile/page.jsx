@@ -58,6 +58,7 @@ async function getProfile() {
       skills,
       interests: p?.interests || [],
       pastProjects,
+      linkedinVerified: !!p?.linkedin_verified,
     };
   } catch {
     return fallback;

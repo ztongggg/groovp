@@ -14,18 +14,23 @@ async function getProject(id) {
     const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("projects")
-      .select("id,name,description,type,skills_needed,timeline_start,timeline_end,max_size, owner:profiles!projects_owner_id_fkey(username), groups(id,name,leader_id,recruiting,members_wanted, group_members(user_id, profiles(full_name,username)))")
+      .select("id,name,description,type,owner_id,join_code,allow_multiple_groups,skills_needed,timeline_start,timeline_end,max_size, owner:profiles!projects_owner_id_fkey(username), groups(id,name,leader_id,recruiting,members_wanted, group_members(user_id, profiles(full_name,username)))")
       .eq("id", id)
       .single();
     if (error) return null;
     let favorited = false;
+    let enrolled = false;
     if (user) {
       try {
         const { data: f } = await supabase.from("project_favorites").select("project_id").eq("user_id", user.id).eq("project_id", id).maybeSingle();
         favorited = !!f;
       } catch {}
+      try {
+        const { data: pm } = await supabase.from("project_members").select("user_id").eq("user_id", user.id).eq("project_id", id).maybeSingle();
+        enrolled = !!pm;
+      } catch {}
     }
-    return { ...data, meId: user?.id || null, favorited };
+    return { ...data, meId: user?.id || null, favorited, enrolled };
   } catch {
     return null;
   }
@@ -66,6 +71,10 @@ export default async function ProjectDetailPage({ params }) {
       meId={p.meId}
       projectId={p.id}
       favorited={p.favorited}
+      joinCode={p.join_code}
+      enrolled={p.enrolled}
+      isOwner={p.meId && p.meId === p.owner_id}
+      allowMultipleGroups={p.allow_multiple_groups !== false}
     />
   );
 }

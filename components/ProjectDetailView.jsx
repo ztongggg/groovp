@@ -1,15 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import JoinGroupButton from "@/components/JoinGroupButton";
 import FavoriteButton from "@/components/FavoriteButton";
+import { enrolInProject } from "@/app/join/actions";
+import { createGroupInProject } from "@/app/project/[id]/actions";
 
 const AVATAR = ["#e8863b", "#34b9a8", "#f2a5bd", "#7c3aed", "#4ac7b2"];
 
-export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId, projectId, favorited }) {
+function ShareCard({ code }) {
+  const [copied, setCopied] = useState(""); // "code" | "link" | ""
+
+  async function copy(what) {
+    const link = typeof window !== "undefined" ? `${window.location.origin}/join?code=${code}` : "";
+    try {
+      await navigator.clipboard.writeText(what === "link" ? link : code);
+      setCopied(what);
+      setTimeout(() => setCopied(""), 1600);
+    } catch {}
+  }
+
+  return (
+    <div className="rounded-2xl border border-dashed border-purple-300 bg-[#f9f7ff] p-4">
+      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Share to invite classmates</p>
+      <p className="mt-1 text-[22px] font-extrabold tracking-wider text-navy">{code}</p>
+      <div className="mt-3 flex gap-2">
+        <button onClick={() => copy("code")} className="flex-1 rounded-xl py-2 text-[13px] font-bold text-white" style={{ background: "#7c3aed" }}>
+          {copied === "code" ? "Copied ✓" : "Copy code"}
+        </button>
+        <button onClick={() => copy("link")} className="flex-1 rounded-xl py-2 text-[13px] font-bold text-purple-600" style={{ background: "#ece8fc" }}>
+          {copied === "link" ? "Copied ✓" : "Copy link"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId, projectId, favorited, joinCode, enrolled, isOwner, allowMultipleGroups }) {
   const [tab, setTab] = useState("info");
-  const totalMembers = groups.reduce((n, g) => n + (g.members?.length || 0), 0);
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [err, setErr] = useState("");
+  const canShare = enrolled || isOwner;
+
+  function enrol() {
+    setErr("");
+    start(async () => {
+      const res = await enrolInProject(projectId);
+      if (res?.error) setErr(res.error);
+      else router.refresh();
+    });
+  }
+
+  function formGroup() {
+    setErr("");
+    start(async () => {
+      const res = await createGroupInProject(projectId);
+      if (res?.groupId) router.push(`/recruiting/${res.groupId}`);
+      else if (res?.error) setErr(res.error);
+    });
+  }
 
   return (
     <div className="relative w-[402px] bg-white pb-28">
@@ -47,8 +99,20 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
           ))}
         </div>
 
+        {err && <p className="mt-3 text-[13px] font-semibold text-[#bf4247]">{err}</p>}
+
         {tab === "info" ? (
           <div className="mt-5 flex flex-col gap-4">
+            {canShare && joinCode && <ShareCard code={joinCode} />}
+            {!enrolled && !isOwner && (
+              <div className="rounded-2xl bg-[#f3f1f8] p-4">
+                <p className="text-[14px] font-bold text-navy">Join this project</p>
+                <p className="mt-1 text-[13px] text-muted">Join to form your own group or request to join one.</p>
+                <button onClick={enrol} disabled={pending} className="mt-3 w-full rounded-xl py-2.5 text-[13px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>
+                  {pending ? "Joining…" : "Join project"}
+                </button>
+              </div>
+            )}
             <div className="rounded-2xl bg-[#f3f1f8] p-4">
               <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Timeline</p>
               <p className="mt-1 text-[14px] font-semibold text-navy">{dateRange.trim() === "-" ? "To be decided" : dateRange}</p>
@@ -60,7 +124,14 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
           </div>
         ) : (
           <div className="mt-5 flex flex-col gap-3">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Groups open · {groups.length}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Groups open · {groups.length}</p>
+              {enrolled && allowMultipleGroups && (
+                <button onClick={formGroup} disabled={pending} className="rounded-xl px-3 py-1.5 text-[12px] font-bold text-purple-600 disabled:opacity-50" style={{ background: "#ece8fc" }}>
+                  {pending ? "…" : "+ Form a group"}
+                </button>
+              )}
+            </div>
             {groups.map((g) => {
               const members = g.members || [];
               const full = members.length >= (maxSize || 99);
@@ -86,6 +157,8 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
                       <Link href={`/recruiting/${g.id}`} className="rounded-xl bg-[#f3f1f8] px-4 py-2 text-[13px] font-bold text-purple-600">Manage ›</Link>
                     ) : !g.recruiting ? (
                       <span className="rounded-xl bg-[#f3f1f8] px-4 py-2 text-[13px] font-bold text-muted">Closed</span>
+                    ) : !enrolled ? (
+                      <button onClick={enrol} disabled={pending} className="rounded-xl px-4 py-2 text-[13px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>Join project first</button>
                     ) : (
                       <JoinGroupButton groupId={g.id} full={full} />
                     )}
@@ -99,8 +172,16 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
 
       {/* sticky bottom bar */}
       <div className="fixed bottom-0 left-1/2 z-20 flex w-[402px] -translate-x-1/2 justify-center border-t border-line bg-white px-6 py-3">
-        {tab === "info" ? (
+        {!enrolled && !isOwner ? (
+          <button onClick={enrol} disabled={pending} className="w-full rounded-2xl py-3.5 text-[15px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>
+            {pending ? "Joining…" : "Join project"}
+          </button>
+        ) : tab === "info" ? (
           <button onClick={() => setTab("groups")} className="w-full rounded-2xl py-3.5 text-[15px] font-bold text-white" style={{ background: "#7c3aed" }}>See groups to join</button>
+        ) : enrolled && allowMultipleGroups ? (
+          <button onClick={formGroup} disabled={pending} className="w-full rounded-2xl py-3.5 text-[15px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>
+            {pending ? "Creating…" : "+ Form a group"}
+          </button>
         ) : groups[0] ? (
           <div className="w-full"><JoinGroupButton groupId={groups[0].id} /></div>
         ) : null}

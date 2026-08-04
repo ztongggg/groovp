@@ -25,7 +25,8 @@ export default function CreateProjectPage() {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [done, setDone] = useState(null); // {projectId, name}
+  const [done, setDone] = useState(null); // {projectId, name, joinCode}
+  const [copied, setCopied] = useState(false);
   const [d, setD] = useState({ type: "academic", name: "", description: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, skills: [], interests: [], project_link: "", privacy: "public", joining_method: "approval" });
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
@@ -37,7 +38,7 @@ export default function CreateProjectPage() {
     const res = await createProject(d);
     setSaving(false);
     if (res?.error) { setError(res.error); return; }
-    setDone({ projectId: res.projectId, name: res.name });
+    setDone({ projectId: res.projectId, name: res.name, joinCode: res.joinCode });
   }
   const next = () => (step < 3 ? setStep(step + 1) : finish());
   const back = () => (step > 0 ? setStep(step - 1) : router.push("/discover"));
@@ -50,7 +51,20 @@ export default function CreateProjectPage() {
         <img src="/blob-teal.png" alt="" className="mb-8 h-32 w-32" style={{ borderRadius: 28 }} />
         <h1 className="text-[26px] font-extrabold text-navy">Congrats! 🎉</h1>
         <p className="mt-2 text-[16px] text-muted">You created <span className="font-bold text-navy">{done.name}</span>.</p>
-        <Link href={`/project/${done.projectId}`} className="mt-8 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white">Go to project</Link>
+        {done.joinCode && (
+          <div className="mt-6 w-full rounded-2xl border border-dashed border-purple-300 bg-[#f9f7ff] p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Share this code with your classmates</p>
+            <p className="mt-1 text-[24px] font-extrabold tracking-wider text-navy">{done.joinCode}</p>
+            <button
+              onClick={() => { navigator.clipboard?.writeText(`${window.location.origin}/join?code=${done.joinCode}`); setCopied(true); setTimeout(() => setCopied(false), 1600); }}
+              className="mt-3 w-full rounded-xl py-2.5 text-[13px] font-bold text-white"
+              style={{ background: "#7c3aed" }}
+            >
+              {copied ? "Link copied ✓" : "Copy invite link"}
+            </button>
+          </div>
+        )}
+        <Link href={`/project/${done.projectId}`} className="mt-6 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white">Go to project</Link>
         <Link href="/discover" className="mt-3 w-full rounded-2xl bg-[#f3f1f8] py-4 text-[16px] font-bold text-navy">Back to Discover</Link>
       </div>
     );

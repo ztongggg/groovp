@@ -2,6 +2,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
+import ConnectLinkedIn from "@/components/ConnectLinkedIn";
 import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -11,17 +12,17 @@ async function getAccount() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { name: "Student", handle: "student", isAdmin: false };
-    const { data: p } = await supabase.from("profiles").select("full_name, username, is_admin").eq("id", user.id).single();
+    if (!user) return { name: "Student", handle: "student", isAdmin: false, linkedin: false };
+    const { data: p } = await supabase.from("profiles").select("full_name, username, is_admin, linkedin_verified").eq("id", user.id).single();
     const emailName = (user.email || "student").split("@")[0];
-    return { name: p?.full_name || emailName, handle: p?.username || emailName, isAdmin: !!p?.is_admin };
+    return { name: p?.full_name || emailName, handle: p?.username || emailName, isAdmin: !!p?.is_admin, linkedin: !!p?.linkedin_verified };
   } catch {
-    return { name: "Student", handle: "student", isAdmin: false };
+    return { name: "Student", handle: "student", isAdmin: false, linkedin: false };
   }
 }
 
 export default async function SettingsPage() {
-  const { name, handle, isAdmin } = await getAccount();
+  const { name, handle, isAdmin, linkedin } = await getAccount();
 
   return (
     <AppShell>
@@ -51,6 +52,8 @@ export default async function SettingsPage() {
           </Link>
 
           <ChangePasswordForm />
+
+          <ConnectLinkedIn verified={linkedin} />
 
           {isAdmin && (
             <Link href="/moderation" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
