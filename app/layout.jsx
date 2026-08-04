@@ -2,8 +2,22 @@ import "./globals.css";
 import PhoneFrame from "@/components/PhoneFrame";
 
 export const metadata = {
-  title: "Groovp",
+  metadataBase: new URL("https://groovp.vercel.app"),
+  title: "Groovp — Find your team",
   description: "Find and evaluate teammates at SUTD before you commit to a team.",
+  applicationName: "Groovp",
+  openGraph: {
+    title: "Groovp — Find your team",
+    description: "Find and evaluate teammates at SUTD before you commit to a team.",
+    url: "https://groovp.vercel.app",
+    siteName: "Groovp",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Groovp — Find your team",
+    description: "Find and evaluate teammates at SUTD before you commit to a team.",
+  },
 };
 
 export default function RootLayout({ children }) {
