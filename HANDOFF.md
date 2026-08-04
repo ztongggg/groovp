@@ -17,7 +17,7 @@ Mobile-web app for SUTD students to **find & evaluate teammates** (coursework, h
 
 ## Supabase
 - Project ref `cvlvrousapvmamkcexpl`. Email confirmation is **OFF** (instant login).
-- Schema: `supabase/schema.sql` (v1) + `supabase/schema_v2.sql` (v2, additive) — both already run. Tables: profiles, projects, groups, group_members, join_requests, ratings, messages, **user_skills**(Basic/Pro/Expert), **project_favorites**, **past_projects**, **conversations**+**conversation_participants**, **notifications**, **reports**, **blocks**. RLS on all. Leader policies: `requests_leader_update`, `members_leader_insert`. `cpart_write` relaxed to `with check(true)` (so chat creator can add the other participant). `handle_new_user` trigger auto-creates a profile row on signup.
+- Schema: `supabase/schema.sql` (v1) + `supabase/schema_v2.sql` (v2, additive) + `supabase/schema_v3.sql` (v3, additive — **must be run** before the §6 deploy: adds `profiles.is_admin` + seeds `flow_leader` as admin, admin report RLS, leader-invite RLS). Tables: profiles, projects, groups, group_members, join_requests, ratings, messages, **user_skills**(Basic/Pro/Expert), **project_favorites**, **past_projects**, **conversations**+**conversation_participants**, **notifications**, **reports**, **blocks**. RLS on all. Leader policies: `requests_leader_update`, `members_leader_insert`. `cpart_write` relaxed to `with check(true)` (so chat creator can add the other participant). `handle_new_user` trigger auto-creates a profile row on signup.
 - Run SQL: user pastes into SQL Editor (https://supabase.com/dashboard/project/cvlvrousapvmamkcexpl/sql/new). Verify a table exists: `fetch('.../rest/v1/<table>?limit=1',{headers:{apikey:'<publishable>'}})` → 404 = missing.
 
 ## Test accounts (all password `test1234`)
@@ -34,7 +34,8 @@ Mobile-web app for SUTD students to **find & evaluate teammates** (coursework, h
 - `/recruiting/[groupId]` (leader-only: recruiting toggle, members-wanted, wanted skills/personality/interests, notes, joining method)
 - `/applicants` (leader: Pending accept/decline + History; from Home Requests) · join request → notifies leader; accept → notifies applicant + adds member
 - `/teams` (merged inbox: group chats + private DMs; My Teams / Requested tabs) · `/chat/[groupId]` (group) · `/dm/[conversationId]` (private, from Message on a profile)
-- `/profile` (real data: name/@user/year·major, personality stat grid, skills w/ neutral proficiency badges, interests, rating, About/Project tabs, past projects, logout) · `/u/[id]` (other user: Message, Rate 1-5+comment, ⋯ Report/Block) · `/settings` (edit profile, change password, logout) · `/notifications`
+- `/profile` (real data: name/@user/year·major, personality stat grid, skills w/ neutral proficiency badges, interests, rating, About/Project tabs, past projects, logout) · `/u/[id]` (other user: Message, Rate 1-5+comment, ⋯ Report/Block) · `/settings` (edit profile, change password, logout, admin-only Moderation link) · `/notifications`
+- `/moderation` (admin-only, `profiles.is_admin`): review reports, resolve/dismiss/reopen · `/invites` (invitee inbox for leader invites: accept/decline). Invite entry = Recruiting page "Invite by username"; invitee reached via Home "Invites (n)" shortcut + notification deep-link.
 - Empty states (discover/teams/notifications) use real Figma illustrations.
 
 ## Business rules honored (spec §5)
@@ -51,7 +52,8 @@ Embedded real assets in `public/`: signup-cloud, login-mascot, blob-teal/pink/or
 - Sessions expire between long gaps → re-login.
 
 ## Remaining / out of scope
-Only spec §6 deliberately-unbuilt items left: moderation review tooling (submission works), invite-by-username follow-up, reapply-after-decline conflict flow. Icon set is inline-SVG approximations of Figma's Simple Design System icons (low ROI to swap). Everything else done.
+§6 items now BUILT (2026-08-04): moderation review (`/moderation`), invite-by-username (Recruiting → `/invites`), reapply-after-decline (declined → pending, "Re-requested" feedback). **Pending deploy: run `schema_v3.sql` then push.**
+Icon set stays inline-SVG (Simple Design System approximations). Deliberately NOT swapped to Figma PNGs: bottom-nav SVGs recolour per active/inactive state and stay crisp — PNGs would regress that. Low ROI confirmed.
 
 ## Working style / prefs
 British/clean copy. Owner wants exact Figma fidelity + real backend. Deploy cadence: build+commit locally, user pushes via GitHub Desktop + says "deployed", then verify live on Vercel. Caveman mode was on (terse).
