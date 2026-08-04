@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { groupHasRoom } from "@/lib/capacity";
 
 // Invitee responds to a leader's invite (status 'invited').
 export async function respondToInvite(requestId, accept) {
@@ -23,6 +24,10 @@ export async function respondToInvite(requestId, accept) {
     revalidatePath("/invites");
     return { ok: true, declined: true };
   }
+
+  // Capacity guard before accepting an invite.
+  const room = await groupHasRoom(supabase, req.group_id, user.id);
+  if (room.full) return { error: "That group is now full." };
 
   // Accept: mark accepted, add self as member, notify the leader.
   const { error: upErr } = await supabase.from("join_requests").update({ status: "accepted" }).eq("id", requestId);

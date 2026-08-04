@@ -2,10 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { groupHasRoom } from "@/lib/capacity";
 
 // Leader accepts an applicant: mark request accepted + add them as a member.
 export async function acceptRequest(id, groupId, applicantId) {
   const supabase = createClient();
+
+  // Capacity guard — don't let a group exceed its max.
+  const cap = await groupHasRoom(supabase, groupId, applicantId);
+  if (cap.full) return { error: "This group is already full." };
+  if (cap.member) return { ok: true, already: true };
 
   const { error } = await supabase
     .from("join_requests")

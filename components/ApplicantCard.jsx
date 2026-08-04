@@ -6,16 +6,19 @@ import { acceptRequest, declineRequest } from "@/app/applicants/actions";
 
 export default function ApplicantCard({ id, groupId, applicantId, name, username, skills = [], project, group, comment }) {
   const [state, setState] = useState("idle"); // idle | working | accepted | declined | error
+  const [msg, setMsg] = useState("");
 
   async function onAccept() {
     setState("working");
     const r = await acceptRequest(id, groupId, applicantId);
-    setState(r?.error ? "error" : "accepted");
+    if (r?.error) { setMsg(r.error); setState("error"); }
+    else setState("accepted");
   }
   async function onDecline() {
     setState("working");
     const r = await declineRequest(id);
-    setState(r?.error ? "error" : "declined");
+    if (r?.error) { setMsg(r.error); setState("error"); }
+    else setState("declined");
   }
 
   if (state === "accepted" || state === "declined") {
@@ -53,7 +56,7 @@ export default function ApplicantCard({ id, groupId, applicantId, name, username
         <button onClick={onDecline} disabled={state === "working"} className="flex-1 rounded-xl py-2.5 text-[14px] font-bold" style={{ background: "#fae0e0", color: "#bf4247" }}>Decline</button>
         <button onClick={onAccept} disabled={state === "working"} className="flex-1 rounded-xl py-2.5 text-[14px] font-bold text-white" style={{ background: "#7c3aed" }}>{state === "working" ? "…" : "Accept"}</button>
       </div>
-      {state === "error" && <p className="mt-2 text-[12px] text-badge-declinedText">Something went wrong — check the group RLS policies.</p>}
+      {state === "error" && <p className="mt-2 text-[12px] text-badge-declinedText">{msg || "Something went wrong — please try again."}</p>}
     </div>
   );
 }

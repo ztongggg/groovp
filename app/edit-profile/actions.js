@@ -9,6 +9,9 @@ export async function updateProfile(data) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "You must be signed in." };
 
+  // skills may be [{ name, level }] (new) or plain strings (defensive)
+  const skillList = (data.skills || []).map((s) => (typeof s === "string" ? { name: s, level: "Basic" } : s));
+
   const { error } = await supabase
     .from("profiles")
     .update({
@@ -21,9 +24,23 @@ export async function updateProfile(data) {
       prefer_working: data.prefer_working || null,
       best_work_time: data.best_work_time || null,
       location: data.location || null,
+      skills: skillList.map((s) => s.name),
+      interests: data.interests || [],
     })
     .eq("id", user.id);
-  if (error) return { error: error.message };
+  if (error) {
+    // Friendly message for the most common failure.
+    if (error.code === "23505") return { error: "That username is already taken." };
+    return { error: error.message };
+  }
+
+  // Rebuild per-skill proficiency (needs the v2 user_skills table; ignore if absent).
+  try {
+    await supabase.from("user_skills").delete().eq("user_id", user.id);
+    if (skillList.length) {
+      await supabase.from("user_skills").insert(skillList.map((s) => ({ user_id: user.id, skill_name: s.name, proficiency: s.level })));
+    }
+  } catch {}
 
   revalidatePath("/profile");
   redirect("/profile");

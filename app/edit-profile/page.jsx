@@ -9,8 +9,16 @@ async function getProfile() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return {};
-    const { data: p } = await supabase.from("profiles").select("full_name, username, university, major, year, personality, prefer_working, best_work_time, location").eq("id", user.id).single();
-    return p || {};
+    const { data: p } = await supabase.from("profiles").select("full_name, username, university, major, year, personality, prefer_working, best_work_time, location, skills, interests").eq("id", user.id).single();
+
+    // Prefer per-skill proficiency (user_skills); fall back to plain names.
+    let skills = (p?.skills || []).map((n) => ({ name: n, level: "Basic" }));
+    try {
+      const { data: us } = await supabase.from("user_skills").select("skill_name, proficiency").eq("user_id", user.id);
+      if (us?.length) skills = us.map((r) => ({ name: r.skill_name, level: r.proficiency || "Basic" }));
+    } catch {}
+
+    return { ...(p || {}), skills, interests: p?.interests || [] };
   } catch {
     return {};
   }

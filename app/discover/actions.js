@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { groupHasRoom } from "@/lib/capacity";
 
 // Request to join a group. Idempotent-ish: a duplicate request is treated as
 // "already requested" rather than an error (unique constraint on group+user).
@@ -38,6 +39,8 @@ export async function requestToJoin(groupId) {
 
   // Auto-join groups: add the member straight away, no approval.
   if (g.joining_method === "auto") {
+    const room = await groupHasRoom(supabase, groupId, user.id);
+    if (room.full) return { error: "This group is already full." };
     const { error: mErr } = await supabase
       .from("group_members")
       .insert({ group_id: groupId, user_id: user.id, role: "member" });
