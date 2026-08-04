@@ -33,7 +33,16 @@ export default function CreateProjectPage() {
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
   const canNext = () => (step === 1 ? d.name.trim().length > 0 : true);
 
+  // Team-size steppers that keep min ≤ max at all times.
+  const bumpMin = (delta) => setD((s) => ({ ...s, min_size: Math.min(s.max_size, Math.max(1, s.min_size + delta)) }));
+  const bumpMax = (delta) => setD((s) => ({ ...s, max_size: Math.min(50, Math.max(s.min_size, s.max_size + delta)) }));
+
   async function finish() {
+    // Client-side guard: dates must be in order.
+    if (d.timeline_start && d.timeline_end && d.timeline_start > d.timeline_end) {
+      setStep(1); setError("End date can't be before the start date.");
+      return;
+    }
     setSaving(true); setError("");
     const res = await createProject(d);
     setSaving(false);
@@ -113,13 +122,13 @@ export default function CreateProjectPage() {
             <div>
               <p className="mb-2 text-[13px] font-bold text-navy">Team size</p>
               <div className="flex gap-3">
-                {[["min_size", "Min"], ["max_size", "Max"]].map(([k, label]) => (
+                {[["min_size", "Min", bumpMin], ["max_size", "Max", bumpMax]].map(([k, label, bump]) => (
                   <div key={k} className="flex flex-1 items-center justify-between rounded-[14px] bg-[#f3f1f8] px-4" style={{ height: 48 }}>
                     <span className="text-[10px] font-bold uppercase text-muted">{label}</span>
                     <div className="flex items-center gap-3">
-                      <button type="button" onClick={() => set(k, Math.max(1, d[k] - 1))} className="text-[18px] font-bold text-purple-600">−</button>
+                      <button type="button" onClick={() => bump(-1)} className="text-[18px] font-bold text-purple-600">−</button>
                       <span className="text-[15px] font-bold text-navy">{d[k]}</span>
-                      <button type="button" onClick={() => set(k, d[k] + 1)} className="text-[18px] font-bold text-purple-600">+</button>
+                      <button type="button" onClick={() => bump(1)} className="text-[18px] font-bold text-purple-600">+</button>
                     </div>
                   </div>
                 ))}

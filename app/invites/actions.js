@@ -33,6 +33,14 @@ export async function respondToInvite(requestId, accept) {
     .insert({ group_id: req.group_id, user_id: user.id, role: "member" });
   if (memErr && memErr.code !== "23505") return { error: memErr.message };
 
+  // Keep the project roster in sync (self-insert, allowed by pmembers_write).
+  try {
+    const { data: grp } = await supabase.from("groups").select("project_id").eq("id", req.group_id).single();
+    if (grp?.project_id) {
+      await supabase.from("project_members").insert({ project_id: grp.project_id, user_id: user.id }).then(() => {}, () => {});
+    }
+  } catch {}
+
   try {
     const { data: g } = await supabase.from("groups").select("leader_id, project_id, name").eq("id", req.group_id).single();
     const { data: me } = await supabase.from("profiles").select("full_name, username").eq("id", user.id).single();

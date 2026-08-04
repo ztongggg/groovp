@@ -9,12 +9,13 @@ export default function RequestButton({ groupId }) {
   async function onClick() {
     setStatus("loading");
     const res = await requestToJoin(groupId);
-    setStatus(res?.error ? "error" : res?.reapplied ? "reapplied" : "done");
+    setStatus(res?.error ? "error" : res?.joined ? "joined" : res?.reapplied ? "reapplied" : "done");
   }
 
-  const done = status === "done" || status === "reapplied";
+  const done = status === "done" || status === "reapplied" || status === "joined";
   const label =
     status === "loading" ? "…"
+      : status === "joined" ? "Joined ✓"
       : status === "reapplied" ? "Re-requested ✓"
       : status === "done" ? "Requested ✓"
       : status === "error" ? "Try again"

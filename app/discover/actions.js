@@ -13,9 +13,22 @@ export async function requestToJoin(groupId) {
   } = await supabase.auth.getUser();
   if (!user) return { error: "You must be signed in." };
 
-  // If a previous request exists, decide what to do based on its status.
-  // A declined applicant is allowed to reapply (flip declined -> pending);
-  // a pending/accepted one is simply told they've already requested.
+  const { data: g } = await supabase
+    .from("groups")
+    .select("id, leader_id, project_id, name, joining_method")
+    .eq("id", groupId)
+    .single();
+  if (!g) return { error: "Group not found." };
+
+  // Already a member? Nothing to do.
+  const { data: mem } = await supabase
+    .from("group_members")
+    .select("user_id")
+    .eq("group_id", groupId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (mem) return { ok: true, already: true };
+
   const { data: existing } = await supabase
     .from("join_requests")
     .select("id, status")
@@ -23,6 +36,22 @@ export async function requestToJoin(groupId) {
     .eq("user_id", user.id)
     .maybeSingle();
 
+  // Auto-join groups: add the member straight away, no approval.
+  if (g.joining_method === "auto") {
+    const { error: mErr } = await supabase
+      .from("group_members")
+      .insert({ group_id: groupId, user_id: user.id, role: "member" });
+    if (mErr && mErr.code !== "23505") return { error: mErr.message };
+    if (g.project_id) {
+      await supabase.from("project_members").insert({ project_id: g.project_id, user_id: user.id }).then(() => {}, () => {});
+    }
+    if (existing) await supabase.from("join_requests").update({ status: "accepted" }).eq("id", existing.id);
+    else await supabase.from("join_requests").insert({ group_id: groupId, user_id: user.id, status: "accepted" }).then(() => {}, () => {});
+    await notifyJoined(supabase, g, user.id);
+    return { ok: true, joined: true };
+  }
+
+  // Approval groups: create / revive a pending request.
   if (existing) {
     if (existing.status === "declined") {
       const { error: reErr } = await supabase
@@ -47,6 +76,18 @@ export async function requestToJoin(groupId) {
 
   await notifyLeader(supabase, groupId, user.id);
   return { ok: true };
+}
+
+// Auto-join: tell the leader someone joined.
+async function notifyJoined(supabase, g, joinerId) {
+  try {
+    if (g?.leader_id && g.leader_id !== joinerId) {
+      const { data: proj } = g.project_id ? await supabase.from("projects").select("name").eq("id", g.project_id).single() : { data: null };
+      const { data: who } = await supabase.from("profiles").select("full_name, username").eq("id", joinerId).single();
+      const nm = who?.full_name || who?.username || "Someone";
+      await supabase.from("notifications").insert({ user_id: g.leader_id, type: "join_accepted", related_id: g.id, body: `${nm} joined ${proj?.name || g.name}` });
+    }
+  } catch {}
 }
 
 // Notify a group's leader of a new/renewed join request.

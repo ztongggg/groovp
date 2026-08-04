@@ -14,9 +14,14 @@ export async function submitRating(rateeId, stars, comment) {
   if (!user) return { error: "You must be signed in." };
   if (user.id === rateeId) return { error: "You can't rate yourself." };
 
+  // One rating per pair — re-rating updates the existing one (needs the
+  // ratings_rater_ratee_uniq index from schema_v6).
   const { error } = await supabase
     .from("ratings")
-    .insert({ rater_id: user.id, ratee_id: rateeId, stars, comment: comment?.trim() || null });
+    .upsert(
+      { rater_id: user.id, ratee_id: rateeId, stars, comment: comment?.trim() || null },
+      { onConflict: "rater_id,ratee_id" }
+    );
   if (error) return { error: error.message };
 
   revalidatePath(`/u/${rateeId}`);

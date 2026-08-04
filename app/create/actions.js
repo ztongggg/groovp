@@ -21,6 +21,13 @@ export async function createProject(data) {
   if (!user) return { error: "You must be signed in." };
   if (!data.name?.trim()) return { error: "Project name is required." };
 
+  // Server-side sanity guards (client can be bypassed).
+  const minSize = Math.max(1, Number(data.min_size) || 1);
+  const maxSize = Math.max(minSize, Number(data.max_size) || minSize);
+  if (data.timeline_start && data.timeline_end && data.timeline_start > data.timeline_end) {
+    return { error: "End date can't be before the start date." };
+  }
+
   // Insert with a unique join_code, retrying if we hit the rare collision.
   let project = null;
   let lastErr = null;
@@ -34,8 +41,8 @@ export async function createProject(data) {
         type: data.type || "academic",
         skills_needed: data.skills || [],
         interests: data.interests || [],
-        min_size: data.min_size || 2,
-        max_size: data.max_size || 5,
+        min_size: minSize,
+        max_size: maxSize,
         timeline_start: data.timeline_start || null,
         timeline_end: data.timeline_end || null,
         privacy: data.privacy || "public",
