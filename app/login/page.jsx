@@ -4,6 +4,15 @@ import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import StatusBar from "@/components/StatusBar";
 import { signIn } from "@/app/auth/actions";
+import { createClient } from "@/lib/supabase/client";
+
+async function signInWithLinkedIn() {
+  const supabase = createClient();
+  await supabase.auth.signInWithOAuth({
+    provider: "linkedin_oidc",
+    options: { redirectTo: `${window.location.origin}/auth/callback?next=/home` },
+  });
+}
 
 function LoginButton() {
   const { pending } = useFormStatus();
@@ -48,10 +57,10 @@ export default function LoginPage() {
 
       <LoginButton />
 
-      {/* LinkedIn (visual only) */}
-      <button type="button" className="absolute flex items-center justify-center gap-2" style={{ left: 32, top: 588, width: 337, height: 49, borderRadius: 20, background: "#7c3aed" }}>
+      {/* Sign in with LinkedIn (real OAuth) */}
+      <button type="button" onClick={signInWithLinkedIn} className="absolute flex items-center justify-center gap-2" style={{ left: 32, top: 588, width: 337, height: 49, borderRadius: 20, background: "#0a66c2" }}>
         <span className="flex h-5 w-5 items-center justify-center rounded" style={{ background: "#fff" }}><span style={{ fontSize: 11, fontWeight: 900, color: "#0a66c2" }}>in</span></span>
-        <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Verify with LinkedIn</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Continue with LinkedIn</span>
       </button>
 
       {/* sign up */}

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function ShareIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -16,6 +18,7 @@ function HeartIcon() {
 
 // Exact Home "Join Project Card" — 280x299, absolute internals per Figma.
 export default function HomeProjectCard({
+  id,
   title,
   desc,
   skills = [],
@@ -30,8 +33,9 @@ export default function HomeProjectCard({
   const joinColor = join === "green" ? "#5f7900" : "#ffffff";
 
   return (
-    <div
-      className="relative shrink-0"
+    <Link
+      href={id ? `/project/${id}` : "#"}
+      className="relative block shrink-0"
       style={{ width: 280, height: 299, borderRadius: 18, background: "#fff", border: "1px solid #e4e3e3" }}
     >
       {/* image header */}
@@ -83,13 +87,13 @@ export default function HomeProjectCard({
       {/* date */}
       <div className="absolute" style={{ left: 13, top: 217, fontSize: 10, fontWeight: 700, color: "#6b7280" }}>{date}</div>
 
-      {/* join button */}
-      <button
+      {/* view CTA (whole card links to the project) */}
+      <span
         className="absolute flex items-center justify-center"
         style={{ left: 13, top: 246, width: 257, height: 35, borderRadius: 12, background: joinBg }}
       >
-        <span style={{ fontSize: 10.9, fontWeight: 800, color: joinColor }}>Join Project</span>
-      </button>
-    </div>
+        <span style={{ fontSize: 10.9, fontWeight: 800, color: joinColor }}>View project</span>
+      </span>
+    </Link>
   );
 }

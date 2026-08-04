@@ -64,16 +64,6 @@ export default async function SettingsPage() {
             </Link>
           )}
 
-          {/* cosmetic section */}
-          <div className="rounded-2xl border border-line bg-white">
-            {["Notification preferences", "Privacy", "Help & Support"].map((row, i) => (
-              <div key={row} className={`flex items-center justify-between px-5 py-4 ${i > 0 ? "border-t border-line" : ""}`}>
-                <span className="text-[15px] font-semibold text-navy">{row}</span>
-                <span className="text-[18px] text-muted">›</span>
-              </div>
-            ))}
-          </div>
-
           <form action={signOut}>
             <button type="submit" className="w-full rounded-2xl py-3.5 text-[15px] font-bold" style={{ background: "#fae0e0", color: "#bf4247" }}>Log Out</button>
           </form>
