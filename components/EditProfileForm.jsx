@@ -24,7 +24,6 @@ export default function EditProfileForm({ initial }) {
   const [d, setD] = useState({
     full_name: initial.full_name || "",
     username: initial.username || "",
-    university: initial.university || "SUTD",
     major: initial.major || "",
     year: initial.year || "",
     personality: initial.personality || "",
@@ -33,6 +32,9 @@ export default function EditProfileForm({ initial }) {
     location: initial.location || "",
     skills: initial.skills || [], // [{ name, level }]
     interests: initial.interests || [],
+    linkedin_url: initial.linkedin_url || "",
+    github_url: initial.github_url || "",
+    portfolio_url: initial.portfolio_url || "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -55,7 +57,12 @@ export default function EditProfileForm({ initial }) {
     <div className="flex flex-col gap-3 px-6 pb-10">
       <input className={cls} placeholder="Full name" value={d.full_name} onChange={(e) => set("full_name", e.target.value)} />
       <input className={cls} placeholder="Username" value={d.username} onChange={(e) => set("username", e.target.value)} />
-      <input className={cls} placeholder="University" value={d.university} onChange={(e) => set("university", e.target.value)} />
+      {/* University is derived from your verified signup email domain — not editable here,
+          otherwise the "Restricted (same school)" privacy tier would mean nothing. */}
+      <div className={`${cls} flex items-center justify-between`}>
+        <span>{initial.university || "University"}</span>
+        <span className="text-[11px] font-bold uppercase tracking-wide text-muted">Verified</span>
+      </div>
       <input className={cls} placeholder="Major" value={d.major} onChange={(e) => set("major", e.target.value)} />
 
       <p className="mt-2 text-[13px] font-bold uppercase tracking-wide text-muted">Year of study</p>
@@ -93,6 +100,13 @@ export default function EditProfileForm({ initial }) {
 
       <p className="mt-4 text-[13px] font-bold uppercase tracking-wide text-muted">Interests</p>
       <div className="flex flex-wrap gap-2">{INTEREST_OPTIONS.map((x) => <Chip key={x} active={d.interests.includes(x)} onClick={() => toggleInterest(x)}>{x}</Chip>)}</div>
+
+      <p className="mt-4 text-[13px] font-bold uppercase tracking-wide text-muted">Links</p>
+      <div className="flex flex-col gap-2.5">
+        <input className={cls} placeholder="LinkedIn URL" value={d.linkedin_url} onChange={(e) => set("linkedin_url", e.target.value)} />
+        <input className={cls} placeholder="GitHub URL" value={d.github_url} onChange={(e) => set("github_url", e.target.value)} />
+        <input className={cls} placeholder="Portfolio website URL" value={d.portfolio_url} onChange={(e) => set("portfolio_url", e.target.value)} />
+      </div>
 
       {error && <p className="mt-3 text-[14px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
 

@@ -17,7 +17,9 @@ export async function updateProfile(data) {
     .update({
       full_name: data.full_name?.trim() || null,
       username: data.username?.trim() || null,
-      university: data.university?.trim() || "SUTD",
+      // university intentionally NOT here — it's derived from the verified signup
+      // email domain (see app/auth/actions.js signUpFull), not user-editable, or the
+      // "Restricted (same school)" privacy tier would mean nothing.
       major: data.major?.trim() || null,
       year: data.year || null,
       personality: data.personality || null,
@@ -26,6 +28,9 @@ export async function updateProfile(data) {
       location: data.location || null,
       skills: skillList.map((s) => s.name),
       interests: data.interests || [],
+      linkedin_url: data.linkedin_url?.trim() || null,
+      github_url: data.github_url?.trim() || null,
+      portfolio_url: data.portfolio_url?.trim() || null,
     })
     .eq("id", user.id);
   if (error) {

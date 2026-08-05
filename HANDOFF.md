@@ -220,6 +220,20 @@ Ran a dedicated code audit (not just grep — actually read each file) against e
 - Also fixed stale `app/layout.jsx` metadata description ("Find and evaluate teammates **at SUTD** before you commit") — another leftover from before the multi-university decision, same class of bug as the Create Project privacy-label fix earlier this session.
 - **Verified**: `npm run build` clean, `/groups/[groupId]` compiles (1.88kB). Not click-tested live.
 
+## FINAL EXHAUSTIVE PASS (2026-08-05) — checked all ~90 frames in the Figma file against the app, not just the 13 sections
+
+Went through the complete frame tree from the original `get_metadata` dump (every section, every frame) one at a time against current code. Found **2 real things**, both fixed:
+
+1. **"Projects & Links" (spec `895:1871`) wasn't actually editable after signup — real gap.** `linkedin_url`/`github_url`/`portfolio_url` were only ever set once at Signup Step 6; `components/EditProfileForm.jsx` and `app/edit-profile/actions.js` never touched them. Added all 3 as editable fields in Edit Profile, wired through `app/edit-profile/page.jsx`'s query and the update action.
+2. **Found and fixed a real security/integrity bug while touching that same form**: `EditProfileForm.jsx` had a free-text "University" input, and `app/edit-profile/actions.js` happily saved whatever the user typed there — meaning anyone could edit their university to anything post-signup, **completely undermining today's earlier multi-university decision** (university is supposed to be derived from the verified signup email domain specifically so the "Restricted, same-school-only" privacy tier means something). Fixed: University is now a read-only "Verified" display in Edit Profile, and `updateProfile()` no longer accepts a `university` field at all — it can only ever be set once, at signup, from the domain lookup.
+
+**Everything else checked and already accounted for** — either built, or a previously-flagged deliberate scope cut still holding:
+- Signup Step 4 "Skills (Searching)" sub-state (`771:13557`) — no search box in the 17-item skill picker. Not built; low value (17 items don't need search), accepted as-is, not re-flagging as a gap.
+- Signup Step 6's 3 richer "Filled in"/"Add Project" modal variants — covered functionally by the inline mini-forms built earlier this session, not literal separate screens. Already noted as a deliberate scope decision, not new.
+- Create Project / Academic Step 1&2 error-state variants (`1001:1067`, `1001:1099`, `1107:3796`) — inline error text only, no distinct error screens. Already flagged earlier, low priority, unchanged.
+
+**Verified**: `npm run build` clean. Not yet click-tested live — no new schema needed for this batch (`linkedin_url` etc already existed as columns since `schema.sql`), so just needs push + deploy.
+
 ## CURRENT OPEN ITEMS (as of end of session 2026-08-05) — everything else in this file above is history/context, this is the actual punch list
 
 **Owner decision needed before building (don't guess at these):**

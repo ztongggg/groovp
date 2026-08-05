@@ -9,7 +9,7 @@ async function getProfile() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return {};
-    const { data: p } = await supabase.from("profiles").select("full_name, username, university, major, year, personality, prefer_working, best_work_time, location, skills, interests").eq("id", user.id).single();
+    const { data: p } = await supabase.from("profiles").select("full_name, username, university, major, year, personality, prefer_working, best_work_time, location, skills, interests, linkedin_url, github_url, portfolio_url").eq("id", user.id).single();
 
     // Prefer per-skill proficiency (user_skills); fall back to plain names.
     let skills = (p?.skills || []).map((n) => ({ name: n, level: "Basic" }));
