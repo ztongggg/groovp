@@ -257,6 +257,8 @@ One real bug hit + fixed earlier in the SQL run: the proficiency migration origi
 
 **Test accounts live in the DB from verification, not cleaned up**: `liveverifytest99@sutd.edu.sg` (profile data), and a project "Live Verify Project" (`GRV-LJH24`) with test cover/avatar images uploaded to Storage. Consider adding to `supabase/cleanup_demo_data.sql` before real users see them.
 
+**Live re-verification after the 7-gap batch deployed**: Filter Panel confirmed fully working (skills+team-size combo filter tested live, list actually narrowed from 6 projects to 2 correctly) — note this took a few tries to confirm because splitting a click and its verification across two separate browser-automation tool calls kept reading stale DOM state; verifying click-then-check within one atomic call was the fix. Also confirmed live: Ratings History page (real route, correct empty state), Join Request Modal (opens on Discover's Request button with the note textarea). Recurring console `404` seen on nearly every page turned out to not correspond to any actual request in the network log across ~10 page loads — near-certainly browser-chrome-level noise (e.g. a favicon fetch outside the page's own JS), not an app defect; stopped chasing it.
+
 Full spec file kept at `C:\Users\limzh\Downloads\groovp-backend-spec-v2.md` (outside repo — consider copying into `supabase/` or repo root so it's not lost/forgotten between sessions — not yet done).
 
 ## Working style / prefs
