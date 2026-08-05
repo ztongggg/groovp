@@ -44,6 +44,7 @@ async function getProfile() {
     const subtitleParts = [p?.year, p?.major, p?.university || "SUTD"].filter(Boolean);
 
     return {
+      userId: user.id,
       name: p?.full_name || emailName,
       username: p?.username || emailName,
       subtitle: subtitleParts.join(" · "),

@@ -45,6 +45,11 @@ async function getData(id, groupId) {
 
 export default async function UserProfilePage({ params, searchParams }) {
   const { me, p, ratings, blocked, match } = await getData(params.id, searchParams?.groupId);
+  const groupId = searchParams?.groupId;
+  const queue = searchParams?.queue ? searchParams.queue.split(",").filter(Boolean) : [];
+  const queueIndex = queue.indexOf(params.id);
+  const showPaging = queue.length > 1 && queueIndex !== -1;
+  const pagingHref = (i) => `/u/${queue[i]}?groupId=${groupId}&queue=${queue.join(",")}`;
 
   if (!p) {
     return (
@@ -65,6 +70,13 @@ export default async function UserProfilePage({ params, searchParams }) {
       <div className="min-h-full bg-white pb-8">
         <div className="relative h-32" style={{ background: "linear-gradient(135deg,#2d1a6b,#5929bf)" }}>
           <Link href="/applicants" className="absolute left-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/85 text-[18px] text-navy">‹</Link>
+          {showPaging && (
+            <div className="absolute left-1/2 top-5 flex -translate-x-1/2 items-center gap-3 rounded-full bg-white/85 px-3 py-1.5">
+              <Link href={pagingHref(Math.max(0, queueIndex - 1))} aria-label="Previous applicant" className="text-[16px] font-bold text-navy" style={{ opacity: queueIndex === 0 ? 0.35 : 1, pointerEvents: queueIndex === 0 ? "none" : "auto" }}>‹</Link>
+              <span className="text-[12px] font-bold text-navy">{queueIndex + 1} of {queue.length}</span>
+              <Link href={pagingHref(Math.min(queue.length - 1, queueIndex + 1))} aria-label="Next applicant" className="text-[16px] font-bold text-navy" style={{ opacity: queueIndex === queue.length - 1 ? 0.35 : 1, pointerEvents: queueIndex === queue.length - 1 ? "none" : "auto" }}>›</Link>
+            </div>
+          )}
           {me && me !== p.id && (
             <div className="absolute right-5 top-5">
               <ModerationMenu userId={p.id} name={name} blocked={blocked} />

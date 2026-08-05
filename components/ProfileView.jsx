@@ -57,7 +57,7 @@ function SkillsCard({ skills }) {
   );
 }
 
-export default function ProfileView({ name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [], pastProjects = [], linkedinVerified = false, githubVerified = false }) {
+export default function ProfileView({ userId, name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [], pastProjects = [], linkedinVerified = false, githubVerified = false }) {
   const [tab, setTab] = useState("about");
 
   return (
@@ -90,11 +90,12 @@ export default function ProfileView({ name, username, subtitle, ratingLabel, rat
         </div>
 
         <p className="mt-3 text-[15px] text-muted">{subtitle}</p>
-        <div className="mt-1 flex items-center gap-2">
+        <Link href={`/ratings/${userId}`} className="mt-1 flex items-center gap-2">
           <StarIcon />
           <span className="text-[20px] font-extrabold text-navy">{ratingLabel}</span>
           <span className="text-[14px] text-muted">({ratingCount} Ratings)</span>
-        </div>
+          {ratingCount > 0 && <span className="text-[13px] font-bold text-purple-600">See all ›</span>}
+        </Link>
 
         {/* tabs */}
         <div className="mt-5 flex rounded-2xl bg-[#eeebf3] p-1.5">
@@ -129,10 +130,13 @@ export default function ProfileView({ name, username, subtitle, ratingLabel, rat
               <p className="py-8 text-center text-[14px] text-muted">No past projects yet.</p>
             ) : (
               pastProjects.map((pp) => (
-                <div key={pp.id} className="rounded-2xl border border-line bg-white p-4">
-                  <p className="text-[15px] font-bold text-navy">{pp.role}</p>
-                  {pp.write_up && <p className="mt-1 text-[13px] text-muted">{pp.write_up}</p>}
-                </div>
+                <Link key={pp.id} href={`/past-projects/${pp.id}`} className="flex items-center justify-between rounded-2xl border border-line bg-white p-4">
+                  <div className="min-w-0">
+                    <p className="truncate text-[15px] font-bold text-navy">{pp.role}</p>
+                    {pp.write_up && <p className="mt-1 truncate text-[13px] text-muted">{pp.write_up}</p>}
+                  </div>
+                  <span className="shrink-0 text-[16px] text-muted">›</span>
+                </Link>
               ))
             )}
           </div>

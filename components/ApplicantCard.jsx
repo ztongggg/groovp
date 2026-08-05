@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { acceptRequest, declineRequest } from "@/app/applicants/actions";
 
-export default function ApplicantCard({ id, groupId, applicantId, name, username, skills = [], project, group, comment, isStrongMatch, matchedSkills = [] }) {
+export default function ApplicantCard({ id, groupId, applicantId, name, username, skills = [], project, group, comment, isStrongMatch, matchedSkills = [], queueIds = [] }) {
   const [state, setState] = useState("idle"); // idle | working | accepted | declined | error
   const [msg, setMsg] = useState("");
 
@@ -31,7 +31,7 @@ export default function ApplicantCard({ id, groupId, applicantId, name, username
 
   return (
     <div className="rounded-2xl border border-line bg-white p-4 shadow-card">
-      <Link href={`/u/${applicantId}?groupId=${groupId}`} className="flex items-center gap-3">
+      <Link href={`/u/${applicantId}?groupId=${groupId}${queueIds.length > 1 ? `&queue=${queueIds.join(",")}` : ""}`} className="flex items-center gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-full text-[13px] font-bold text-white" style={{ background: "#7c3aed" }}>
           {(name || "?").slice(0, 2).toUpperCase()}
         </span>

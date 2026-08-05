@@ -48,6 +48,13 @@ function TeamRow({ top, color, title, subtitle, href, photoUrl }) {
 
 export default function TeamsView({ requests = [], teams = [] }) {
   const [tab, setTab] = useState("requested");
+  const [q, setQ] = useState("");
+
+  const query = q.trim().toLowerCase();
+  const matches = (t) => !query || [t.title, t.subtitle].join(" ").toLowerCase().includes(query);
+  const filteredRequests = requests.filter(matches);
+  const filteredTeams = teams.filter(matches);
+  const listTop = 190;
 
   return (
     <div className="relative w-[402px]" style={{ minHeight: 794, background: "#f9f8fb" }}>
@@ -60,12 +67,21 @@ export default function TeamsView({ requests = [], teams = [] }) {
         <span style={{ fontSize: 12.5, fontWeight: 600, color: tab === "requested" ? "#fff" : "#1d1b44" }}>Requested</span>
       </button>
 
+      {(tab === "requested" ? requests.length > 0 : teams.length > 0) && (
+        <div className="absolute flex items-center" style={{ left: 24, top: 146, width: 354, height: 40, borderRadius: 14, background: "#f0eef5", paddingLeft: 14 }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#757080" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" className="ml-2.5 w-full bg-transparent text-[13px] text-navy focus:outline-none" />
+        </div>
+      )}
+
       {tab === "requested" ? (
         requests.length === 0 ? (
-          <div className="absolute" style={{ left: 24, top: 200, fontSize: 13, color: "#757080" }}>No requests yet. Request to join a project from Discover.</div>
+          <div className="absolute" style={{ left: 24, top: listTop, fontSize: 13, color: "#757080" }}>No requests yet. Request to join a project from Discover.</div>
+        ) : filteredRequests.length === 0 ? (
+          <div className="absolute" style={{ left: 24, top: listTop, fontSize: 13, color: "#757080" }}>No matches for &quot;{q}&quot;.</div>
         ) : (
-          requests.map((r, i) => (
-            <RequestRow key={r.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={r.title} subtitle={r.subtitle} applied={r.applied} status={r.status} photoUrl={r.photoUrl} />
+          filteredRequests.map((r, i) => (
+            <RequestRow key={r.id} top={listTop + i * 108} color={COLORS[i % COLORS.length]} title={r.title} subtitle={r.subtitle} applied={r.applied} status={r.status} photoUrl={r.photoUrl} />
           ))
         )
       ) : teams.length === 0 ? (
@@ -75,9 +91,11 @@ export default function TeamsView({ requests = [], teams = [] }) {
           <p className="text-[16px] font-semibold text-navy">You&apos;re not on a team yet</p>
           <p className="mt-1 text-[14px] text-muted">Browse Discover to find a project, or start your own.</p>
         </div>
+      ) : filteredTeams.length === 0 ? (
+        <div className="absolute" style={{ left: 24, top: listTop, fontSize: 13, color: "#757080" }}>No matches for &quot;{q}&quot;.</div>
       ) : (
-        teams.map((t, i) => (
-          <TeamRow key={t.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={t.title} subtitle={t.subtitle} href={t.kind === "dm" ? `/dm/${t.id}` : `/chat/${t.id}`} photoUrl={t.photoUrl} />
+        filteredTeams.map((t, i) => (
+          <TeamRow key={t.id} top={listTop + i * 108} color={COLORS[i % COLORS.length]} title={t.title} subtitle={t.subtitle} href={t.kind === "dm" ? `/dm/${t.id}` : `/chat/${t.id}`} photoUrl={t.photoUrl} />
         ))
       )}
     </div>

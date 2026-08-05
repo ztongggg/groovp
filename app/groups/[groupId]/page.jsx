@@ -3,6 +3,7 @@ import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
 import { createClient } from "@/lib/supabase/server";
 import LeaveGroupButton from "@/components/LeaveGroupButton";
+import JoinGroupButton from "@/components/JoinGroupButton";
 
 async function getData(groupId) {
   try {
@@ -11,7 +12,7 @@ async function getData(groupId) {
 
     const { data: g } = await supabase
       .from("groups")
-      .select("id, name, photo_url, leader_id, recruiting, members_wanted, skills_wanted, personality_wanted, interests_wanted, additional_notes, max_members, status")
+      .select("id, name, photo_url, leader_id, project_id, recruiting, members_wanted, skills_wanted, personality_wanted, interests_wanted, additional_notes, max_members, status")
       .eq("id", groupId)
       .single();
     if (!g) return null;
@@ -67,7 +68,7 @@ export default async function GroupInfoPage({ params }) {
       <div className="min-h-full bg-white pb-8">
         <StatusBar />
         <div className="flex items-center gap-3 px-6">
-          <Link href={`/chat/${group.id}`} className="text-[22px] text-navy">‹</Link>
+          <Link href={isMember ? `/chat/${group.id}` : group.project_id ? `/project/${group.project_id}` : "/discover"} className="text-[22px] text-navy">‹</Link>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d1b44" }}>Group Info</h1>
         </div>
 
@@ -149,6 +150,12 @@ export default async function GroupInfoPage({ params }) {
         {isMember && !isLeader && (
           <div className="mt-6 px-6">
             <LeaveGroupButton groupId={group.id} />
+          </div>
+        )}
+
+        {!isMember && !isLeader && recruiting && (
+          <div className="mt-6 px-6">
+            <JoinGroupButton groupId={group.id} full={members.length >= (group.max_members || 99)} />
           </div>
         )}
       </div>

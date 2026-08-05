@@ -88,6 +88,11 @@ export default async function DiscoverPage() {
                 groupId: group?.id,
                 strongMatch: shared >= STRONG_MATCH_THRESHOLD,
                 coverImageUrl: p.cover_image_url,
+                interests: p.interests || [],
+                timelineStart: p.timeline_start,
+                timelineEnd: p.timeline_end,
+                minSize: p.min_size,
+                maxSize: p.max_size,
               };
             })}
           />

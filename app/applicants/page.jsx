@@ -81,7 +81,9 @@ export default async function ApplicantsPage() {
         ) : (
           <div className="mt-5 flex flex-col gap-4 px-6">
             {pending.length > 0 && <p className="text-[12px] font-bold uppercase tracking-wide text-muted">Pending · {pending.length}</p>}
-            {pending.map((a) => <ApplicantCard key={a.id} {...a} />)}
+            {pending.map((a) => (
+              <ApplicantCard key={a.id} {...a} queueIds={pending.filter((p) => p.groupId === a.groupId).map((p) => p.applicantId)} />
+            ))}
 
             {invited.length > 0 && (
               <>

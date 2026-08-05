@@ -5,7 +5,8 @@ import { groupHasRoom } from "@/lib/capacity";
 
 // Request to join a group. Idempotent-ish: a duplicate request is treated as
 // "already requested" rather than an error (unique constraint on group+user).
-export async function requestToJoin(groupId) {
+export async function requestToJoin(groupId, note) {
+  const comment = (note || "").trim() || null;
   if (!groupId) return { error: "This project has no group to join yet." };
 
   const supabase = createClient();
@@ -65,7 +66,7 @@ export async function requestToJoin(groupId) {
       }
       const { error: reErr } = await supabase
         .from("join_requests")
-        .update({ status: "pending", declined_at: null })
+        .update({ status: "pending", declined_at: null, comment })
         .eq("id", existing.id);
       if (reErr) return { error: reErr.message };
       await notifyLeader(supabase, groupId, user.id);
@@ -76,7 +77,7 @@ export async function requestToJoin(groupId) {
 
   const { error } = await supabase
     .from("join_requests")
-    .insert({ group_id: groupId, user_id: user.id, status: "pending" });
+    .insert({ group_id: groupId, user_id: user.id, status: "pending", comment });
 
   if (error) {
     if (error.code === "23505") return { ok: true, already: true }; // race: unique violation
