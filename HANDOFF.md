@@ -244,7 +244,9 @@ Ran a dedicated code audit (not just grep — actually read each file) against e
 
 **Not built, needs a schema decision, not guessed at**: nothing else — the Personal-vs-Academic-parity gap flagged in the previous audit is now resolved by item 4 above (the number-of-groups field was the actual missing piece).
 
-**Verified**: `npm run build` clean, 28 routes total now (up from 25), all new/touched routes compile including the 3 new settings pages. Not yet click-tested live — `schema_v9.sql` needs to run first (new columns: `projects.number_of_groups`, and 5 new `profiles` boolean columns) or every one of these features will silently no-op against missing columns.
+**Verified**: `npm run build` clean, 28 routes total now (up from 25), all new/touched routes compile including the 3 new settings pages.
+
+**Live-verified after `schema_v9.sql` ran + deployed (same session)**: Help & Support renders correctly. Privacy toggles — clicked "Show ratings publicly" off, **confirmed real DB persistence** by reloading the page and re-reading the toggle's rendered state (not just optimistic client state). Notification Preferences page renders all 3 toggles with correct copy. Academic "Number of groups" field renders in Create Project Step 2 with a working stepper. Deploy took ~2 min to propagate this time — a `curl` HEAD check returning `307` (redirect to login, not 404) was the signal it had gone live before the browser tab caught up.
 
 **Progress 2026-08-05 (further session) — `cover_image` built (spec §2), the wide project banner, separate field from `photo`:**
 - `supabase/schema_v8.sql` (new file — `schema_v7.sql` was already run/deployed, don't append further to it) — `projects.cover_image_url` column + a dedicated `project-covers` Storage bucket (public, 5MB, JPEG/PNG). **Not yet run against Supabase.**
