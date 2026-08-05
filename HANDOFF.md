@@ -219,6 +219,10 @@ Found a real bug while working through the spec: Home's "Recently viewed" header
 - Edit Project screen (host-only, `project.owner_id` already exists so no new role concept needed, just the UI).
 - Still-open product decisions (profile completeness formula, delete-project cascade, rating edit-after-submit lock, Popular-sort metric) — ask owner before building the specific feature that needs each one.
 
+**Status as of end of session 2026-08-05: schema_v7.sql RUN successfully against Supabase (owner confirmed), code COMMITTED locally (`de6ac2c`, 47 files) — NOT YET PUSHED.** Next session should check whether the owner has pushed via GitHub Desktop yet; if so, verify everything live on Vercel (signup flow with a real university email, matching badges on Requests, all 8 new screens, file/photo upload). If not pushed yet, that's the very next step.
+
+One real bug hit + fixed during the SQL run: the proficiency migration originally ran `UPDATE ... SET proficiency='Good'` **before** widening the CHECK constraint, so Postgres rejected 'Good' against the still-active old `('Basic','Pro','Expert')` constraint. Fixed by reordering (widen constraint → migrate data → narrow constraint) — `schema_v7.sql` now has the corrected order committed. If re-running this file elsewhere, the corrected version is safe to re-run (idempotent).
+
 Full spec file kept at `C:\Users\limzh\Downloads\groovp-backend-spec-v2.md` (outside repo — consider copying into `supabase/` or repo root so it's not lost/forgotten between sessions — not yet done).
 
 ## Working style / prefs
