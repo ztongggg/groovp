@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { savePastProject } from "@/lib/pastProjects";
 
 export async function signIn(_prevState, formData) {
   const email = formData.get("email");
@@ -79,16 +80,16 @@ export async function signUpFull(data) {
         linkedin_url: data.linkedin_url || null,
         github_url: data.github_url || null,
         portfolio_url: data.portfolio_url || null,
+        has_completed_onboarding_tour: false,
       })
       .eq("id", uid);
 
     // Step 6 "Add Project" entries — no project exists yet at signup time,
     // so these save as freestanding past_projects rows (project_id null).
     if ((data.pending_projects || []).length) {
-      await supabase
-        .from("past_projects")
-        .insert(data.pending_projects.map((p) => ({ user_id: uid, role: p.role || null, write_up: p.write_up || null })))
-        .then(() => {}, () => {});
+      await Promise.all(
+        data.pending_projects.map((p) => savePastProject(supabase, { userId: uid, role: p.role, writeUp: p.write_up }))
+      ).catch(() => {});
     }
 
     // v2-only column — separate call so a missing column can't reject the core update.

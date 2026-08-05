@@ -18,10 +18,11 @@ export async function requestToJoin(groupId, note) {
 
   const { data: g } = await supabase
     .from("groups")
-    .select("id, leader_id, project_id, name, joining_method")
+    .select("id, leader_id, project_id, name, joining_method, recruiting")
     .eq("id", groupId)
     .single();
   if (!g) return { error: "Group not found." };
+  if (g.recruiting === false) return { error: "This group isn't recruiting right now." };
 
   // Already a member? Nothing to do.
   const { data: mem } = await supabase
@@ -55,6 +56,11 @@ export async function requestToJoin(groupId, note) {
     await notifyJoined(supabase, g, user.id);
     return { ok: true, joined: true };
   }
+
+  // Approval groups: same capacity guard the auto-join path already had — a
+  // pending request shouldn't be acceptable-in-principle if there's no room.
+  const room = await groupHasRoom(supabase, groupId, user.id);
+  if (room.full) return { error: "This group is already full." };
 
   // Approval groups: create / revive a pending request.
   if (existing) {

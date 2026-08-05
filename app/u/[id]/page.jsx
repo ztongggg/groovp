@@ -37,14 +37,33 @@ async function getData(id, groupId) {
       } catch {}
     }
 
-    return { me: user?.id || null, p, ratings: ratings || [], blocked, match };
+    // Rate Teammates is only legal against a project you and they shared a now-
+    // ended group on (spec's business rule) — resolve the first eligible one so
+    // the generic profile Rate form has a real project_id to submit against.
+    // If there's more than one shared ended project, this picks one of them
+    // (not necessarily "the most recent") rather than presenting a picker.
+    let rateableProjectId = null;
+    if (user && user.id !== id) {
+      try {
+        const { data: myEnded } = await supabase.from("group_members").select("group_id, groups!inner(project_id, status)").eq("user_id", user.id).eq("groups.status", "Ended");
+        const myGroupIds = (myEnded || []).map((g) => g.group_id);
+        if (myGroupIds.length) {
+          const { data: shared } = await supabase.from("group_members").select("group_id").eq("user_id", id).in("group_id", myGroupIds);
+          const sharedIds = new Set((shared || []).map((s) => s.group_id));
+          const found = (myEnded || []).find((g) => sharedIds.has(g.group_id));
+          rateableProjectId = found?.groups?.project_id || null;
+        }
+      } catch {}
+    }
+
+    return { me: user?.id || null, p, ratings: ratings || [], blocked, match, rateableProjectId };
   } catch {
-    return { me: null, p: null, ratings: [], blocked: false, match: null };
+    return { me: null, p: null, ratings: [], blocked: false, match: null, rateableProjectId: null };
   }
 }
 
 export default async function UserProfilePage({ params, searchParams }) {
-  const { me, p, ratings, blocked, match } = await getData(params.id, searchParams?.groupId);
+  const { me, p, ratings, blocked, match, rateableProjectId } = await getData(params.id, searchParams?.groupId);
   const groupId = searchParams?.groupId;
   const queue = searchParams?.queue ? searchParams.queue.split(",").filter(Boolean) : [];
   const queueIndex = queue.indexOf(params.id);
@@ -163,9 +182,9 @@ export default async function UserProfilePage({ params, searchParams }) {
             </>
           )}
 
-          {me && me !== p.id && (
+          {me && me !== p.id && rateableProjectId && (
             <div className="mt-6">
-              <RateForm rateeId={p.id} name={name} />
+              <RateForm rateeId={p.id} name={name} projectId={rateableProjectId} />
             </div>
           )}
 

@@ -132,7 +132,7 @@ export default function ProfileView({ userId, name, username, subtitle, ratingLa
               pastProjects.map((pp) => (
                 <Link key={pp.id} href={`/past-projects/${pp.id}`} className="flex items-center justify-between rounded-2xl border border-line bg-white p-4">
                   <div className="min-w-0">
-                    <p className="truncate text-[15px] font-bold text-navy">{pp.role}</p>
+                    <p className="truncate text-[15px] font-bold text-navy">{pp.role || "Untitled project"}</p>
                     {pp.write_up && <p className="mt-1 truncate text-[13px] text-muted">{pp.write_up}</p>}
                   </div>
                   <span className="shrink-0 text-[16px] text-muted">›</span>

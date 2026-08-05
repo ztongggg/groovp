@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { shouldNotify } from "@/lib/notify";
 
 export async function updateGroupName(groupId, name) {
   const trimmed = (name || "").trim();
@@ -105,13 +106,26 @@ export async function searchInviteCandidates(groupId, query) {
   return filtered.map((c) => ({ ...c, requestStatus: statusById[c.id] || null }));
 }
 
-// Leader ends the project's group. Just flips status for now — the fuller
-// Rate Teammates / Add Project to Profile follow-on sequence (Figma nodes
-// 570:14873, 570:14915) isn't built yet, see HANDOFF.
+// Leader ends the project's group, then prompts every OTHER member to rate
+// their teammates (the leader gets their own prompt inline via EndProjectFlow,
+// so this only notifies everyone else — a rate_reminder each, gated per-recipient).
 export async function endProject(groupId) {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   const { error } = await supabase.from("groups").update({ status: "Ended" }).eq("id", groupId);
   if (error) return { error: error.message };
+
+  try {
+    const { data: g } = await supabase.from("groups").select("name, projects(name)").eq("id", groupId).single();
+    const { data: members } = await supabase.from("group_members").select("user_id").eq("group_id", groupId).neq("user_id", user?.id || "");
+    for (const m of members || []) {
+      if (await shouldNotify(supabase, m.user_id, "notify_rate_reminder")) {
+        await supabase.from("notifications").insert({ user_id: m.user_id, type: "rate_reminder", related_id: groupId, body: `${g?.projects?.name || g?.name || "A project"} has ended — rate your teammates` });
+      }
+    }
+  } catch {}
+
   revalidatePath(`/groups/${groupId}/edit`);
   return { ok: true };
 }

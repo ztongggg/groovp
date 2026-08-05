@@ -5,7 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 
 // Form a new group inside an existing project. The creator becomes its leader.
 // Requires: signed in, enrolled in the project, and the project allows multiple groups.
-export async function createGroupInProject(projectId) {
+// `data` is optional — omit for the old auto-name-and-go-configure-later behavior
+// (kept for any other caller), or pass the real Start a New Group form fields.
+export async function createGroupInProject(projectId, data) {
   if (!projectId) return { error: "Missing project." };
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -37,11 +39,22 @@ export async function createGroupInProject(projectId) {
   const { data: mine } = await supabase.from("groups").select("id").eq("project_id", projectId).eq("leader_id", user.id).maybeSingle();
   if (mine) return { error: "You already lead a group here.", groupId: mine.id };
 
-  const name = `Group ${String.fromCharCode(65 + count)}`; // A, B, C, ...
+  const name = data?.name?.trim() || `Group ${String.fromCharCode(65 + count)}`; // A, B, C, ...
+  const minMembers = Math.max(1, Number(data?.min_members) || 2);
+  const maxMembers = Math.max(minMembers, Number(data?.max_members) || 5);
 
   const { data: group, error } = await supabase
     .from("groups")
-    .insert({ project_id: projectId, name, leader_id: user.id })
+    .insert({
+      project_id: projectId,
+      name,
+      leader_id: user.id,
+      photo_url: data?.photo_url || null,
+      min_members: minMembers,
+      max_members: maxMembers,
+      skills_wanted: data?.skills_wanted || [],
+      interests_wanted: data?.interests_wanted || [],
+    })
     .select()
     .single();
   if (error) return { error: error.message };

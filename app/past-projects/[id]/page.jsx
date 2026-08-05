@@ -42,7 +42,7 @@ export default async function PastProjectDetailPage({ params }) {
         </div>
 
         <div className="mt-5 px-6">
-          <p className="text-[20px] font-extrabold text-navy">{pp.role}</p>
+          <p className="text-[20px] font-extrabold text-navy">{pp.role || "Untitled project"}</p>
           <p className="mt-1 text-[13px] text-muted">{pp.ownerName}</p>
 
           {pp.project && (

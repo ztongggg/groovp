@@ -88,7 +88,7 @@ export default function SignupPage() {
         <img src="/blob-teal.png" alt="" className="mb-8 h-32 w-32" style={{ borderRadius: 28 }} />
         <h1 className="text-[26px] font-extrabold text-navy">You&apos;re all set! 🎉</h1>
         <p className="mt-2 text-[16px] text-muted">Welcome to Groovp, {d.full_name.split(" ")[0] || "there"}. Time to find your team.</p>
-        <button onClick={() => { router.push("/home"); router.refresh(); }} className="mt-8 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white">
+        <button onClick={() => { router.push("/tutorial/1"); router.refresh(); }} className="mt-8 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white">
           Let&apos;s go
         </button>
       </div>

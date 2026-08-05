@@ -24,7 +24,7 @@ export default function AddPastProjectPage() {
       <p className="mt-1 text-[15px] text-muted">Show what you've worked on.</p>
 
       <form action={formAction} className="mt-6 flex flex-col gap-3">
-        <input name="role" required placeholder="Title / your role (e.g. ML Engineer — NeuralLink)" className={cls} />
+        <input name="role" placeholder="Title / your role (e.g. ML Engineer — NeuralLink) — optional" className={cls} />
         <textarea name="write_up" rows={4} placeholder="What did you build? What was your part?" className={cls} />
         {state?.error && <p className="text-[14px] font-medium text-badge-declinedText">{state.error}</p>}
         <Submit />

@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { shouldNotify } from "@/lib/notify";
 
 export async function sendMessage(groupId, body) {
   const text = (body || "").trim();
@@ -17,6 +18,25 @@ export async function sendMessage(groupId, body) {
     .insert({ group_id: groupId, sender_id: user.id, body: text });
   if (error) return { error: error.message };
 
+  // Notify other group members (best-effort, gated per-recipient).
+  try {
+    const { data: members } = await supabase.from("group_members").select("user_id").eq("group_id", groupId).neq("user_id", user.id);
+    if (members?.length) {
+      const { data: me } = await supabase.from("profiles").select("full_name, username").eq("id", user.id).single();
+      const { data: g } = await supabase.from("groups").select("name").eq("id", groupId).single();
+      const nm = me?.full_name || me?.username || "Someone";
+      const recipients = [];
+      for (const m of members) {
+        if (await shouldNotify(supabase, m.user_id, "notify_new_message")) recipients.push(m.user_id);
+      }
+      if (recipients.length) {
+        await supabase.from("notifications").insert(
+          recipients.map((uid) => ({ user_id: uid, type: "new_message", related_id: groupId, body: `${nm} in ${g?.name || "your group"}: ${text.slice(0, 80)}` }))
+        );
+      }
+    }
+  } catch {}
+
   return { ok: true };
 }
 
@@ -32,6 +52,18 @@ export async function sendDM(conversationId, body) {
     .from("messages")
     .insert({ conversation_id: conversationId, sender_id: user.id, body: text });
   if (error) return { error: error.message };
+
+  // Notify the other participant (best-effort).
+  try {
+    const { data: others } = await supabase.from("conversation_participants").select("user_id").eq("conversation_id", conversationId).neq("user_id", user.id);
+    const otherId = others?.[0]?.user_id;
+    if (otherId && (await shouldNotify(supabase, otherId, "notify_new_message"))) {
+      const { data: me } = await supabase.from("profiles").select("full_name, username").eq("id", user.id).single();
+      const nm = me?.full_name || me?.username || "Someone";
+      await supabase.from("notifications").insert({ user_id: otherId, type: "new_message", related_id: conversationId, body: `${nm}: ${text.slice(0, 80)}` });
+    }
+  } catch {}
+
   return { ok: true };
 }
 

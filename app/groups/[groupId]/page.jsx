@@ -4,6 +4,7 @@ import StatusBar from "@/components/StatusBar";
 import { createClient } from "@/lib/supabase/server";
 import LeaveGroupButton from "@/components/LeaveGroupButton";
 import JoinGroupButton from "@/components/JoinGroupButton";
+import { computeMatch } from "@/lib/matching";
 
 async function getData(groupId) {
   try {
@@ -28,10 +29,19 @@ async function getData(groupId) {
 
     const isMember = user && (members || []).some((m) => m.user_id === user.id);
 
+    // Group Info - Request Others: a non-member viewer sees their own match
+    // score against this group's wanted criteria (User↔Group direction).
+    let match = null;
+    if (user && !isMember && !isLeader) {
+      const { data: viewer } = await supabase.from("profiles").select("skills, interests, personality, prefer_working, best_work_time").eq("id", user.id).maybeSingle();
+      if (viewer) match = computeMatch(viewer, g);
+    }
+
     return {
       group: g,
       isLeader,
       isMember,
+      match,
       pendingCount,
       members: (members || []).map((m) => ({
         userId: m.user_id,
@@ -60,7 +70,7 @@ export default async function GroupInfoPage({ params }) {
     );
   }
 
-  const { group, isLeader, isMember, pendingCount, members } = data;
+  const { group, isLeader, isMember, match, pendingCount, members } = data;
   const recruiting = group.recruiting !== false && group.status !== "Ended";
 
   return (
@@ -96,6 +106,20 @@ export default async function GroupInfoPage({ params }) {
           </div>
         </div>
 
+        {match && (
+          <div className="mt-6 px-6">
+            <div className="rounded-2xl p-4" style={{ background: match.isStrongMatch ? "#f5f0ff" : "#f9f8fb", border: match.isStrongMatch ? "1px solid #7c3aed" : "1px solid #eee" }}>
+              {match.isStrongMatch ? (
+                <p className="text-[13.5px] font-bold text-purple-600">✨ Strong Match — you overlap on {match.overlapCount} thing{match.overlapCount === 1 ? "" : "s"} they're looking for.</p>
+              ) : match.overlapCount > 0 ? (
+                <p className="text-[13.5px] font-semibold text-navy">You share {match.overlapCount} thing{match.overlapCount === 1 ? "" : "s"} with what this group wants — matching items are highlighted below.</p>
+              ) : (
+                <p className="text-[13.5px] text-muted">No overlap yet with what this group is looking for — you can still request to join.</p>
+              )}
+            </div>
+          </div>
+        )}
+
         {recruiting && (
           <div className="mt-6 flex flex-col gap-4 px-6">
             {group.members_wanted > 0 && (
@@ -104,19 +128,28 @@ export default async function GroupInfoPage({ params }) {
             {group.skills_wanted?.length > 0 && (
               <div>
                 <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Skills wanted</p>
-                <div className="flex flex-wrap gap-2">{group.skills_wanted.map((s) => <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={{ background: "#f5f0ff", color: "#7c3aed" }}>{s}</span>)}</div>
+                <div className="flex flex-wrap gap-2">{group.skills_wanted.map((s) => {
+                  const matched = match?.matchedSkills?.some((m) => m.toLowerCase() === s.toLowerCase());
+                  return <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f5f0ff", color: "#7c3aed" }}>{s}</span>;
+                })}</div>
               </div>
             )}
             {group.personality_wanted?.length > 0 && (
               <div>
                 <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Personality wanted</p>
-                <div className="flex flex-wrap gap-2">{group.personality_wanted.map((s) => <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={{ background: "#f0eef5", color: "#1e1b4b" }}>{s}</span>)}</div>
+                <div className="flex flex-wrap gap-2">{group.personality_wanted.map((s) => {
+                  const matched = match?.matchedPersonality?.some((m) => m.toLowerCase() === s.toLowerCase());
+                  return <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f0eef5", color: "#1e1b4b" }}>{s}</span>;
+                })}</div>
               </div>
             )}
             {group.interests_wanted?.length > 0 && (
               <div>
                 <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Interests wanted</p>
-                <div className="flex flex-wrap gap-2">{group.interests_wanted.map((s) => <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={{ background: "#f5f0ff", color: "#7c3aed" }}>{s}</span>)}</div>
+                <div className="flex flex-wrap gap-2">{group.interests_wanted.map((s) => {
+                  const matched = match?.matchedInterests?.some((m) => m.toLowerCase() === s.toLowerCase());
+                  return <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f5f0ff", color: "#7c3aed" }}>{s}</span>;
+                })}</div>
               </div>
             )}
             {group.additional_notes && (

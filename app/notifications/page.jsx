@@ -23,7 +23,7 @@ const ICON = {
 };
 
 // Notifications that deep-link somewhere when tapped.
-const HREF = { invite: "/invites" };
+const STATIC_HREF = { invite: "/invites", new_join_requests: "/applicants", join_accepted: "/teams" };
 
 async function getNotifs() {
   try {
@@ -32,12 +32,30 @@ async function getNotifs() {
     if (!user) return [];
     const { data } = await supabase
       .from("notifications")
-      .select("id,type,body,read,created_at")
+      .select("id,type,body,read,created_at,related_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
     // mark all read on view
     await supabase.from("notifications").update({ read: true }).eq("user_id", user.id).eq("read", false).then(() => {}, () => {});
-    return data || [];
+
+    // new_message's related_id is either a group id (group chat) or a conversation
+    // id (DM) — resolve which, so the click routes to /chat/[id] vs /dm/[id].
+    const msgIds = (data || []).filter((n) => n.type === "new_message" && n.related_id).map((n) => n.related_id);
+    let groupIdSet = new Set();
+    if (msgIds.length) {
+      const { data: groups } = await supabase.from("groups").select("id").in("id", msgIds);
+      groupIdSet = new Set((groups || []).map((g) => g.id));
+    }
+
+    return (data || []).map((n) => ({
+      ...n,
+      href:
+        n.type === "new_message" && n.related_id
+          ? groupIdSet.has(n.related_id) ? `/chat/${n.related_id}` : `/dm/${n.related_id}`
+          : n.type === "rate_reminder" && n.related_id
+            ? `/groups/${n.related_id}/rate`
+            : STATIC_HREF[n.type],
+    }));
   } catch {
     return [];
   }
@@ -66,7 +84,7 @@ export default async function NotificationsPage() {
           <div className="mt-5 flex flex-col gap-2 px-5">
             {notifs.map((n) => {
               const ic = ICON[n.type] || ICON.new_message;
-              const href = HREF[n.type];
+              const href = n.href;
               const inner = (
                 <>
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: ic.bg }}>

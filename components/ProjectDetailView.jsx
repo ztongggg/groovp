@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import JoinGroupButton from "@/components/JoinGroupButton";
 import FavoriteButton from "@/components/FavoriteButton";
 import { enrolInProject } from "@/app/join/actions";
-import { createGroupInProject } from "@/app/project/[id]/actions";
 
 const AVATAR = ["#e8863b", "#34b9a8", "#f2a5bd", "#7c3aed", "#4ac7b2"];
 
@@ -54,14 +53,6 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
     });
   }
 
-  function formGroup() {
-    setErr("");
-    start(async () => {
-      const res = await createGroupInProject(projectId);
-      if (res?.groupId) router.push(`/recruiting/${res.groupId}`);
-      else if (res?.error) setErr(res.error);
-    });
-  }
 
   return (
     <div className="relative w-[402px] bg-white pb-28">
@@ -135,9 +126,9 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Groups open · {groups.length}{type === "academic" && numberOfGroups > 1 ? ` of ${numberOfGroups} planned` : ""}</p>
               {enrolled && allowMultipleGroups && (
-                <button onClick={formGroup} disabled={pending} className="rounded-xl px-3 py-1.5 text-[12px] font-bold text-purple-600 disabled:opacity-50" style={{ background: "#ece8fc" }}>
-                  {pending ? "…" : "+ Form a group"}
-                </button>
+                <Link href={`/project/${projectId}/new-group`} className="rounded-xl px-3 py-1.5 text-[12px] font-bold text-purple-600" style={{ background: "#ece8fc" }}>
+                  + Form a group
+                </Link>
               )}
             </div>
             {groups.map((g) => {
@@ -187,9 +178,9 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
         ) : tab === "info" ? (
           <button onClick={() => setTab("groups")} className="w-full rounded-2xl py-3.5 text-[15px] font-bold text-white" style={{ background: "#7c3aed" }}>See groups to join</button>
         ) : enrolled && allowMultipleGroups ? (
-          <button onClick={formGroup} disabled={pending} className="w-full rounded-2xl py-3.5 text-[15px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>
-            {pending ? "Creating…" : "+ Form a group"}
-          </button>
+          <Link href={`/project/${projectId}/new-group`} className="flex w-full items-center justify-center rounded-2xl py-3.5 text-[15px] font-bold text-white" style={{ background: "#7c3aed" }}>
+            + Form a group
+          </Link>
         ) : groups[0] ? (
           <div className="w-full"><JoinGroupButton groupId={groups[0].id} /></div>
         ) : null}

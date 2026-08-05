@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitRating } from "@/app/rate/actions";
 
-export default function RateForm({ rateeId, name }) {
+export default function RateForm({ rateeId, name, projectId }) {
   const router = useRouter();
   const [stars, setStars] = useState(0);
   const [hover, setHover] = useState(0);
@@ -15,7 +15,7 @@ export default function RateForm({ rateeId, name }) {
   async function submit() {
     if (!stars) return;
     setState("saving");
-    const res = await submitRating(rateeId, stars, comment);
+    const res = await submitRating(rateeId, projectId, stars, comment);
     if (res?.error) {
       setState("error");
       setMsg(res.error);
