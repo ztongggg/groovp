@@ -4,11 +4,11 @@ import PhoneFrame from "@/components/PhoneFrame";
 export const metadata = {
   metadataBase: new URL("https://groovp.vercel.app"),
   title: "Groovp — Find your team",
-  description: "Find and evaluate teammates at SUTD before you commit to a team.",
+  description: "Find and evaluate teammates before you commit to a team.",
   applicationName: "Groovp",
   openGraph: {
     title: "Groovp — Find your team",
-    description: "Find and evaluate teammates at SUTD before you commit to a team.",
+    description: "Find and evaluate teammates before you commit to a team.",
     url: "https://groovp.vercel.app",
     siteName: "Groovp",
     type: "website",
@@ -16,7 +16,7 @@ export const metadata = {
   twitter: {
     card: "summary",
     title: "Groovp — Find your team",
-    description: "Find and evaluate teammates at SUTD before you commit to a team.",
+    description: "Find and evaluate teammates before you commit to a team.",
   },
 };
 
