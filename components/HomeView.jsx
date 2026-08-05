@@ -59,7 +59,7 @@ function EmptyRow() {
   return <div className="px-[30px] py-6 text-[14px] text-muted">No projects yet — create one from Discover.</div>;
 }
 
-export default function HomeView({ name = "there", projects = [], unread = 0, invites = 0 }) {
+export default function HomeView({ name = "there", projects = [], recentlyViewed = [], unread = 0, invites = 0 }) {
   const [feed, setFeed] = useState("popular");
   const latest = [...projects].reverse();
 
@@ -88,11 +88,11 @@ export default function HomeView({ name = "there", projects = [], unread = 0, in
       </div>
 
       <h2 className="mt-4 px-[30px]" style={{ fontSize: 20, fontWeight: 800, color: "#434343" }}>Recently viewed</h2>
-      {projects.length === 0 ? (
-        <EmptyRow />
+      {recentlyViewed.length === 0 ? (
+        <div className="px-[30px] py-6 text-[14px] text-muted">Projects you open will show up here.</div>
       ) : (
         <div className="mt-[18px] flex gap-[14px] overflow-x-auto px-[30px] pb-2">
-          {projects.map((p) => (
+          {recentlyViewed.map((p) => (
             <HomeProjectCard key={p.id} {...p} members={["JK"]} join="purple" />
           ))}
         </div>

@@ -36,6 +36,7 @@ export async function unblockUser(blockedId) {
 
   await supabase.from("blocks").delete().eq("blocker_id", user.id).eq("blocked_id", blockedId);
   revalidatePath(`/u/${blockedId}`);
+  revalidatePath("/settings/blocked");
   return { ok: true };
 }
 

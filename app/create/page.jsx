@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createProject } from "@/app/create/actions";
+import ResourceFileUpload from "@/components/ResourceFileUpload";
+import AvatarUpload from "@/components/AvatarUpload";
 
 const SKILLS = ["Python", "React", "TypeScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "AI/ML", "FastAPI", "Design", "Research"];
-const INTERESTS = ["AI & ML", "EdTech", "Sustainability", "Healthcare", "FinTech", "Hackathons", "Startups", "Research", "Design"];
+const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
 const STEPS = [
   { title: "What kind of project is this?", sub: "This determines whether multiple groups can form under it." },
@@ -27,7 +29,7 @@ export default function CreateProjectPage() {
   const [error, setError] = useState("");
   const [done, setDone] = useState(null); // {projectId, name, joinCode}
   const [copied, setCopied] = useState(false);
-  const [d, setD] = useState({ type: "academic", name: "", description: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, skills: [], interests: [], project_link: "", privacy: "public", joining_method: "approval" });
+  const [d, setD] = useState({ type: "academic", name: "", description: "", photo_url: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, skills: [], interests: [], project_link: "", resource_files: [], privacy: "public", joining_method: "approval" });
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
@@ -109,6 +111,7 @@ export default function CreateProjectPage() {
         )}
         {step === 1 && (
           <div className="flex flex-col gap-3">
+            <div className="mb-1 flex justify-center"><AvatarUpload url={d.photo_url} onChange={(url) => set("photo_url", url)} /></div>
             <input className={inputCls} style={{ height: 52 }} placeholder="Project name" value={d.name} onChange={(e) => set("name", e.target.value)} />
             <textarea className="w-full rounded-[14px] bg-[#f5f0ff] p-4 text-[13px] text-navy focus:outline-none" rows={5} placeholder="Describe your project — goals, what you're building, and what kind of teammates you need…" value={d.description} onChange={(e) => set("description", e.target.value)} />
             <div className="flex gap-3">
@@ -143,6 +146,7 @@ export default function CreateProjectPage() {
               <div className="flex flex-wrap gap-2">{INTERESTS.map((x) => <Chip key={x} active={d.interests.includes(x)} onClick={() => toggle("interests", x)}>{x}</Chip>)}</div>
             </div>
             <input className={inputCls} style={{ height: 48 }} placeholder="Add a resource link (optional)" value={d.project_link} onChange={(e) => set("project_link", e.target.value)} />
+            <ResourceFileUpload files={d.resource_files} onChange={(files) => set("resource_files", files)} />
           </div>
         )}
         {step === 3 && (
@@ -150,7 +154,7 @@ export default function CreateProjectPage() {
             <div>
               <p className="mb-2 text-[13px] font-bold text-navy">Privacy</p>
               <div className="flex flex-col gap-2">
-                {[["public", "Public — anyone can find it"], ["restricted", "Restricted — SUTD students only"], ["invite-only", "Invite-only"]].map(([v, label]) => (
+                {[["public", "Public — anyone can find it"], ["restricted", "Restricted — same school only"], ["invite-only", "Invite-only"]].map(([v, label]) => (
                   <button key={v} type="button" onClick={() => set("privacy", v)} className="flex items-center gap-3 rounded-[14px] p-4 text-left" style={{ background: d.privacy === v ? "#f5f0ff" : "#f3f1f8", border: `1px solid ${d.privacy === v ? "#7c3aed" : "transparent"}` }}>
                     <span className="flex h-5 w-5 items-center justify-center rounded-full border-2" style={{ borderColor: d.privacy === v ? "#7c3aed" : "#c9c5d3" }}>{d.privacy === v && <span className="h-2.5 w-2.5 rounded-full bg-purple-600" />}</span>
                     <span className="text-[14px] font-semibold text-navy">{label}</span>

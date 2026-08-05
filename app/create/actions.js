@@ -38,6 +38,7 @@ export async function createProject(data) {
         owner_id: user.id,
         name: data.name.trim(),
         description: data.description?.trim() || null,
+        photo_url: data.photo_url || null,
         type: data.type || "academic",
         skills_needed: data.skills || [],
         interests: data.interests || [],
@@ -48,6 +49,7 @@ export async function createProject(data) {
         privacy: data.privacy || "public",
         joining_method: data.joining_method || "approval",
         project_link: data.project_link?.trim() || null,
+        resource_files: (data.resource_files || []).map((f) => f.url),
         allow_multiple_groups: (data.type || "academic") === "academic",
         join_code: makeCode(),
       })

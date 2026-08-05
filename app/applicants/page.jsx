@@ -3,6 +3,7 @@ import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
 import ApplicantCard from "@/components/ApplicantCard";
 import { createClient } from "@/lib/supabase/server";
+import { computeMatch } from "@/lib/matching";
 
 async function getApplicants() {
   try {
@@ -15,7 +16,7 @@ async function getApplicants() {
     // groups I lead
     const { data: groups } = await supabase
       .from("groups")
-      .select("id, name, projects(name)")
+      .select("id, name, skills_wanted, interests_wanted, personality_wanted, projects(name)")
       .eq("leader_id", user.id);
     if (!groups || groups.length === 0) return [];
 
@@ -24,22 +25,28 @@ async function getApplicants() {
 
     const { data: reqs } = await supabase
       .from("join_requests")
-      .select("id, group_id, user_id, status, comment, created_at, profiles:user_id(full_name, username, skills)")
+      .select("id, group_id, user_id, status, comment, created_at, profiles:user_id(full_name, username, skills, interests, personality, prefer_working, best_work_time)")
       .in("group_id", groupIds)
       .order("created_at", { ascending: false });
 
-    return (reqs || []).map((r) => ({
-      id: r.id,
-      groupId: r.group_id,
-      applicantId: r.user_id,
-      status: r.status,
-      name: r.profiles?.full_name || r.profiles?.username || "Someone",
-      username: r.profiles?.username || "user",
-      skills: r.profiles?.skills || [],
-      comment: r.comment,
-      group: byId[r.group_id]?.name || "Group",
-      project: byId[r.group_id]?.projects?.name || "your project",
-    }));
+    return (reqs || []).map((r) => {
+      const group = byId[r.group_id];
+      const match = computeMatch(r.profiles || {}, group || {});
+      return {
+        id: r.id,
+        groupId: r.group_id,
+        applicantId: r.user_id,
+        status: r.status,
+        name: r.profiles?.full_name || r.profiles?.username || "Someone",
+        username: r.profiles?.username || "user",
+        skills: r.profiles?.skills || [],
+        comment: r.comment,
+        group: group?.name || "Group",
+        project: group?.projects?.name || "your project",
+        isStrongMatch: match.isStrongMatch,
+        matchedSkills: match.matchedSkills,
+      };
+    });
   } catch {
     return [];
   }

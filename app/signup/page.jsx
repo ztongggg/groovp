@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 import { signUpFull } from "@/app/auth/actions";
 
 const SKILL_OPTIONS = ["Python", "React", "TypeScript", "JavaScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "C++", "TensorFlow", "AWS", "Docker", "Research", "Product", "Design", "Business"];
-const INTEREST_OPTIONS = ["Machine Learning", "EdTech", "Sustainability", "Healthcare", "FinTech", "Hackathons", "Startups", "Open Source", "Robotics", "Design", "Gaming", "Social Impact"];
+const INTEREST_OPTIONS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 const YEARS = ["Y1", "Y2", "Y3", "Y4", "Y5"];
 const PERSONALITY = [
   { key: "personality", q: "Are you more introvert or extrovert?", options: ["Introvert", "Extrovert"] },
   { key: "prefer_working", q: "Prefer working online or face-to-face?", options: ["Online", "Face-to-face"] },
   { key: "best_work_time", q: "When do you do your best work?", options: ["In the morning", "At night"] },
-  { key: "location", q: "Where do you stay?", options: ["On Campus", "East", "West", "North", "Central"] },
+  { key: "location", q: "Where do you stay?", options: ["On Campus", "East", "West", "North", "South", "Central"] },
 ];
 
 const STEPS = [
@@ -21,6 +21,7 @@ const STEPS = [
   { title: "Your working style", sub: "This helps us match you with the right people." },
   { title: "Your skills", sub: "Pick what you bring to a team." },
   { title: "Your interests", sub: "What kind of projects excite you?" },
+  { title: "Projects & Links", sub: "Add links to your GitHub, portfolio, or other work! Or you can always do this later." },
 ];
 
 function Field({ icon, ...props }) {
@@ -42,6 +43,7 @@ const I = {
   mail: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>,
   lock: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>,
   book: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5Z" /></svg>,
+  link: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" /></svg>,
 };
 
 export default function SignupPage() {
@@ -50,7 +52,10 @@ export default function SignupPage() {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [] });
+  const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [], linkedin_url: "", github_url: "", portfolio_url: "", pending_projects: [] });
+  const [showLinks, setShowLinks] = useState(false);
+  const [addingProject, setAddingProject] = useState(false);
+  const [newProject, setNewProject] = useState({ role: "", write_up: "" });
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
@@ -70,7 +75,7 @@ export default function SignupPage() {
     if (res?.error) { setSaving(false); setError(res.error); return; }
     router.push("/home"); router.refresh();
   }
-  const next = () => (step < 4 ? setStep(step + 1) : finish());
+  const next = () => (step < STEPS.length - 1 ? setStep(step + 1) : finish());
   const back = () => (step > 0 ? setStep(step - 1) : setIntro(true));
 
   /* ---------- INTRO ---------- */
@@ -104,9 +109,12 @@ export default function SignupPage() {
       <div className="absolute" style={{ left: 25, top: 93, width: 350, fontSize: 13, fontWeight: 400, color: "#6b6678", lineHeight: "16px" }}>{s.sub}</div>
 
       {/* progress */}
-      {[32, 102, 171, 241, 311].map((x, i) => (
-        <div key={x} className="absolute" style={{ left: x, top: 140, width: i === 2 ? 62 : 61, height: 6, borderRadius: 3, background: i <= step ? "#7c3aed" : "#eae5fc" }} />
-      ))}
+      {STEPS.map((_, i) => {
+        const gap = 9;
+        const segW = (346 - gap * (STEPS.length - 1)) / STEPS.length;
+        const x = 32 + i * (segW + gap);
+        return <div key={i} className="absolute" style={{ left: x, top: 140, width: segW, height: 6, borderRadius: 3, background: i <= step ? "#7c3aed" : "#eae5fc" }} />;
+      })}
 
       {/* content */}
       <div className="absolute" style={{ left: 33, top: 172, width: 337, bottom: 128, overflowY: "auto" }}>
@@ -136,7 +144,7 @@ export default function SignupPage() {
             <p className="mt-2 text-[13px] font-bold uppercase tracking-wide text-muted">Year of study</p>
             <div className="flex flex-wrap gap-2">{YEARS.map((y) => <Chip key={y} active={d.year === y} onClick={() => set("year", y)}>{y}</Chip>)}</div>
             <p className="mt-2 text-[13px] font-bold uppercase tracking-wide text-muted">How do you identify?</p>
-            <div className="flex flex-wrap gap-2">{["Woman", "Man", "Non-binary", "Prefer not to say"].map((g) => <Chip key={g} active={d.gender === g} onClick={() => set("gender", g)}>{g}</Chip>)}</div>
+            <div className="flex flex-wrap gap-2">{["Woman", "Man", "Prefer not to say"].map((g) => <Chip key={g} active={d.gender === g} onClick={() => set("gender", g)}>{g}</Chip>)}</div>
           </div>
         )}
         {step === 2 && (
@@ -161,7 +169,7 @@ export default function SignupPage() {
                   <div key={s.name} className="flex items-center justify-between rounded-xl bg-[#f3f1f8] px-3 py-2">
                     <span className="text-[14px] font-semibold text-navy">{s.name}</span>
                     <div className="flex gap-1">
-                      {["Basic", "Pro", "Expert"].map((lv) => (
+                      {["Basic", "Good", "Expert"].map((lv) => (
                         <button key={lv} type="button" onClick={() => setSkillLevel(s.name, lv)} className="rounded-md px-2.5 py-1 text-[11px] font-bold" style={{ background: s.level === lv ? "#7c3aed" : "#fff", color: s.level === lv ? "#fff" : "#757080" }}>{lv}</button>
                       ))}
                     </div>
@@ -172,6 +180,46 @@ export default function SignupPage() {
           </div>
         )}
         {step === 4 && <div className="flex flex-wrap gap-2.5">{INTEREST_OPTIONS.map((x) => <Chip key={x} active={d.interests.includes(x)} onClick={() => toggle("interests", x)}>{x}</Chip>)}</div>}
+        {step === 5 && (
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="mb-2 text-[13px] font-bold uppercase tracking-wide text-muted">Projects</p>
+              {d.pending_projects.map((p, i) => (
+                <div key={i} className="mb-2 flex items-center justify-between gap-2 rounded-xl bg-[#f3f1f8] px-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-[14px] font-semibold text-navy">{p.role || "Project"}</p>
+                    {p.write_up && <p className="truncate text-[12px] text-muted">{p.write_up}</p>}
+                  </div>
+                  <button type="button" onClick={() => setD((s) => ({ ...s, pending_projects: s.pending_projects.filter((_, idx) => idx !== i) }))} className="shrink-0 text-[12px] font-bold" style={{ color: "#bf4247" }}>Remove</button>
+                </div>
+              ))}
+              {addingProject ? (
+                <div className="flex flex-col gap-2 rounded-xl border border-line p-3">
+                  <input placeholder="Role (e.g. Frontend Lead)" value={newProject.role} onChange={(e) => setNewProject((s) => ({ ...s, role: e.target.value }))} className="rounded-lg border border-line px-3 py-2 text-[13px] focus:outline-none" />
+                  <textarea placeholder="What did you build?" value={newProject.write_up} onChange={(e) => setNewProject((s) => ({ ...s, write_up: e.target.value }))} rows={2} className="rounded-lg border border-line px-3 py-2 text-[13px] focus:outline-none" />
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => { if (newProject.role) setD((s) => ({ ...s, pending_projects: [...s.pending_projects, newProject] })); setNewProject({ role: "", write_up: "" }); setAddingProject(false); }} className="flex-1 rounded-lg py-2 text-[13px] font-bold text-white" style={{ background: "#7c3aed" }}>Add</button>
+                    <button type="button" onClick={() => { setAddingProject(false); setNewProject({ role: "", write_up: "" }); }} className="flex-1 rounded-lg py-2 text-[13px] font-bold text-navy" style={{ background: "#f3f1f8" }}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setAddingProject(true)} className="w-full rounded-2xl border-[1.5px] py-3 text-[13px] font-semibold" style={{ borderColor: "#7c3aed", color: "#7c3aed" }}>+ Add Project</button>
+              )}
+            </div>
+            <div>
+              <p className="mb-2 text-[13px] font-bold uppercase tracking-wide text-muted">Links</p>
+              {showLinks ? (
+                <div className="flex flex-col gap-2.5">
+                  <Field icon={I.link} placeholder="LinkedIn URL" value={d.linkedin_url} onChange={(e) => set("linkedin_url", e.target.value)} />
+                  <Field icon={I.link} placeholder="GitHub URL" value={d.github_url} onChange={(e) => set("github_url", e.target.value)} />
+                  <Field icon={I.link} placeholder="Portfolio website URL" value={d.portfolio_url} onChange={(e) => set("portfolio_url", e.target.value)} />
+                </div>
+              ) : (
+                <button type="button" onClick={() => setShowLinks(true)} className="w-full rounded-2xl border-[1.5px] py-3 text-[13px] font-semibold" style={{ borderColor: "#7c3aed", color: "#7c3aed" }}>+ Add Link</button>
+              )}
+            </div>
+          </div>
+        )}
         {error && <p className="mt-4 text-[14px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
       </div>
 
@@ -180,8 +228,13 @@ export default function SignupPage() {
         <span style={{ fontSize: 14, fontWeight: 800, color: "#1d1b44" }}>Cancel</span>
       </button>
       <button onClick={next} disabled={!canNext() || saving} className="absolute flex items-center justify-center disabled:opacity-50" style={{ left: 143, top: 762, width: 226, height: 51, borderRadius: 18, background: "#7c3aed" }}>
-        <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>{saving ? "Creating…" : step < 4 ? "Next →" : "Finish"}</span>
+        <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>{saving ? "Creating…" : step < STEPS.length - 1 ? "Next →" : step === 5 ? "Save" : "Finish"}</span>
       </button>
+      {step === 5 && (
+        <button onClick={finish} disabled={saving} className="absolute w-full text-center disabled:opacity-50" style={{ left: 32, top: 825, width: 338, fontSize: 12.5, fontWeight: 600, color: "#757080" }}>
+          Skip for now
+        </button>
+      )}
     </div>
   );
 }

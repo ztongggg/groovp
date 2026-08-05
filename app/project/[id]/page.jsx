@@ -29,6 +29,8 @@ async function getProject(id) {
         const { data: pm } = await supabase.from("project_members").select("user_id").eq("user_id", user.id).eq("project_id", id).maybeSingle();
         enrolled = !!pm;
       } catch {}
+      // Recently Viewed log — best-effort, upsert so repeat views just bump viewed_at.
+      supabase.from("project_views").upsert({ user_id: user.id, project_id: id, viewed_at: new Date().toISOString() }).then(() => {}, () => {});
     }
     return { ...data, meId: user?.id || null, favorited, enrolled };
   } catch {

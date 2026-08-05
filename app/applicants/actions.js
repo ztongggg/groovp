@@ -42,7 +42,7 @@ export async function declineRequest(id) {
   const supabase = createClient();
   const { error } = await supabase
     .from("join_requests")
-    .update({ status: "declined" })
+    .update({ status: "declined", declined_at: new Date().toISOString() })
     .eq("id", id);
   if (error) return { error: error.message };
 

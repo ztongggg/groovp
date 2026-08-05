@@ -6,7 +6,7 @@ import { saveRecruiting } from "@/app/recruiting/[groupId]/actions";
 
 const SKILLS = ["Python", "React", "TypeScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "AI/ML", "Design"];
 const PERSONALITY = ["Introvert", "Extrovert", "Online", "Face-to-face", "Morning", "Night owl"];
-const INTERESTS = ["AI & ML", "EdTech", "Sustainability", "Healthcare", "Hackathons", "Startups", "Design", "Research"];
+const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
 function Chip({ active, onClick, children }) {
   return <button type="button" onClick={onClick} className="rounded-full px-3.5 py-1.5 text-[13px] font-semibold" style={{ background: active ? "#7c3aed" : "#f3f1f8", color: active ? "#fff" : "#1d1b44" }}>{children}</button>;

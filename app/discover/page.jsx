@@ -3,6 +3,7 @@ import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
 import DiscoverList from "@/components/DiscoverList";
 import { createClient } from "@/lib/supabase/server";
+import { STRONG_MATCH_THRESHOLD } from "@/lib/matching";
 
 function fmt(d) {
   if (!d) return "";
@@ -85,7 +86,7 @@ export default async function DiscoverPage() {
                 avatarColor: AVATAR_COLORS[i % AVATAR_COLORS.length],
                 initials: (p.name || "P").slice(0, 2).toUpperCase(),
                 groupId: group?.id,
-                strongMatch: shared >= 2,
+                strongMatch: shared >= STRONG_MATCH_THRESHOLD,
               };
             })}
           />

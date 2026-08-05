@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 
 const BLOB_IMG = { "#4ac7b2": "teal", "#f2a5bd": "pink", "#f29c38": "orange", "#7c3aed": "teal" };
-function AvatarBlob({ color }) {
+function AvatarBlob({ color, photoUrl }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  if (photoUrl) return <img src={photoUrl} alt="" style={{ width: 48, height: 48, borderRadius: 14, objectFit: "cover" }} />;
   const name = BLOB_IMG[color] || "teal";
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={`/blob-${name}.png`} alt="" style={{ width: 48, height: 48, borderRadius: 14 }} />;
@@ -17,12 +19,12 @@ const STATUS = {
 };
 const COLORS = ["#4ac7b2", "#f2a5bd", "#f29c38", "#7c3aed"];
 
-function RequestRow({ top, color, title, subtitle, applied, status }) {
+function RequestRow({ top, color, title, subtitle, applied, status, photoUrl }) {
   const s = STATUS[status] || STATUS.pending;
   return (
     <div className="absolute" style={{ left: 24, top, width: 354, height: 92, borderRadius: 18, background: "#fff", border: "1px solid #f3f1f8" }}>
       <div className="absolute" style={{ left: 16, top: 22 }}>
-        <AvatarBlob color={color} />
+        <AvatarBlob color={color} photoUrl={photoUrl} />
       </div>
       <div className="absolute" style={{ left: 76, top: 16, width: 190, fontSize: 13.5, fontWeight: 700, color: "#1d1b44", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</div>
       <div className="absolute" style={{ left: 76, top: 36, fontSize: 11, fontWeight: 400, color: "#757080" }}>{subtitle}</div>
@@ -34,10 +36,10 @@ function RequestRow({ top, color, title, subtitle, applied, status }) {
   );
 }
 
-function TeamRow({ top, color, title, subtitle, href }) {
+function TeamRow({ top, color, title, subtitle, href, photoUrl }) {
   return (
     <Link href={href} className="absolute" style={{ left: 24, top, width: 354, height: 92, borderRadius: 18, background: "#fff", border: "1px solid #f3f1f8" }}>
-      <div className="absolute" style={{ left: 16, top: 22 }}><AvatarBlob color={color} /></div>
+      <div className="absolute" style={{ left: 16, top: 22 }}><AvatarBlob color={color} photoUrl={photoUrl} /></div>
       <div className="absolute" style={{ left: 76, top: 24, fontSize: 14, fontWeight: 700, color: "#1d1b44" }}>{title}</div>
       <div className="absolute" style={{ left: 76, top: 46, fontSize: 11, fontWeight: 400, color: "#757080" }}>{subtitle} · open chat ›</div>
     </Link>
@@ -63,7 +65,7 @@ export default function TeamsView({ requests = [], teams = [] }) {
           <div className="absolute" style={{ left: 24, top: 200, fontSize: 13, color: "#757080" }}>No requests yet. Request to join a project from Discover.</div>
         ) : (
           requests.map((r, i) => (
-            <RequestRow key={r.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={r.title} subtitle={r.subtitle} applied={r.applied} status={r.status} />
+            <RequestRow key={r.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={r.title} subtitle={r.subtitle} applied={r.applied} status={r.status} photoUrl={r.photoUrl} />
           ))
         )
       ) : teams.length === 0 ? (
@@ -75,7 +77,7 @@ export default function TeamsView({ requests = [], teams = [] }) {
         </div>
       ) : (
         teams.map((t, i) => (
-          <TeamRow key={t.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={t.title} subtitle={t.subtitle} href={t.kind === "dm" ? `/dm/${t.id}` : `/chat/${t.id}`} />
+          <TeamRow key={t.id} top={150 + i * 108} color={COLORS[i % COLORS.length]} title={t.title} subtitle={t.subtitle} href={t.kind === "dm" ? `/dm/${t.id}` : `/chat/${t.id}`} photoUrl={t.photoUrl} />
         ))
       )}
     </div>

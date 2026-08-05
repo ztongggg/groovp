@@ -4,8 +4,9 @@ import RateForm from "@/components/RateForm";
 import ModerationMenu from "@/components/ModerationMenu";
 import MessageButton from "@/components/MessageButton";
 import { createClient } from "@/lib/supabase/server";
+import { computeMatch } from "@/lib/matching";
 
-async function getData(id) {
+async function getData(id, groupId) {
   try {
     const supabase = createClient();
     const {
@@ -25,14 +26,25 @@ async function getData(id) {
         blocked = !!b;
       } catch {}
     }
-    return { me: user?.id || null, p, ratings: ratings || [], blocked };
+
+    // Reviewing an applicant against a specific group (from Requests) — compute the
+    // Strong Match / highlighted-attributes state (spec §5), only when groupId is passed.
+    let match = null;
+    if (groupId) {
+      try {
+        const { data: g } = await supabase.from("groups").select("skills_wanted, interests_wanted, personality_wanted").eq("id", groupId).single();
+        if (g) match = computeMatch(p || {}, g);
+      } catch {}
+    }
+
+    return { me: user?.id || null, p, ratings: ratings || [], blocked, match };
   } catch {
-    return { me: null, p: null, ratings: [], blocked: false };
+    return { me: null, p: null, ratings: [], blocked: false, match: null };
   }
 }
 
-export default async function UserProfilePage({ params }) {
-  const { me, p, ratings, blocked } = await getData(params.id);
+export default async function UserProfilePage({ params, searchParams }) {
+  const { me, p, ratings, blocked, match } = await getData(params.id, searchParams?.groupId);
 
   if (!p) {
     return (
@@ -75,6 +87,9 @@ export default async function UserProfilePage({ params }) {
             <div className="pb-2">
               <h1 className="flex items-center gap-1.5 text-[24px] font-extrabold text-navy">
                 {name}
+                {match?.isStrongMatch && (
+                  <span className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-extrabold text-white" style={{ background: "#7c3aed" }}>✨ Strong Match</span>
+                )}
                 {p.linkedin_verified && (
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="#0a66c2" aria-label="LinkedIn verified"><title>LinkedIn verified</title><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z" /></svg>
                 )}
@@ -94,7 +109,12 @@ export default async function UserProfilePage({ params }) {
 
           {personality.length > 0 && (
             <div className="mt-5 flex flex-wrap gap-2">
-              {personality.map((t) => <span key={t} className="rounded-full bg-[#f0eef5] px-4 py-2 text-[13px] font-semibold text-navy">{t}</span>)}
+              {personality.map((t) => {
+                const matched = match?.matchedPersonality?.some((m) => m.toLowerCase() === t.toLowerCase());
+                return (
+                  <span key={t} className="rounded-full px-4 py-2 text-[13px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f0eef5", color: "#1e1b4b" }}>{t}</span>
+                );
+              })}
             </div>
           )}
 
@@ -102,7 +122,26 @@ export default async function UserProfilePage({ params }) {
             <>
               <p className="mb-2 mt-6 text-[13px] font-bold uppercase tracking-wide text-muted">Skills</p>
               <div className="flex flex-wrap gap-2">
-                {p.skills.map((s) => <span key={s} className="rounded-full bg-[#f5f0ff] px-4 py-1.5 text-[13px] font-semibold text-purple-600">{s}</span>)}
+                {p.skills.map((s) => {
+                  const matched = match?.matchedSkills?.some((m) => m.toLowerCase() === s.toLowerCase());
+                  return (
+                    <span key={s} className="rounded-full px-4 py-1.5 text-[13px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f5f0ff", color: "#7c3aed" }}>{s}</span>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {p.interests?.length > 0 && (
+            <>
+              <p className="mb-2 mt-6 text-[13px] font-bold uppercase tracking-wide text-muted">Interests</p>
+              <div className="flex flex-wrap gap-2">
+                {p.interests.map((s) => {
+                  const matched = match?.matchedInterests?.some((m) => m.toLowerCase() === s.toLowerCase());
+                  return (
+                    <span key={s} className="rounded-full px-4 py-1.5 text-[13px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f5f0ff", color: "#7c3aed" }}>{s}</span>
+                  );
+                })}
               </div>
             </>
           )}

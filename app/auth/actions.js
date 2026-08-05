@@ -40,6 +40,15 @@ export async function signUp(_prevState, formData) {
 export async function signUpFull(data) {
   const supabase = createClient();
 
+  // University is derived from the email domain, not user-entered — the
+  // allowlist is also what makes the "Restricted" (same-school) privacy
+  // tier meaningful. Reject unrecognized domains before creating the account.
+  const emailDomain = (data.email || "").split("@")[1]?.toLowerCase();
+  const { data: uniRow } = emailDomain
+    ? await supabase.from("university_domains").select("university").eq("domain", emailDomain).maybeSingle()
+    : { data: null };
+  if (!uniRow) return { error: "Please sign up with your university email address." };
+
   const { data: auth, error } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
@@ -58,7 +67,7 @@ export async function signUpFull(data) {
       .update({
         full_name: data.full_name,
         username: data.username,
-        university: data.university || "SUTD",
+        university: uniRow.university,
         major: data.major || null,
         year: data.year || null,
         personality: data.personality || null,
@@ -67,8 +76,20 @@ export async function signUpFull(data) {
         location: data.location || null,
         skills: skillList.map((s) => s.name),
         interests: data.interests || [],
+        linkedin_url: data.linkedin_url || null,
+        github_url: data.github_url || null,
+        portfolio_url: data.portfolio_url || null,
       })
       .eq("id", uid);
+
+    // Step 6 "Add Project" entries — no project exists yet at signup time,
+    // so these save as freestanding past_projects rows (project_id null).
+    if ((data.pending_projects || []).length) {
+      await supabase
+        .from("past_projects")
+        .insert(data.pending_projects.map((p) => ({ user_id: uid, role: p.role || null, write_up: p.write_up || null })))
+        .then(() => {}, () => {});
+    }
 
     // v2-only column — separate call so a missing column can't reject the core update.
     if (data.gender) {

@@ -32,7 +32,7 @@ export async function requestToJoin(groupId) {
 
   const { data: existing } = await supabase
     .from("join_requests")
-    .select("id, status")
+    .select("id, status, declined_at")
     .eq("group_id", groupId)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -57,9 +57,15 @@ export async function requestToJoin(groupId) {
   // Approval groups: create / revive a pending request.
   if (existing) {
     if (existing.status === "declined") {
+      // 3-day cooldown after a decline before the same applicant can reapply.
+      const cooldownMs = 3 * 24 * 60 * 60 * 1000;
+      const declinedAt = existing.declined_at ? new Date(existing.declined_at).getTime() : 0;
+      if (Date.now() - declinedAt < cooldownMs) {
+        return { error: "You can reapply to this group 3 days after being declined." };
+      }
       const { error: reErr } = await supabase
         .from("join_requests")
-        .update({ status: "pending" })
+        .update({ status: "pending", declined_at: null })
         .eq("id", existing.id);
       if (reErr) return { error: reErr.message };
       await notifyLeader(supabase, groupId, user.id);

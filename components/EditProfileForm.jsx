@@ -6,12 +6,12 @@ import { updateProfile } from "@/app/edit-profile/actions";
 
 const YEARS = ["Y1", "Y2", "Y3", "Y4", "Y5"];
 const SKILL_OPTIONS = ["Python", "React", "TypeScript", "JavaScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "C++", "TensorFlow", "AWS", "Docker", "Research", "Product", "Design", "Business"];
-const INTEREST_OPTIONS = ["Machine Learning", "EdTech", "Sustainability", "Healthcare", "FinTech", "Hackathons", "Startups", "Open Source", "Robotics", "Design", "Gaming", "Social Impact"];
+const INTEREST_OPTIONS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 const PERSONALITY = [
   { key: "personality", q: "Introvert or extrovert?", options: ["Introvert", "Extrovert"] },
   { key: "prefer_working", q: "Online or face-to-face?", options: ["Online", "Face-to-face"] },
   { key: "best_work_time", q: "Best work time", options: ["In the morning", "At night"] },
-  { key: "location", q: "Where do you stay?", options: ["On Campus", "East", "West", "North", "Central"] },
+  { key: "location", q: "Where do you stay?", options: ["On Campus", "East", "West", "North", "South", "Central"] },
 ];
 const cls = "rounded-2xl border border-line bg-bgapp px-4 py-3.5 text-[15px] text-navy focus:border-purple-600 focus:outline-none";
 
@@ -82,7 +82,7 @@ export default function EditProfileForm({ initial }) {
             <div key={s.name} className="flex items-center justify-between rounded-xl bg-[#f7f6fa] px-3 py-2">
               <span className="text-[13px] font-semibold text-navy">{s.name}</span>
               <div className="flex gap-1.5">
-                {["Basic", "Pro", "Expert"].map((lv) => (
+                {["Basic", "Good", "Expert"].map((lv) => (
                   <button key={lv} type="button" onClick={() => setSkillLevel(s.name, lv)} className="rounded-md px-2.5 py-1 text-[11px] font-bold" style={{ background: s.level === lv ? "#7c3aed" : "#fff", color: s.level === lv ? "#fff" : "#757080" }}>{lv}</button>
                 ))}
               </div>

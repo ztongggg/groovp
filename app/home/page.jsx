@@ -40,7 +40,7 @@ async function getData() {
       .select("id,name,description,skills_needed,timeline_start,timeline_end,max_size, groups(group_members(count))")
       .order("created_at", { ascending: false });
 
-    const projects = (rows || []).map((p) => {
+    const mapProject = (p) => {
       const members = p.groups?.[0]?.group_members?.[0]?.count ?? 0;
       return {
         id: p.id,
@@ -50,19 +50,34 @@ async function getData() {
         count: `${members}/${p.max_size || 0}`,
         date: `${fmt(p.timeline_start)} - ${fmt(p.timeline_end)}`,
       };
-    });
+    };
+    const projects = (rows || []).map(mapProject);
 
-    return { name, projects, unread, invites };
+    let recentlyViewed = [];
+    if (user) {
+      try {
+        const { data: views } = await supabase
+          .from("project_views")
+          .select("project_id, viewed_at")
+          .eq("user_id", user.id)
+          .order("viewed_at", { ascending: false })
+          .limit(10);
+        const byId = Object.fromEntries((rows || []).map((p) => [p.id, p]));
+        recentlyViewed = (views || []).map((v) => byId[v.project_id]).filter(Boolean).map(mapProject);
+      } catch {}
+    }
+
+    return { name, projects, recentlyViewed, unread, invites };
   } catch {
-    return { name: "there", projects: [], unread: 0, invites: 0 };
+    return { name: "there", projects: [], recentlyViewed: [], unread: 0, invites: 0 };
   }
 }
 
 export default async function HomePage() {
-  const { name, projects, unread, invites } = await getData();
+  const { name, projects, recentlyViewed, unread, invites } = await getData();
   return (
     <AppShell>
-      <HomeView name={name} projects={projects} unread={unread} invites={invites} />
+      <HomeView name={name} projects={projects} recentlyViewed={recentlyViewed} unread={unread} invites={invites} />
     </AppShell>
   );
 }

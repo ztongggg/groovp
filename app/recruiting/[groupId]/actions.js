@@ -105,3 +105,39 @@ export async function inviteByUsername(groupId, rawUsername) {
   revalidatePath(`/recruiting/${groupId}`);
   return { ok: true, name: target.full_name || username };
 }
+
+// Same invite mechanism as inviteByUsername, but from a known user id — used by the
+// Invite Member search screen (app/groups/[groupId]/invite) where the target is
+// already resolved from search results.
+export async function inviteUserId(groupId, targetId) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "You must be signed in." };
+  if (user.id === targetId) return { error: "You can't invite yourself." };
+
+  const { data: g } = await supabase.from("groups").select("id, leader_id, project_id, name").eq("id", groupId).single();
+  if (!g) return { error: "Group not found." };
+  if (g.leader_id !== user.id) return { error: "Only the group leader can invite." };
+
+  const { data: mem } = await supabase.from("group_members").select("user_id").eq("group_id", groupId).eq("user_id", targetId).maybeSingle();
+  if (mem) return { error: "Already in this group." };
+
+  const { data: existing } = await supabase.from("join_requests").select("id, status").eq("group_id", groupId).eq("user_id", targetId).maybeSingle();
+
+  if (existing) {
+    if (existing.status === "invited" || existing.status === "pending") return { ok: true, already: true };
+    const { error: upErr } = await supabase.from("join_requests").update({ status: "invited" }).eq("id", existing.id);
+    if (upErr) return { error: upErr.message };
+  } else {
+    const { error: insErr } = await supabase.from("join_requests").insert({ group_id: groupId, user_id: targetId, status: "invited" });
+    if (insErr) return { error: insErr.message };
+  }
+
+  try {
+    const { data: proj } = g.project_id ? await supabase.from("projects").select("name").eq("id", g.project_id).single() : { data: null };
+    await supabase.from("notifications").insert({ user_id: targetId, type: "invite", related_id: groupId, body: `You've been invited to join ${proj?.name || g.name}` });
+  } catch {}
+
+  revalidatePath(`/groups/${groupId}/invite`);
+  return { ok: true };
+}

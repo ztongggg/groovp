@@ -68,7 +68,10 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
       {/* navy cover banner */}
       <div className="relative" style={{ height: 260, background: "#1e1b4b" }}>
         <Link href="/discover" className="absolute left-5 top-14 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-[18px] text-white">‹</Link>
-        <div className="absolute right-5 top-14">
+        <div className="absolute right-5 top-14 flex items-center gap-2">
+          {isOwner && (
+            <Link href={`/project/${projectId}/edit`} aria-label="Edit project" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-[15px] text-white">✎</Link>
+          )}
           <FavoriteButton projectId={projectId} initial={favorited} />
         </div>
         <div className="absolute" style={{ left: 34, top: 103, width: 334, height: 130, borderRadius: 16, background: "#d9d9d9" }} />

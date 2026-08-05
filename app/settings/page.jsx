@@ -57,6 +57,11 @@ export default async function SettingsPage() {
           <ConnectLinkedIn verified={linkedin} />
           <ConnectGitHub verified={github} />
 
+          <Link href="/settings/blocked" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
+            <span className="text-[15px] font-semibold text-navy">Blocked Users</span>
+            <span className="text-[18px] text-muted">›</span>
+          </Link>
+
           {isAdmin && (
             <Link href="/moderation" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
               <span className="text-[15px] font-semibold text-navy">Moderation queue</span>

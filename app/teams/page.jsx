@@ -22,7 +22,7 @@ async function getData() {
 
     const { data: reqs } = await supabase
       .from("join_requests")
-      .select("id,status,created_at, groups(name, projects(name))")
+      .select("id,status,created_at, groups(name, photo_url, projects(name))")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -32,11 +32,12 @@ async function getData() {
       title: r.groups?.projects?.name || "Project",
       subtitle: r.groups?.name || "Group",
       applied: relTime(r.created_at),
+      photoUrl: r.groups?.photo_url || null,
     }));
 
     const { data: mem } = await supabase
       .from("group_members")
-      .select("group_id, groups(id, name, projects(name))")
+      .select("group_id, groups(id, name, photo_url, projects(name))")
       .eq("user_id", user.id);
 
     const teams = (mem || []).map((m) => ({
@@ -44,6 +45,7 @@ async function getData() {
       title: m.groups?.projects?.name || "Project",
       subtitle: m.groups?.name || "Group",
       kind: "group",
+      photoUrl: m.groups?.photo_url || null,
     }));
 
     // private conversations (merged into the inbox per spec)
