@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { groupHasRoom } from "@/lib/capacity";
+import { shouldNotify } from "@/lib/notify";
 
 // Request to join a group. Idempotent-ish: a duplicate request is treated as
 // "already requested" rather than an error (unique constraint on group+user).
@@ -91,7 +92,7 @@ export async function requestToJoin(groupId, note) {
 // Auto-join: tell the leader someone joined.
 async function notifyJoined(supabase, g, joinerId) {
   try {
-    if (g?.leader_id && g.leader_id !== joinerId) {
+    if (g?.leader_id && g.leader_id !== joinerId && (await shouldNotify(supabase, g.leader_id, "notify_join_accepted"))) {
       const { data: proj } = g.project_id ? await supabase.from("projects").select("name").eq("id", g.project_id).single() : { data: null };
       const { data: who } = await supabase.from("profiles").select("full_name, username").eq("id", joinerId).single();
       const nm = who?.full_name || who?.username || "Someone";
@@ -105,7 +106,7 @@ async function notifyJoined(supabase, g, joinerId) {
 async function notifyLeader(supabase, groupId, applicantId) {
   try {
     const { data: g } = await supabase.from("groups").select("leader_id, project_id, name").eq("id", groupId).single();
-    if (g?.leader_id && g.leader_id !== applicantId) {
+    if (g?.leader_id && g.leader_id !== applicantId && (await shouldNotify(supabase, g.leader_id, "notify_join_requests"))) {
       const { data: proj } = await supabase.from("projects").select("name").eq("id", g.project_id).single();
       await supabase.from("notifications").insert({ user_id: g.leader_id, type: "new_join_requests", related_id: groupId, body: `New request to join ${proj?.name || g.name}` });
     }

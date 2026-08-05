@@ -6,15 +6,19 @@ import { createClient } from "@/lib/supabase/server";
 async function getData(userId) {
   try {
     const supabase = createClient();
-    const { data: p } = await supabase.from("profiles").select("full_name, username").eq("id", userId).single();
-    const { data: ratings } = await supabase
-      .from("ratings")
-      .select("id, stars, comment, created_at, rater:profiles!ratings_rater_id_fkey(full_name, username)")
-      .eq("ratee_id", userId)
-      .order("created_at", { ascending: false });
-    return { name: p?.full_name || p?.username || "Student", ratings: ratings || [] };
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data: p } = await supabase.from("profiles").select("full_name, username, show_ratings_publicly").eq("id", userId).single();
+    const visible = user?.id === userId || p?.show_ratings_publicly !== false;
+    const { data: ratings } = visible
+      ? await supabase
+          .from("ratings")
+          .select("id, stars, comment, created_at, rater:profiles!ratings_rater_id_fkey(full_name, username)")
+          .eq("ratee_id", userId)
+          .order("created_at", { ascending: false })
+      : { data: [] };
+    return { name: p?.full_name || p?.username || "Student", ratings: ratings || [], visible };
   } catch {
-    return { name: "Student", ratings: [] };
+    return { name: "Student", ratings: [], visible: true };
   }
 }
 
@@ -22,7 +26,7 @@ async function getData(userId) {
 // summary, reached from My Profile's rating line (previously showed inline only,
 // no dedicated view).
 export default async function RatingsHistoryPage({ params }) {
-  const { name, ratings } = await getData(params.userId);
+  const { name, ratings, visible } = await getData(params.userId);
   const count = ratings.length;
   const avg = count ? (ratings.reduce((s, r) => s + r.stars, 0) / count).toFixed(1) : null;
   const dist = [5, 4, 3, 2, 1].map((n) => ratings.filter((r) => r.stars === n).length);
@@ -38,7 +42,9 @@ export default async function RatingsHistoryPage({ params }) {
         </div>
         <p className="mt-1 px-6 text-[13px] text-muted">{name}</p>
 
-        {count === 0 ? (
+        {!visible ? (
+          <p className="mt-16 text-center text-[14px] text-muted">{name} has chosen to keep ratings private.</p>
+        ) : count === 0 ? (
           <p className="mt-16 text-center text-[14px] text-muted">No ratings yet.</p>
         ) : (
           <>

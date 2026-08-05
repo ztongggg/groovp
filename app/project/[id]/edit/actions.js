@@ -29,6 +29,7 @@ export async function updateProject(projectId, data) {
       interests: data.interests || [],
       min_size: minSize,
       max_size: maxSize,
+      number_of_groups: Math.max(1, Number(data.number_of_groups) || 1),
       timeline_start: data.timeline_start || null,
       timeline_end: data.timeline_end || null,
       privacy: data.privacy || "public",

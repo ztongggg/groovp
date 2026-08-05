@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { shouldNotify } from "@/lib/notify";
 
 // Per-group recruiting settings. Only the group's leader may save.
 export async function saveRecruiting(groupId, data) {
@@ -94,12 +95,14 @@ export async function inviteByUsername(groupId, rawUsername) {
     const { data: proj } = g.project_id
       ? await supabase.from("projects").select("name").eq("id", g.project_id).single()
       : { data: null };
-    await supabase.from("notifications").insert({
-      user_id: target.id,
-      type: "invite",
-      related_id: groupId,
-      body: `You've been invited to join ${proj?.name || g.name}`,
-    });
+    if (await shouldNotify(supabase, target.id, "notify_invites")) {
+      await supabase.from("notifications").insert({
+        user_id: target.id,
+        type: "invite",
+        related_id: groupId,
+        body: `You've been invited to join ${proj?.name || g.name}`,
+      });
+    }
   } catch {}
 
   revalidatePath(`/recruiting/${groupId}`);
@@ -135,7 +138,9 @@ export async function inviteUserId(groupId, targetId) {
 
   try {
     const { data: proj } = g.project_id ? await supabase.from("projects").select("name").eq("id", g.project_id).single() : { data: null };
-    await supabase.from("notifications").insert({ user_id: targetId, type: "invite", related_id: groupId, body: `You've been invited to join ${proj?.name || g.name}` });
+    if (await shouldNotify(supabase, targetId, "notify_invites")) {
+      await supabase.from("notifications").insert({ user_id: targetId, type: "invite", related_id: groupId, body: `You've been invited to join ${proj?.name || g.name}` });
+    }
   } catch {}
 
   revalidatePath(`/groups/${groupId}/invite`);

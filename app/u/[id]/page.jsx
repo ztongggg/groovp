@@ -61,7 +61,8 @@ export default async function UserProfilePage({ params, searchParams }) {
 
   const name = p.full_name || p.username || "Student";
   const subtitle = [p.year, p.major, p.university || "SUTD"].filter(Boolean).join(" · ");
-  const count = ratings.length;
+  const ratingsVisible = me === p.id || p.show_ratings_publicly !== false;
+  const count = ratingsVisible ? ratings.length : 0;
   const avg = count ? (ratings.reduce((s, r) => s + r.stars, 0) / count).toFixed(1) : null;
   const personality = [p.personality, p.prefer_working, p.best_work_time, p.location].filter(Boolean);
 
@@ -115,7 +116,11 @@ export default async function UserProfilePage({ params, searchParams }) {
 
           <p className="mt-3 text-[15px] text-muted">{subtitle}</p>
           <div className="mt-1 flex items-center justify-between">
-            <p className="text-[16px] font-extrabold text-navy">★ {avg || "New"} <span className="text-[13px] font-normal text-muted">({count} Ratings)</span></p>
+            {ratingsVisible ? (
+              <p className="text-[16px] font-extrabold text-navy">★ {avg || "New"} <span className="text-[13px] font-normal text-muted">({count} Ratings)</span></p>
+            ) : (
+              <p className="text-[13px] font-semibold text-muted">Ratings are private</p>
+            )}
             {me && me !== p.id && !blocked && <MessageButton userId={p.id} />}
           </div>
 
@@ -165,7 +170,9 @@ export default async function UserProfilePage({ params, searchParams }) {
           )}
 
           <p className="mb-2 mt-6 text-[13px] font-bold uppercase tracking-wide text-muted">Ratings</p>
-          {count === 0 ? (
+          {!ratingsVisible ? (
+            <p className="text-[14px] text-muted">{name} has chosen to keep ratings private.</p>
+          ) : count === 0 ? (
             <p className="text-[14px] text-muted">No ratings yet.</p>
           ) : (
             <div className="flex flex-col gap-3">

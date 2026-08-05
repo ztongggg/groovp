@@ -57,8 +57,23 @@ export default async function SettingsPage() {
           <ConnectLinkedIn verified={linkedin} />
           <ConnectGitHub verified={github} />
 
+          <Link href="/settings/privacy" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
+            <span className="text-[15px] font-semibold text-navy">Privacy</span>
+            <span className="text-[18px] text-muted">›</span>
+          </Link>
+
+          <Link href="/settings/notifications" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
+            <span className="text-[15px] font-semibold text-navy">Notification Preferences</span>
+            <span className="text-[18px] text-muted">›</span>
+          </Link>
+
           <Link href="/settings/blocked" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
             <span className="text-[15px] font-semibold text-navy">Blocked Users</span>
+            <span className="text-[18px] text-muted">›</span>
+          </Link>
+
+          <Link href="/settings/help" className="flex items-center justify-between rounded-2xl border border-line bg-white px-5 py-4">
+            <span className="text-[15px] font-semibold text-navy">Help &amp; Support</span>
             <span className="text-[18px] text-muted">›</span>
           </Link>
 

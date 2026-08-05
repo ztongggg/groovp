@@ -38,7 +38,7 @@ function ShareCard({ code }) {
   );
 }
 
-export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId, projectId, favorited, joinCode, enrolled, isOwner, allowMultipleGroups, coverImageUrl }) {
+export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId, projectId, favorited, joinCode, enrolled, isOwner, allowMultipleGroups, coverImageUrl, numberOfGroups }) {
   const [tab, setTab] = useState("info");
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -133,7 +133,7 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
         ) : (
           <div className="mt-5 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Groups open · {groups.length}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Groups open · {groups.length}{type === "academic" && numberOfGroups > 1 ? ` of ${numberOfGroups} planned` : ""}</p>
               {enrolled && allowMultipleGroups && (
                 <button onClick={formGroup} disabled={pending} className="rounded-xl px-3 py-1.5 text-[12px] font-bold text-purple-600 disabled:opacity-50" style={{ background: "#ece8fc" }}>
                   {pending ? "…" : "+ Form a group"}

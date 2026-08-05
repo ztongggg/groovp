@@ -8,7 +8,7 @@ const REASONS = ["Fake profile / misrepresentation", "Inappropriate behavior", "
 
 export default function ModerationMenu({ userId, name, blocked }) {
   const router = useRouter();
-  const [view, setView] = useState(null); // null | menu | report | done
+  const [view, setView] = useState(null); // null | menu | report | done | confirmBlock
   const [reason, setReason] = useState("");
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
@@ -39,8 +39,17 @@ export default function ModerationMenu({ userId, name, blocked }) {
               <div className="flex flex-col gap-2">
                 <p className="mb-2 text-center text-[13px] font-semibold text-muted">{name}</p>
                 <button onClick={() => setView("report")} className="rounded-xl bg-[#f3f1f8] py-3.5 text-[15px] font-bold text-navy">Report user</button>
-                <button onClick={doBlock} disabled={busy} className="rounded-xl py-3.5 text-[15px] font-bold" style={{ background: "#fae0e0", color: "#bf4247" }}>{blocked ? "Unblock user" : "Block user"}</button>
+                <button onClick={() => (blocked ? doBlock() : setView("confirmBlock"))} disabled={busy} className="rounded-xl py-3.5 text-[15px] font-bold" style={{ background: "#fae0e0", color: "#bf4247" }}>{blocked ? "Unblock user" : "Block user"}</button>
                 <button onClick={() => setView(null)} className="mt-1 py-2 text-[15px] font-semibold text-muted">Cancel</button>
+              </div>
+            )}
+
+            {view === "confirmBlock" && (
+              <div className="flex flex-col gap-2">
+                <p className="text-[16px] font-bold text-navy">Block {name}?</p>
+                <p className="mb-2 text-[13px] text-muted">They won&apos;t be able to message you or see your content, and any pending request between you is cancelled.</p>
+                <button onClick={doBlock} disabled={busy} className="rounded-xl py-3.5 text-[15px] font-bold text-white" style={{ background: "#bf4247" }}>{busy ? "Blocking…" : "Block"}</button>
+                <button onClick={() => setView("menu")} className="py-2 text-[14px] font-semibold text-muted">Cancel</button>
               </div>
             )}
 

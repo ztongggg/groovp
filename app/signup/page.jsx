@@ -50,6 +50,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [intro, setIntro] = useState(true);
   const [step, setStep] = useState(0);
+  const [done, setDone] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [], linkedin_url: "", github_url: "", portfolio_url: "", pending_projects: [] });
@@ -72,11 +73,27 @@ export default function SignupPage() {
   async function finish() {
     setSaving(true); setError("");
     const res = await signUpFull(d);
-    if (res?.error) { setSaving(false); setError(res.error); return; }
-    router.push("/home"); router.refresh();
+    setSaving(false);
+    if (res?.error) { setError(res.error); return; }
+    setDone(true);
   }
   const next = () => (step < STEPS.length - 1 ? setStep(step + 1) : finish());
   const back = () => (step > 0 ? setStep(step - 1) : setIntro(true));
+
+  /* ---------- COMPLETE ---------- */
+  if (done) {
+    return (
+      <div className="relative flex w-[402px] flex-col items-center bg-white px-8 pt-40 text-center" style={{ height: 874 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/blob-teal.png" alt="" className="mb-8 h-32 w-32" style={{ borderRadius: 28 }} />
+        <h1 className="text-[26px] font-extrabold text-navy">You&apos;re all set! 🎉</h1>
+        <p className="mt-2 text-[16px] text-muted">Welcome to Groovp, {d.full_name.split(" ")[0] || "there"}. Time to find your team.</p>
+        <button onClick={() => { router.push("/home"); router.refresh(); }} className="mt-8 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white">
+          Let&apos;s go
+        </button>
+      </div>
+    );
+  }
 
   /* ---------- INTRO ---------- */
   if (intro) {

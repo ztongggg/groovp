@@ -26,6 +26,7 @@ export default function EditProjectForm({ project }) {
     timeline_end: project.timeline_end || "",
     min_size: project.min_size || 2,
     max_size: project.max_size || 5,
+    number_of_groups: project.number_of_groups || 1,
     skills: project.skills_needed || [],
     interests: project.interests || [],
     project_link: project.project_link || "",
@@ -72,6 +73,17 @@ export default function EditProjectForm({ project }) {
         <div className="flex-1"><p className="mb-1 text-[12px] font-semibold text-muted">Start</p><input type="date" className={inputCls} value={d.timeline_start} onChange={(e) => set("timeline_start", e.target.value)} /></div>
         <div className="flex-1"><p className="mb-1 text-[12px] font-semibold text-muted">End</p><input type="date" className={inputCls} value={d.timeline_end} onChange={(e) => set("timeline_end", e.target.value)} /></div>
       </div>
+
+      {project.type === "academic" && (
+        <div>
+          <p className="mb-2 text-[13px] font-bold text-navy">Number of groups</p>
+          <div className="flex w-fit items-center gap-5 rounded-[14px] bg-[#f3f1f8] px-5 py-3">
+            <button type="button" onClick={() => set("number_of_groups", Math.max(1, d.number_of_groups - 1))} className="text-[18px] font-bold text-purple-600">−</button>
+            <span className="text-[15px] font-bold text-navy">{d.number_of_groups}</span>
+            <button type="button" onClick={() => set("number_of_groups", Math.min(20, d.number_of_groups + 1))} className="text-[18px] font-bold text-purple-600">+</button>
+          </div>
+        </div>
+      )}
 
       <div>
         <p className="mb-2 text-[13px] font-bold text-navy">Team size</p>

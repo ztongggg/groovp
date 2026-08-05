@@ -52,6 +52,7 @@ export async function createProject(data) {
         project_link: data.project_link?.trim() || null,
         resource_files: (data.resource_files || []).map((f) => f.url),
         allow_multiple_groups: (data.type || "academic") === "academic",
+        number_of_groups: (data.type || "academic") === "academic" ? Math.max(1, Number(data.number_of_groups) || 1) : 1,
         join_code: makeCode(),
       })
       .select()

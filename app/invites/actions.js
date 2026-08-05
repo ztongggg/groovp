@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { groupHasRoom } from "@/lib/capacity";
+import { shouldNotify } from "@/lib/notify";
 
 // Invitee responds to a leader's invite (status 'invited').
 export async function respondToInvite(requestId, accept) {
@@ -49,7 +50,7 @@ export async function respondToInvite(requestId, accept) {
   try {
     const { data: g } = await supabase.from("groups").select("leader_id, project_id, name").eq("id", req.group_id).single();
     const { data: me } = await supabase.from("profiles").select("full_name, username").eq("id", user.id).single();
-    if (g?.leader_id && g.leader_id !== user.id) {
+    if (g?.leader_id && g.leader_id !== user.id && (await shouldNotify(supabase, g.leader_id, "notify_join_accepted"))) {
       const { data: proj } = g.project_id ? await supabase.from("projects").select("name").eq("id", g.project_id).single() : { data: null };
       const who = me?.full_name || me?.username || "Someone";
       await supabase.from("notifications").insert({

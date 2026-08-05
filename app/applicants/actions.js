@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { groupHasRoom } from "@/lib/capacity";
+import { shouldNotify } from "@/lib/notify";
 
 // Leader accepts an applicant: mark request accepted + add them as a member.
 export async function acceptRequest(id, groupId, applicantId) {
@@ -31,7 +32,9 @@ export async function acceptRequest(id, groupId, applicantId) {
       await supabase.from("project_members").insert({ project_id: g.project_id, user_id: applicantId }).then(() => {}, () => {});
     }
     const { data: proj } = g?.project_id ? await supabase.from("projects").select("name").eq("id", g.project_id).single() : { data: null };
-    await supabase.from("notifications").insert({ user_id: applicantId, type: "join_accepted", related_id: groupId, body: `You're in! Accepted into ${proj?.name || g?.name || "a group"}` });
+    if (await shouldNotify(supabase, applicantId, "notify_join_accepted")) {
+      await supabase.from("notifications").insert({ user_id: applicantId, type: "join_accepted", related_id: groupId, body: `You're in! Accepted into ${proj?.name || g?.name || "a group"}` });
+    }
   } catch {}
 
   revalidatePath("/applicants");

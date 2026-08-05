@@ -12,7 +12,7 @@ async function getData(projectId) {
 
     const { data: p } = await supabase
       .from("projects")
-      .select("id, owner_id, name, description, photo_url, cover_image_url, type, skills_needed, interests, min_size, max_size, timeline_start, timeline_end, privacy, joining_method, project_link, resource_files, course_code, instructor, things_to_note")
+      .select("id, owner_id, name, description, photo_url, cover_image_url, type, skills_needed, interests, min_size, max_size, number_of_groups, timeline_start, timeline_end, privacy, joining_method, project_link, resource_files, course_code, instructor, things_to_note")
       .eq("id", projectId)
       .single();
     if (!p || p.owner_id !== user.id) return null;

@@ -30,7 +30,7 @@ export default function CreateProjectPage() {
   const [error, setError] = useState("");
   const [done, setDone] = useState(null); // {projectId, name, joinCode}
   const [copied, setCopied] = useState(false);
-  const [d, setD] = useState({ type: "academic", name: "", description: "", photo_url: "", cover_image_url: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, skills: [], interests: [], project_link: "", resource_files: [], privacy: "public", joining_method: "approval" });
+  const [d, setD] = useState({ type: "academic", name: "", description: "", photo_url: "", cover_image_url: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, number_of_groups: 1, skills: [], interests: [], project_link: "", resource_files: [], privacy: "public", joining_method: "approval" });
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
@@ -124,6 +124,16 @@ export default function CreateProjectPage() {
         )}
         {step === 2 && (
           <div className="flex flex-col gap-5">
+            {d.type === "academic" && (
+              <div>
+                <p className="mb-2 text-[13px] font-bold text-navy">Number of groups</p>
+                <div className="flex w-fit items-center gap-5 rounded-[14px] bg-[#f3f1f8] px-5 py-3">
+                  <button type="button" onClick={() => set("number_of_groups", Math.max(1, d.number_of_groups - 1))} className="text-[18px] font-bold text-purple-600">−</button>
+                  <span className="text-[15px] font-bold text-navy">{d.number_of_groups}</span>
+                  <button type="button" onClick={() => set("number_of_groups", Math.min(20, d.number_of_groups + 1))} className="text-[18px] font-bold text-purple-600">+</button>
+                </div>
+              </div>
+            )}
             <div>
               <p className="mb-2 text-[13px] font-bold text-navy">Team size</p>
               <div className="flex gap-3">

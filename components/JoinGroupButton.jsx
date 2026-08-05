@@ -1,19 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { requestToJoin } from "@/app/discover/actions";
 
 export default function JoinGroupButton({ groupId, full }) {
-  const [status, setStatus] = useState("idle"); // idle | modal | loading | done | error
+  const [status, setStatus] = useState("idle"); // idle | modal | loading | confirmed | done | reapplied | joined | error
   const [note, setNote] = useState("");
+  const [wasReapply, setWasReapply] = useState(false);
 
   async function send() {
     setStatus("loading");
     const res = await requestToJoin(groupId, note);
-    setStatus(res?.error ? "error" : res?.joined ? "joined" : res?.reapplied ? "reapplied" : "done");
+    if (res?.error) { setStatus("error"); return; }
+    if (res?.joined) { setStatus("joined"); return; }
+    setWasReapply(!!res?.reapplied);
+    setStatus("confirmed");
   }
 
-  const done = status === "done" || status === "reapplied" || status === "joined";
+  const settled = status === "done" || status === "reapplied" || status === "joined";
   const label =
     status === "loading" ? "…"
       : status === "joined" ? "Joined ✓"
@@ -26,9 +31,9 @@ export default function JoinGroupButton({ groupId, full }) {
     <>
       <button
         onClick={() => (status === "error" ? send() : setStatus("modal"))}
-        disabled={status === "loading" || done || full}
+        disabled={status === "loading" || settled || full}
         className="rounded-xl px-4 py-2 text-[13px] font-bold disabled:opacity-60"
-        style={{ background: done ? "#dcf674" : "#7c3aed", color: done ? "#5f7900" : "#fff" }}
+        style={{ background: settled ? "#dcf674" : "#7c3aed", color: settled ? "#5f7900" : "#fff" }}
       >
         {full ? "Full" : label}
       </button>
@@ -41,6 +46,20 @@ export default function JoinGroupButton({ groupId, full }) {
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder="e.g. I've worked with React before and I'm free most evenings" className="w-full rounded-xl border border-line px-3 py-2.5 text-[14px] text-navy focus:outline-none" />
             <button onClick={send} className="mt-3 w-full rounded-xl py-3 text-[14px] font-bold text-white" style={{ background: "#7c3aed" }}>Send request</button>
             <button onClick={() => setStatus("idle")} className="mt-2 w-full py-2 text-[14px] font-semibold text-muted">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {status === "confirmed" && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
+          <div className="mx-auto flex w-[402px] flex-col items-center rounded-t-3xl bg-white p-6 pb-8 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#d4f2de" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#298c52" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+            </div>
+            <p className="mt-4 text-[18px] font-extrabold text-navy">Request sent!</p>
+            <p className="mt-1 text-[13.5px] text-muted">The leader will review it — check Teams → Requested for updates.</p>
+            <button onClick={() => setStatus(wasReapply ? "reapplied" : "done")} className="mt-5 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white">Keep Browsing</button>
+            <Link href="/teams" className="mt-2 w-full rounded-2xl py-3.5 text-center text-[15px] font-bold text-navy" style={{ background: "#f3f1f8" }}>View Request Status</Link>
           </div>
         </div>
       )}

@@ -55,6 +55,12 @@ export async function openPrivateChat(otherId) {
       }
     }
     if (!convId) {
+      // Privacy: "allow others to message me first" gates starting a brand-new
+      // conversation. An existing one (found above) is never affected.
+      const { data: target } = await supabase.from("profiles").select("allow_message_first").eq("id", otherId).maybeSingle();
+      if (target?.allow_message_first === false) {
+        return { error: "This user isn't accepting new messages right now." };
+      }
       const { data: conv, error } = await supabase.from("conversations").insert({ type: "private" }).select().single();
       if (error) return { error: error.message };
       convId = conv.id;
