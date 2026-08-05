@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createProject } from "@/app/create/actions";
 import ResourceFileUpload from "@/components/ResourceFileUpload";
 import AvatarUpload from "@/components/AvatarUpload";
+import CoverImageUpload from "@/components/CoverImageUpload";
 
 const SKILLS = ["Python", "React", "TypeScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "AI/ML", "FastAPI", "Design", "Research"];
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
@@ -29,7 +30,7 @@ export default function CreateProjectPage() {
   const [error, setError] = useState("");
   const [done, setDone] = useState(null); // {projectId, name, joinCode}
   const [copied, setCopied] = useState(false);
-  const [d, setD] = useState({ type: "academic", name: "", description: "", photo_url: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, skills: [], interests: [], project_link: "", resource_files: [], privacy: "public", joining_method: "approval" });
+  const [d, setD] = useState({ type: "academic", name: "", description: "", photo_url: "", cover_image_url: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, skills: [], interests: [], project_link: "", resource_files: [], privacy: "public", joining_method: "approval" });
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
@@ -111,6 +112,7 @@ export default function CreateProjectPage() {
         )}
         {step === 1 && (
           <div className="flex flex-col gap-3">
+            <CoverImageUpload url={d.cover_image_url} onChange={(url) => set("cover_image_url", url)} />
             <div className="mb-1 flex justify-center"><AvatarUpload url={d.photo_url} onChange={(url) => set("photo_url", url)} /></div>
             <input className={inputCls} style={{ height: 52 }} placeholder="Project name" value={d.name} onChange={(e) => set("name", e.target.value)} />
             <textarea className="w-full rounded-[14px] bg-[#f5f0ff] p-4 text-[13px] text-navy focus:outline-none" rows={5} placeholder="Describe your project — goals, what you're building, and what kind of teammates you need…" value={d.description} onChange={(e) => set("description", e.target.value)} />

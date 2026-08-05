@@ -38,7 +38,7 @@ function ShareCard({ code }) {
   );
 }
 
-export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId, projectId, favorited, joinCode, enrolled, isOwner, allowMultipleGroups }) {
+export default function ProjectDetailView({ name, description, type, ownerUsername, dateRange, skills = [], memberCount, maxSize, groups = [], meId, projectId, favorited, joinCode, enrolled, isOwner, allowMultipleGroups, coverImageUrl }) {
   const [tab, setTab] = useState("info");
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -74,7 +74,12 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
           )}
           <FavoriteButton projectId={projectId} initial={favorited} />
         </div>
-        <div className="absolute" style={{ left: 34, top: 103, width: 334, height: 130, borderRadius: 16, background: "#d9d9d9" }} />
+        {coverImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={coverImageUrl} alt="" className="absolute object-cover" style={{ left: 34, top: 103, width: 334, height: 130, borderRadius: 16 }} />
+        ) : (
+          <div className="absolute" style={{ left: 34, top: 103, width: 334, height: 130, borderRadius: 16, background: "#d9d9d9" }} />
+        )}
       </div>
 
       {/* overlapping content card */}

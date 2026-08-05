@@ -39,6 +39,7 @@ export async function createProject(data) {
         name: data.name.trim(),
         description: data.description?.trim() || null,
         photo_url: data.photo_url || null,
+        cover_image_url: data.cover_image_url || null,
         type: data.type || "academic",
         skills_needed: data.skills || [],
         interests: data.interests || [],

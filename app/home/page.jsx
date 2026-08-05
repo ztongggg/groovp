@@ -37,7 +37,7 @@ async function getData() {
 
     const { data: rows } = await supabase
       .from("projects")
-      .select("id,name,description,skills_needed,timeline_start,timeline_end,max_size, groups(group_members(count))")
+      .select("id,name,description,skills_needed,timeline_start,timeline_end,max_size,cover_image_url, groups(group_members(count))")
       .order("created_at", { ascending: false });
 
     const mapProject = (p) => {
@@ -49,6 +49,7 @@ async function getData() {
         skills: p.skills_needed || [],
         count: `${members}/${p.max_size || 0}`,
         date: `${fmt(p.timeline_start)} - ${fmt(p.timeline_end)}`,
+        coverImageUrl: p.cover_image_url,
       };
     };
     const projects = (rows || []).map(mapProject);

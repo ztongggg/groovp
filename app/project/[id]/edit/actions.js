@@ -24,6 +24,7 @@ export async function updateProject(projectId, data) {
       name: data.name.trim(),
       description: data.description?.trim() || null,
       photo_url: data.photo_url || null,
+      cover_image_url: data.cover_image_url || null,
       skills_needed: data.skills || [],
       interests: data.interests || [],
       min_size: minSize,

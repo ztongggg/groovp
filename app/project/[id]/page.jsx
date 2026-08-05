@@ -14,7 +14,7 @@ async function getProject(id) {
     const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("projects")
-      .select("id,name,description,type,owner_id,join_code,allow_multiple_groups,skills_needed,timeline_start,timeline_end,max_size, owner:profiles!projects_owner_id_fkey(username), groups(id,name,leader_id,recruiting,members_wanted, group_members(user_id, profiles(full_name,username)))")
+      .select("id,name,description,type,owner_id,join_code,allow_multiple_groups,skills_needed,timeline_start,timeline_end,max_size,cover_image_url, owner:profiles!projects_owner_id_fkey(username), groups(id,name,leader_id,recruiting,members_wanted, group_members(user_id, profiles(full_name,username)))")
       .eq("id", id)
       .single();
     if (error) return null;
@@ -77,6 +77,7 @@ export default async function ProjectDetailPage({ params }) {
       enrolled={p.enrolled}
       isOwner={p.meId && p.meId === p.owner_id}
       allowMultipleGroups={p.allow_multiple_groups !== false}
+      coverImageUrl={p.cover_image_url}
     />
   );
 }

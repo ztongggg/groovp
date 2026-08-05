@@ -53,6 +53,7 @@ export default function DiscoverList({ items = [] }) {
               groupId={p.groupId}
               projectId={p.id}
               strongMatch={p.strongMatch}
+              coverImageUrl={p.coverImageUrl}
             />
           ))}
         </div>

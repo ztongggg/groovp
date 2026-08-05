@@ -30,7 +30,7 @@ async function getData() {
 
     const { data, error } = await supabase
       .from("projects")
-      .select("id,name,description,skills_needed,interests,timeline_start,timeline_end,min_size,max_size, groups(id, group_members(count))")
+      .select("id,name,description,skills_needed,interests,timeline_start,timeline_end,min_size,max_size,cover_image_url, groups(id, group_members(count))")
       .order("created_at", { ascending: false });
     if (error) return { projects: [], mine };
     return { projects: data || [], mine };
@@ -87,6 +87,7 @@ export default async function DiscoverPage() {
                 initials: (p.name || "P").slice(0, 2).toUpperCase(),
                 groupId: group?.id,
                 strongMatch: shared >= STRONG_MATCH_THRESHOLD,
+                coverImageUrl: p.cover_image_url,
               };
             })}
           />

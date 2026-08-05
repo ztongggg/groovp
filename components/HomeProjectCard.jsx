@@ -28,6 +28,7 @@ export default function HomeProjectCard({
   date,
   join = "purple", // "purple" | "green"
   badge,
+  coverImageUrl,
 }) {
   const joinBg = join === "green" ? "#dcf674" : "#7c3aed";
   const joinColor = join === "green" ? "#5f7900" : "#ffffff";
@@ -39,7 +40,12 @@ export default function HomeProjectCard({
       style={{ width: 280, height: 299, borderRadius: 18, background: "#fff", border: "1px solid #e4e3e3" }}
     >
       {/* image header */}
-      <div className="absolute left-0 top-0" style={{ width: 280, height: 75, background: "#d9d9d9", borderTopLeftRadius: 18, borderTopRightRadius: 18 }} />
+      {coverImageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={coverImageUrl} alt="" className="absolute left-0 top-0 object-cover" style={{ width: 280, height: 75, borderTopLeftRadius: 18, borderTopRightRadius: 18 }} />
+      ) : (
+        <div className="absolute left-0 top-0" style={{ width: 280, height: 75, background: "#d9d9d9", borderTopLeftRadius: 18, borderTopRightRadius: 18 }} />
+      )}
 
       {/* strong applicant badge */}
       {badge && (

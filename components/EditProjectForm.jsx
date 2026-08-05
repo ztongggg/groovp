@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { updateProject } from "@/app/project/[id]/edit/actions";
 import ResourceFileUpload from "@/components/ResourceFileUpload";
 import AvatarUpload from "@/components/AvatarUpload";
+import CoverImageUpload from "@/components/CoverImageUpload";
 
 const SKILLS = ["Python", "React", "TypeScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "AI/ML", "FastAPI", "Design", "Research"];
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
@@ -20,6 +21,7 @@ export default function EditProjectForm({ project }) {
     name: project.name || "",
     description: project.description || "",
     photo_url: project.photo_url || "",
+    cover_image_url: project.cover_image_url || "",
     timeline_start: project.timeline_start || "",
     timeline_end: project.timeline_end || "",
     min_size: project.min_size || 2,
@@ -54,6 +56,7 @@ export default function EditProjectForm({ project }) {
 
   return (
     <div className="mt-5 flex flex-col gap-5 px-6 pb-8">
+      <CoverImageUpload url={d.cover_image_url} onChange={(url) => set("cover_image_url", url)} />
       <div className="flex justify-center"><AvatarUpload url={d.photo_url} onChange={(url) => set("photo_url", url)} /></div>
       <input className={inputCls} placeholder="Project name" value={d.name} onChange={(e) => set("name", e.target.value)} />
       <textarea className="w-full rounded-[14px] bg-[#f5f0ff] p-4 text-[13px] text-navy focus:outline-none" rows={4} placeholder="Description" value={d.description} onChange={(e) => set("description", e.target.value)} />
