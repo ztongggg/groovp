@@ -73,7 +73,7 @@ export default function ChatView({ groupId, conversationId, title, subtitle, meI
                   >
                     {m.body}
                   </div>
-                  <p className={`mt-1 text-[10.5px] text-muted ${mine ? "text-right pr-1" : "pl-3"}`}>{fmtTime(m.created_at)}</p>
+                  <p suppressHydrationWarning className={`mt-1 text-[10.5px] text-muted ${mine ? "text-right pr-1" : "pl-3"}`}>{fmtTime(m.created_at)}</p>
                 </div>
               </div>
             );
