@@ -49,12 +49,12 @@ function Chip({ active, onClick, children }) {
   );
 }
 const I = {
-  user: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" /></svg>,
-  at: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1" /></svg>,
-  mail: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>,
-  lock: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>,
-  book: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5Z" /></svg>,
-  link: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b8696" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" /></svg>,
+  user: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" /></svg>,
+  at: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1" /></svg>,
+  mail: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>,
+  lock: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>,
+  book: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5Z" /></svg>,
+  link: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" /></svg>,
 };
 
 export default function SignupPage() {
@@ -66,6 +66,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [], linkedin_url: "", github_url: "", portfolio_url: "", pending_projects: [] });
   const [showLinks, setShowLinks] = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const [addingProject, setAddingProject] = useState(false);
   const [newProject, setNewProject] = useState({ role: "", write_up: "" });
 
@@ -166,7 +167,7 @@ export default function SignupPage() {
         {step === 0 && (
           <>
             <div className="flex flex-col items-center">
-              <div className="relative flex items-center justify-center rounded-full" style={{ width: 76, height: 76, background: "#f5f0ff" }}>
+              <div className="relative flex items-center justify-center rounded-full" style={{ width: 76, height: 76, background: "#f5f0ff", border: "1.5px dashed #c4b5fd" }}>
                 {I.user}
                 <span className="absolute flex items-center justify-center rounded-full" style={{ right: -4, bottom: -2, width: 32, height: 32, background: "#7c3aed" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z" /><circle cx="12" cy="13" r="4" /></svg>
@@ -178,7 +179,17 @@ export default function SignupPage() {
               <Field icon={I.user} placeholder="Full name" value={d.full_name} onChange={(e) => set("full_name", e.target.value)} />
               <Field icon={I.at} placeholder="Username" value={d.username} onChange={(e) => set("username", e.target.value)} />
               <Field icon={I.mail} type="email" placeholder="Email" value={d.email} onChange={(e) => set("email", e.target.value)} />
-              <Field icon={I.lock} type="password" placeholder="Password (min 6)" value={d.password} onChange={(e) => set("password", e.target.value)} />
+              <div className="relative flex items-center" style={{ height: 52, borderRadius: 14, background: "#f3f1f8", paddingLeft: 48, paddingRight: 44 }}>
+                <span className="absolute" style={{ left: 16 }}>{I.lock}</span>
+                <input type={showPw ? "text" : "password"} placeholder="Password (min 6)" value={d.password} onChange={(e) => set("password", e.target.value)} className="w-full bg-transparent focus:outline-none" style={{ fontSize: 14, fontWeight: 400, color: "#1d1b44" }} />
+                <button type="button" onClick={() => setShowPw((v) => !v)} className="absolute flex items-center justify-center" style={{ right: 16 }} aria-label={showPw ? "Hide password" : "Show password"}>
+                  {showPw ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a21.7 21.7 0 0 1-2.61 3.87M14.12 14.12a3 3 0 1 1-4.24-4.24" /><path d="M1 1l22 22" /></svg>
+                  )}
+                </button>
+              </div>
             </div>
           </>
         )}
