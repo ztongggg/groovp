@@ -74,7 +74,7 @@ function LinkRow({ icon, iconBg, label, url, verified }) {
   );
 }
 
-export default function ProfileView({ userId, name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [], pastProjects = [], linkedinVerified = false, githubVerified = false, linkedinUrl = "", githubUrl = "", portfolioUrl = "" }) {
+export default function ProfileView({ userId, name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [], pastProjects = [], linkedinVerified = false, githubVerified = false, linkedinUrl = "", githubUrl = "", portfolioUrl = "", completeness = null }) {
   const [tab, setTab] = useState("about");
 
   return (
@@ -108,6 +108,20 @@ export default function ProfileView({ userId, name, username, subtitle, ratingLa
           <span className="text-[14px] text-muted">({ratingCount} Ratings)</span>
           {ratingCount > 0 && <span className="text-[13px] font-bold text-purple-600">See all ›</span>}
         </Link>
+
+        {/* Completeness — eight equally-weighted fields. Hidden once complete so
+            a finished profile isn't nagged at. */}
+        {completeness && completeness.percent < 100 && (
+          <Link href={completeness.missing[0]?.href || "/edit-profile"} className="mt-4 block rounded-2xl p-4" style={{ background: "#f5f0ff" }}>
+            <div className="flex items-baseline justify-between">
+              <p className="text-[13px] font-bold text-navy">Profile {completeness.percent}% complete</p>
+              <span className="text-[12px] font-bold text-purple-600">{completeness.missing[0]?.label} ›</span>
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full" style={{ background: "#e2d9f7" }}>
+              <div className="h-2 rounded-full" style={{ width: `${completeness.percent}%`, background: "#7c3aed" }} />
+            </div>
+          </Link>
+        )}
 
         {/* tabs */}
         <div className="mt-5 flex rounded-2xl bg-[#eeebf3] p-1.5">

@@ -48,3 +48,24 @@ export async function updateProject(projectId, data) {
   revalidatePath(`/project/${projectId}/edit`);
   return { ok: true };
 }
+
+// Soft-archive, never a cascading hard delete (owner decision, 2026-08-07).
+// The project disappears from every feed and stops taking join requests, but
+// groups, memberships, chat history and past-project records are left intact so
+// members do not silently lose a conversation they were part of.
+export async function deleteProject(projectId) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "You must be signed in." };
+
+  const { error } = await supabase
+    .from("projects")
+    .update({ status: "Deleted", deleted_at: new Date().toISOString() })
+    .eq("id", projectId)
+    .eq("owner_id", user.id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/home");
+  revalidatePath("/discover");
+  return { ok: true };
+}

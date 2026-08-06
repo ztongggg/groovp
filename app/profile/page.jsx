@@ -1,6 +1,7 @@
 import AppShell from "@/components/AppShell";
 import ProfileView from "@/components/ProfileView";
 import { createClient } from "@/lib/supabase/server";
+import { profileCompleteness } from "@/lib/completeness";
 
 async function getProfile() {
   const fallback = {
@@ -70,6 +71,7 @@ async function getProfile() {
       linkedinUrl: p?.linkedin_url || "",
       githubUrl: p?.github_url || "",
       portfolioUrl: p?.portfolio_url || "",
+      completeness: profileCompleteness(p),
     };
   } catch {
     return fallback;

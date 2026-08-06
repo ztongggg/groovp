@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateProject } from "@/app/project/[id]/edit/actions";
+import { updateProject, deleteProject } from "@/app/project/[id]/edit/actions";
 import ResourceFileUpload from "@/components/ResourceFileUpload";
 import AvatarUpload from "@/components/AvatarUpload";
 import CoverImageUpload from "@/components/CoverImageUpload";
@@ -40,6 +40,8 @@ export default function EditProjectForm({ project }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const set = (k, v) => { setD((s) => ({ ...s, [k]: v })); setSaved(false); };
   const toggle = (k, v) => { setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] })); setSaved(false); };
@@ -140,6 +142,44 @@ export default function EditProjectForm({ project }) {
       <button onClick={save} disabled={saving} className="mt-2 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white disabled:opacity-50">
         {saving ? "Saving…" : saved ? "Saved ✓" : "Save changes"}
       </button>
+
+      {/* Danger zone — archives rather than cascades, so members keep their
+          group chats and past-project records. */}
+      <div className="mt-4 border-t border-line pt-5">
+        {!confirmDelete ? (
+          <button type="button" onClick={() => setConfirmDelete(true)} className="w-full rounded-2xl py-3 text-[14px] font-bold" style={{ background: "#fae0e0", color: "#bf4247" }}>
+            Delete project
+          </button>
+        ) : (
+          <div className="rounded-2xl p-4" style={{ background: "#fae0e0" }}>
+            <p className="text-[14px] font-bold" style={{ color: "#bf4247" }}>Delete this project?</p>
+            <p className="mt-1 text-[13px]" style={{ color: "#8c3a3e" }}>
+              It will be removed from Discover and Home, and stop accepting join requests. Existing groups, their chats and members are kept.
+            </p>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => {
+                  setDeleting(true);
+                  setError("");
+                  deleteProject(project.id).then((res) => {
+                    if (res?.error) { setError(res.error); setDeleting(false); }
+                    else router.push("/home");
+                  });
+                }}
+                className="flex-1 rounded-xl py-2.5 text-[13px] font-bold text-white disabled:opacity-50"
+                style={{ background: "#bf4247" }}
+              >
+                {deleting ? "Deleting…" : "Yes, delete"}
+              </button>
+              <button type="button" onClick={() => setConfirmDelete(false)} className="flex-1 rounded-xl bg-white py-2.5 text-[13px] font-bold text-navy">
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
