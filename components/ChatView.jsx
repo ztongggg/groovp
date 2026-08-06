@@ -34,7 +34,7 @@ export default function ChatView({ groupId, conversationId, title, meId, message
     <div className="flex h-full w-[402px] flex-col bg-bgapp">
       {/* header */}
       <div className="flex items-center gap-3 border-b border-line bg-white px-5 py-4">
-        <Link href={backHref} className="text-[22px] text-navy">‹</Link>
+        <Link href={backHref} className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
         <p className="flex-1 text-[17px] font-bold text-navy">{title}</p>
         {groupId && (
           <Link href={`/groups/${groupId}`} aria-label="Group info" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "#f3f1f8" }}>
