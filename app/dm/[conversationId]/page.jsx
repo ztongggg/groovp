@@ -21,7 +21,7 @@ async function getData(convId) {
       .eq("conversation_id", convId)
       .order("created_at", { ascending: true });
 
-    return { title, meId: user?.id || null, messages: (msgs || []).map((m) => ({ id: m.id, body: m.body, sender_id: m.sender_id, name: "" })) };
+    return { title, meId: user?.id || null, messages: (msgs || []).map((m) => ({ id: m.id, body: m.body, sender_id: m.sender_id, created_at: m.created_at, name: "" })) };
   } catch {
     return { title: "Chat", meId: null, messages: [] };
   }

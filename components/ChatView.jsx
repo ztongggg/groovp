@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { sendMessage, sendDM } from "@/app/chat/actions";
 
+function fmtTime(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 export default function ChatView({ groupId, conversationId, title, meId, messages = [], backHref = "/teams" }) {
   const router = useRouter();
   const [text, setText] = useState("");
@@ -55,6 +60,7 @@ export default function ChatView({ groupId, conversationId, title, meId, message
                   >
                     {m.body}
                   </div>
+                  <p className={`mt-1 text-[10.5px] text-muted ${mine ? "text-right pr-1" : "pl-3"}`}>{fmtTime(m.created_at)}</p>
                 </div>
               </div>
             );

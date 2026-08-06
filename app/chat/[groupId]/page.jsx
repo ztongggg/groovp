@@ -27,6 +27,7 @@ async function getData(groupId) {
         id: m.id,
         body: m.body,
         sender_id: m.sender_id,
+        created_at: m.created_at,
         name: m.profiles?.full_name || m.profiles?.username || "User",
       })),
     };
