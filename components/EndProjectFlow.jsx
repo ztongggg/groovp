@@ -6,7 +6,7 @@ import RateTeammatesList from "@/components/RateTeammatesList";
 import { endProject } from "@/app/groups/[groupId]/actions";
 import { addPastProjectForProject } from "@/app/groups/[groupId]/end/actions";
 
-export default function EndProjectFlow({ groupId, groupStatus, projectId, members }) {
+export default function EndProjectFlow({ groupId, groupName, groupStatus, projectId, members }) {
   const router = useRouter();
   const [step, setStep] = useState(groupStatus === "Ended" ? "rate" : "confirm");
   const [ending, setEnding] = useState(false);
@@ -34,14 +34,17 @@ export default function EndProjectFlow({ groupId, groupStatus, projectId, member
 
   if (step === "confirm") {
     return (
-      <div className="mt-6 flex flex-col items-center px-8 text-center">
-        <p className="text-[20px] font-extrabold text-navy">End this project?</p>
-        <p className="mt-2 text-[14px] text-muted">This marks the group as ended. Members won&apos;t be able to post further updates here — you&apos;ll get a chance to rate your teammates next.</p>
+      <div className="mt-16 flex flex-col items-center px-8 text-center">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#d44d52" }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z" /></svg>
+        </span>
+        <p className="mt-4 text-[20px] font-extrabold text-navy">End this project?</p>
+        <p className="mt-2 text-[14px] text-muted">This will close the Group chat {groupName ? `"${groupName}"` : ""}. Members will be prompted to rate each other, and the group chat will be archived.</p>
         {error && <p className="mt-3 text-[13px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
-        <button onClick={onConfirmEnd} disabled={ending} className="mt-6 w-full rounded-2xl py-3.5 text-[15px] font-bold text-white disabled:opacity-50" style={{ background: "#bf4247" }}>
-          {ending ? "Ending…" : "End Project"}
+        <button onClick={onConfirmEnd} disabled={ending} className="mt-6 w-full rounded-2xl py-3.5 text-[15px] font-bold" style={{ background: "#fae0e0", color: "#bf4247" }}>
+          {ending ? "Ending…" : "Yes, End Project"}
         </button>
-        <button onClick={() => router.back()} className="mt-3 py-2 text-[14px] font-semibold text-muted">Cancel</button>
+        <button onClick={() => router.back()} className="mt-2 w-full rounded-2xl py-3.5 text-[15px] font-bold text-navy" style={{ background: "#f3f1f8" }}>Cancel</button>
       </div>
     );
   }
@@ -49,12 +52,12 @@ export default function EndProjectFlow({ groupId, groupStatus, projectId, member
   if (step === "rate") {
     return (
       <div className="mt-6 flex flex-col gap-4 px-6">
-        <div className="text-center">
-          <p className="text-[20px] font-extrabold text-navy">Rate your teammates</p>
-          <p className="mt-2 text-[14px] text-muted">Optional — help future teammates know who's great to work with.</p>
+        <div>
+          <p className="text-[22px] font-extrabold text-navy">Rate your teammates</p>
+          <p className="mt-1 text-[13px] text-muted">{groupName ? `"${groupName}" has ended.` : "This project has ended."} Leave a rating for each teammate.</p>
         </div>
-        <RateTeammatesList members={members} projectId={projectId} />
-        <button onClick={() => setStep("addProject")} className="mt-2 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white">Continue</button>
+        <RateTeammatesList members={members} projectId={projectId} onDone={() => setStep("addProject")} />
+        <button onClick={() => setStep("addProject")} className="w-full rounded-2xl py-3 text-[14px] font-semibold text-muted">Skip for now</button>
       </div>
     );
   }

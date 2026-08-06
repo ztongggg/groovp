@@ -38,7 +38,7 @@ export default async function EndProjectPage({ params }) {
     <AppShell>
       <div className="min-h-full bg-white pb-8">
         <StatusBar />
-        <EndProjectFlow groupId={data.group.id} groupStatus={data.group.status} projectId={data.group.project_id} members={data.members} />
+        <EndProjectFlow groupId={data.group.id} groupName={data.group.name} groupStatus={data.group.status} projectId={data.group.project_id} members={data.members} />
       </div>
     </AppShell>
   );

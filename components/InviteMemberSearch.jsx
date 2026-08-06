@@ -5,6 +5,7 @@ import { searchInviteCandidates } from "@/app/groups/[groupId]/actions";
 import { inviteUserId } from "@/app/recruiting/[groupId]/actions";
 
 const STATUS_LABEL = { invited: "Invited", pending: "Applied", accepted: "Member", declined: null };
+const AVATAR = ["#f29c38", "#4ac7b2", "#f2a5bd", "#7c3aed", "#34b9a8"];
 
 export default function InviteMemberSearch({ groupId }) {
   const [q, setQ] = useState("");
@@ -45,13 +46,13 @@ export default function InviteMemberSearch({ groupId }) {
       {loading && <p className="text-[13px] text-muted">Searching…</p>}
 
       <div className="flex flex-col gap-2.5">
-        {results.map((c) => {
+        {results.map((c, i) => {
           const already = invited[c.id] || c.requestStatus === "invited" || c.requestStatus === "pending" || c.requestStatus === "accepted";
           const label = invited[c.id] ? "Invited" : STATUS_LABEL[c.requestStatus] || null;
           return (
-            <div key={c.id} className="flex items-center justify-between rounded-2xl border border-line bg-white px-3 py-2.5">
+            <div key={c.id} className="flex items-center justify-between rounded-2xl bg-white px-3 py-2.5" style={{ boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" }}>
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full text-[13px] font-bold text-white" style={{ background: "#7c3aed" }}>
+                <span className="flex h-11 w-11 items-center justify-center rounded-full text-[13px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
                   {(c.full_name || c.username || "?").slice(0, 2).toUpperCase()}
                 </span>
                 <div>
