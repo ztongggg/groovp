@@ -93,14 +93,31 @@ export default function SignupPage() {
 
   /* ---------- COMPLETE ---------- */
   if (done) {
+    const confetti = [
+      { l: 48, t: 178, w: 24, h: 24, r: 999, bg: "#f2a5bd" },
+      { l: 200, t: 158, w: 8, h: 8, r: 999, bg: "#f2a5bd" },
+      { l: 348, t: 202, w: 22, h: 22, r: 6, bg: "#7c3aed", rot: 20 },
+      { l: 88, t: 258, w: 34, h: 12, r: 6, bg: "#ffb800", rot: -30 },
+      { l: 288, t: 288, w: 34, h: 12, r: 6, bg: "#ffb800", rot: 30 },
+      { l: 370, t: 318, w: 8, h: 8, r: 999, bg: "#7c3aed" },
+      { l: 60, t: 398, w: 8, h: 8, r: 999, bg: "#dcf674" },
+      { l: 90, t: 465, w: 14, h: 6, r: 4, bg: "#f2a5bd", rot: -20 },
+      { l: 335, t: 435, w: 12, h: 12, r: 999, bg: "#c4b5fd" },
+      { l: 347, t: 470, w: 10, h: 6, r: 4, bg: "#7c3aed", rot: 20 },
+    ];
     return (
-      <div className="relative flex w-[402px] flex-col items-center bg-white px-8 pt-40 text-center" style={{ height: 874 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/blob-teal.png" alt="" className="mb-8 h-32 w-32" style={{ borderRadius: 28 }} />
-        <h1 className="text-[26px] font-extrabold text-navy">You&apos;re all set! 🎉</h1>
-        <p className="mt-2 text-[16px] text-muted">Welcome to Groovp, {d.full_name.split(" ")[0] || "there"}. Time to find your team.</p>
-        <button onClick={() => { router.push("/tutorial/1"); router.refresh(); }} className="mt-8 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white">
-          Let&apos;s go
+      <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
+        {confetti.map((c, i) => <span key={i} className="absolute" style={{ left: c.l, top: c.t, width: c.w, height: c.h, borderRadius: c.r, background: c.bg, transform: c.rot ? `rotate(${c.rot}deg)` : undefined }} />)}
+        <div className="absolute" style={{ left: 151, top: 265, width: 100, height: 100 }}>
+          <div className="absolute" style={{ background: "#ff4625", inset: "0% 15% 0% 16%", borderTopLeftRadius: 37, borderTopRightRadius: 37, borderBottomLeftRadius: 6, borderBottomRightRadius: 6 }} />
+          <div className="absolute rounded-full" style={{ background: "#071a3d", left: 30, top: 42, width: 9, height: 9 }} />
+          <div className="absolute rounded-full" style={{ background: "#071a3d", left: 62, top: 42, width: 9, height: 9 }} />
+          <div className="absolute" style={{ background: "#6d1b2a", left: 44, top: 58, width: 12, height: 6, borderRadius: "0 0 6px 6px" }} />
+        </div>
+        <p className="absolute w-full text-center" style={{ top: 566, fontSize: 26, fontWeight: 800, color: "#1d1b44" }}>You&apos;re all set!</p>
+        <p className="absolute w-full text-center" style={{ top: 604, fontSize: 14, color: "#757080", padding: "0 32px" }}>Your profile is ready. Let&apos;s find your perfect team on Groovp.</p>
+        <button onClick={() => { router.push("/tutorial/1"); router.refresh(); }} className="absolute flex items-center justify-center gap-2" style={{ left: 32, top: 761, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
+          <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>Go to Home →</span>
         </button>
       </div>
     );
@@ -115,7 +132,7 @@ export default function SignupPage() {
         {/* real Figma illustration (node 570:15162), exact position */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/signup-cloud.png" alt="" className="pointer-events-none absolute" style={{ left: -48, top: 88, width: 500, height: 500 }} />
-        <div className="absolute" style={{ left: 32, top: 600, width: 340, fontSize: 28, fontWeight: 800, color: "#1e1b4b", lineHeight: "34px" }}>Just a few questions before you start!</div>
+        <div className="absolute" style={{ left: 32, top: 600, width: 340, fontSize: 28, fontWeight: 800, color: "#1e1b4b", lineHeight: "34px" }}>Just 4 questions before you start!</div>
         <div className="absolute" style={{ left: 32, top: 700, width: 340, fontSize: 14, fontWeight: 400, color: "#6b6678", lineHeight: "17px" }}>Tell us a bit about yourself so we can match you with teammates who fit — from skills to working style.</div>
         <button onClick={() => setIntro(false)} className="absolute flex items-center justify-center" style={{ left: 32, top: 800, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
           <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>I&apos;m ready!</span>
