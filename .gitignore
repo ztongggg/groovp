@@ -13,3 +13,7 @@ parse.js
 # ...but real app assets under public/ must be committed
 !public/*.png
 !public/**/*.png
+
+# Owner's reference spec folder (89 screen .md+.png pairs) — local reference
+# material, not app code, not meant to be pushed.
+figma-backend-spec/
