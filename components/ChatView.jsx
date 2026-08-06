@@ -10,7 +10,7 @@ function fmtTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function ChatView({ groupId, conversationId, title, meId, messages = [], backHref = "/teams" }) {
+export default function ChatView({ groupId, conversationId, title, subtitle, meId, messages = [], backHref = "/teams" }) {
   const router = useRouter();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -35,7 +35,10 @@ export default function ChatView({ groupId, conversationId, title, meId, message
       {/* header */}
       <div className="flex items-center gap-3 border-b border-line bg-white px-5 py-4">
         <Link href={backHref} className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
-        <p className="flex-1 text-[17px] font-bold text-navy">{title}</p>
+        <div className="flex-1 min-w-0">
+          <p className="truncate text-[17px] font-bold text-navy">{title}</p>
+          {subtitle && <p className="truncate text-[11.5px] text-muted">{subtitle}</p>}
+        </div>
         {groupId && (
           <Link href={`/groups/${groupId}`} aria-label="Group info" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "#f3f1f8" }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d1b44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" /></svg>
