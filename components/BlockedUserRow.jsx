@@ -16,14 +16,9 @@ export default function BlockedUserRow({ userId, name }) {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-line bg-white p-4">
-      <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full text-[13px] font-bold text-white" style={{ background: "#7c3aed" }}>
-          {(name || "?").slice(0, 2).toUpperCase()}
-        </span>
-        <p className="text-[13.5px] font-semibold text-navy">{name}</p>
-      </div>
-      <button onClick={onUnblock} disabled={busy} className="rounded-full px-4 py-2 text-[11.5px] font-semibold text-navy disabled:opacity-50" style={{ background: "#f3f1f8" }}>
+    <div className="flex items-center justify-between rounded-2xl bg-white p-4" style={{ boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" }}>
+      <p className="text-[14px] font-bold text-navy">{name}</p>
+      <button onClick={onUnblock} disabled={busy} className="rounded-full px-4 py-2 text-[12.5px] font-bold text-navy disabled:opacity-50" style={{ background: "#f3f1f8" }}>
         {busy ? "…" : "Unblock"}
       </button>
     </div>
