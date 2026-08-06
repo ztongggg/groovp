@@ -25,7 +25,7 @@ async function getApplicants() {
 
     const { data: reqs } = await supabase
       .from("join_requests")
-      .select("id, group_id, user_id, status, comment, created_at, profiles:user_id(full_name, username, skills, interests, personality, prefer_working, best_work_time)")
+      .select("id, group_id, user_id, status, comment, created_at, profiles:user_id(full_name, username, year, major, skills, interests, personality, prefer_working, best_work_time)")
       .in("group_id", groupIds)
       .order("created_at", { ascending: false });
 
@@ -39,6 +39,8 @@ async function getApplicants() {
         status: r.status,
         name: r.profiles?.full_name || r.profiles?.username || "Someone",
         username: r.profiles?.username || "user",
+        subtitle: [r.profiles?.year, r.profiles?.major].filter(Boolean).join(" · "),
+        createdAt: r.created_at,
         skills: r.profiles?.skills || [],
         comment: r.comment,
         group: group?.name || "Group",
