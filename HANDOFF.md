@@ -394,5 +394,13 @@ Owner pushed the above batch and reported it was still inaccurate. Investigated:
 
 **Not yet pushed as of this note** — needs another push+deploy+verify cycle.
 
+## Progress 2026-08-06 (same day, continued yet further) — 2 more fixes
+
+- **User A/B Profile** (`/u/[id]`) — same LinkedIn/GitHub/Portfolio row-card fix as My Profile, applied to this separate page (its own copy of the old small-inline-badge pattern). Fields were already selected via existing `select("*")`.
+- **Create Project Step 1** — spec's error-state PNG shows red-bordered fields with specific inline messages when name/description are empty; previous UI just silently disabled Next with no explanation, and didn't require description at all. Added real touched-state validation (shows on a failed Next attempt, not on first render).
+- **Checked, deliberately left alone**: Create Project (Personal)'s Privacy step PNG shows only 2 privacy options (no Restricted) — this contradicts the owner's own already-confirmed spec decision ("both project types can use any privacy tier, no conditional logic on type"), so trusted the written decision over what looks like a stale/inconsistent mockup and did NOT restrict Personal projects to 2 options. Personal Step 1's date fields also show a richer timeline-with-time-of-day widget in the PNG — would need timeline columns to store time not just date; not investigated further, flagging only.
+
+**Not yet pushed as of this note.**
+
 ## Working style / prefs
 British/clean copy. Owner wants exact Figma fidelity + real backend. Deploy cadence: build+commit locally, user pushes via GitHub Desktop + says "deployed", then verify live on Vercel. Caveman mode was on (terse). This session (2026-08-06): explicitly asked for a full "start over" interface rebuild from `figma-backend-spec/`, backend frozen, and chose full-depth-on-everything over a faster lighter pass, and a single final report over per-batch check-ins.
