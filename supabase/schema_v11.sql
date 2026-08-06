@@ -24,3 +24,13 @@ alter table public.projects
 update public.projects set status = 'Active' where status is null;
 
 create index if not exists projects_status_idx on public.projects (status);
+
+-- ---------- GROUP CHAT READ TRACKING ----------
+-- DMs already track this via conversation_participants.last_read_at; group chats
+-- had no equivalent, so the Teams inbox could not show an unread count for them.
+alter table public.group_members
+  add column if not exists last_read_at timestamptz;
+
+-- Message lookups for the inbox are "newest per group", so index the sort key.
+create index if not exists messages_group_created_idx
+  on public.messages (group_id, created_at desc);

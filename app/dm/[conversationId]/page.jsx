@@ -21,6 +21,17 @@ async function getData(convId) {
       .eq("conversation_id", convId)
       .order("created_at", { ascending: true });
 
+    // Opening the DM marks it read, clearing its Teams unread badge.
+    if (user) {
+      try {
+        await supabase
+          .from("conversation_participants")
+          .update({ last_read_at: new Date().toISOString() })
+          .eq("conversation_id", convId)
+          .eq("user_id", user.id);
+      } catch {}
+    }
+
     return { title, meId: user?.id || null, messages: (msgs || []).map((m) => ({ id: m.id, body: m.body, sender_id: m.sender_id, created_at: m.created_at, name: "" })) };
   } catch {
     return { title: "Chat", meId: null, messages: [] };

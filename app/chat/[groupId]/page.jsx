@@ -25,6 +25,17 @@ async function getData(groupId) {
       .eq("group_id", groupId)
       .order("created_at", { ascending: true });
 
+    // Opening the chat marks it read — this is what clears the Teams unread badge.
+    if (user) {
+      try {
+        await supabase
+          .from("group_members")
+          .update({ last_read_at: new Date().toISOString() })
+          .eq("group_id", groupId)
+          .eq("user_id", user.id);
+      } catch {}
+    }
+
     return {
       title: g?.name || "Chat",
       subtitle: [memberCount ? `${memberCount} member${memberCount === 1 ? "" : "s"}` : null, g?.projects?.name].filter(Boolean).join(" · "),
