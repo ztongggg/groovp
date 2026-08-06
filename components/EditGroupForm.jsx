@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { updateGroupName, updateGroupPhoto, removeMember, transferLeadership, leaveGroup } from "@/app/groups/[groupId]/actions";
 import AvatarUpload from "@/components/AvatarUpload";
 
+const AVATAR = ["#f29c38", "#f2a5bd", "#4ac7b2", "#7c3aed", "#34b9a8"];
+
 export default function EditGroupForm({ group, meId, isLeader, members }) {
   const router = useRouter();
   const [name, setName] = useState(group.name || "");
@@ -80,10 +82,10 @@ export default function EditGroupForm({ group, meId, isLeader, members }) {
           {isLeader && <Link href={`/groups/${group.id}/invite`} className="text-[12px] font-bold text-purple-600">+ Invite</Link>}
         </div>
         <div className="flex flex-col gap-2">
-          {members.map((m) => (
+          {members.map((m, i) => (
             <div key={m.userId} className="relative flex items-center justify-between rounded-2xl bg-[#f3f1f8] px-4 py-3">
               <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: "#7c3aed" }}>
+                <span className="flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
                   {(m.name || "?").slice(0, 2).toUpperCase()}
                 </span>
                 <div>
