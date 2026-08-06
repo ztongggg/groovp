@@ -64,27 +64,54 @@ export default function CreateProjectPage() {
 
   /* congrats */
   if (done) {
+    const inviteLink = `${typeof window !== "undefined" ? window.location.origin : ""}/join?code=${done.joinCode}`;
+    const confetti = [
+      { l: 48, t: 120, w: 22, h: 22, r: 999, bg: "#f2a5bd" },
+      { l: 200, t: 100, w: 8, h: 8, r: 999, bg: "#f2a5bd" },
+      { l: 340, t: 148, w: 22, h: 22, r: 6, bg: "#7c3aed", rot: 20 },
+      { l: 88, t: 205, w: 32, h: 11, r: 6, bg: "#ffb800", rot: -30 },
+      { l: 282, t: 235, w: 32, h: 11, r: 6, bg: "#ffb800", rot: 30 },
+      { l: 362, t: 265, w: 8, h: 8, r: 999, bg: "#7c3aed" },
+      { l: 60, t: 335, w: 8, h: 8, r: 999, bg: "#dcf674" },
+    ];
     return (
-      <div className="relative flex w-[402px] flex-col items-center bg-white px-8 pt-40 text-center" style={{ height: 874 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/blob-teal.png" alt="" className="mb-8 h-32 w-32" style={{ borderRadius: 28 }} />
-        <h1 className="text-[26px] font-extrabold text-navy">Congrats! 🎉</h1>
-        <p className="mt-2 text-[16px] text-muted">You created <span className="font-bold text-navy">{done.name}</span>.</p>
+      <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
+        {confetti.map((c, i) => <span key={i} className="absolute" style={{ left: c.l, top: c.t, width: c.w, height: c.h, borderRadius: c.r, background: c.bg, transform: c.rot ? `rotate(${c.rot}deg)` : undefined }} />)}
+        <div className="absolute" style={{ left: 151, top: 210, width: 100, height: 100 }}>
+          <div className="absolute" style={{ background: "#ff4625", inset: "0% 15% 0% 16%", borderTopLeftRadius: 37, borderTopRightRadius: 37, borderBottomLeftRadius: 6, borderBottomRightRadius: 6 }} />
+          <div className="absolute rounded-full" style={{ background: "#071a3d", left: 30, top: 42, width: 9, height: 9 }} />
+          <div className="absolute rounded-full" style={{ background: "#071a3d", left: 62, top: 42, width: 9, height: 9 }} />
+          <div className="absolute" style={{ background: "#6d1b2a", left: 44, top: 58, width: 12, height: 6, borderRadius: "0 0 6px 6px" }} />
+        </div>
+        <p className="absolute w-full text-center" style={{ top: 328, fontSize: 26, fontWeight: 800, color: "#1d1b44" }}>Congrats!</p>
+        <p className="absolute w-full text-center" style={{ top: 366, fontSize: 15, fontWeight: 700, color: "#1d1b44" }}>You created &quot;{done.name}&quot;</p>
+        <p className="absolute w-full text-center" style={{ top: 392, fontSize: 13, color: "#757080", padding: "0 32px" }}>Copy the code below and share it so people can find and request to join.</p>
+
         {done.joinCode && (
-          <div className="mt-6 w-full rounded-2xl border border-dashed border-purple-300 bg-[#f9f7ff] p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Share this code with your classmates</p>
-            <p className="mt-1 text-[24px] font-extrabold tracking-wider text-navy">{done.joinCode}</p>
+          <>
+            <div className="absolute flex items-center justify-between" style={{ left: 32, top: 452, width: 338, height: 52, borderRadius: 16, background: "#f3f1f8" }}>
+              <span className="pl-4 text-[16px] font-extrabold tracking-wider text-navy">{done.joinCode}</span>
+              <button
+                onClick={() => { navigator.clipboard?.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 1600); }}
+                className="mr-1.5 rounded-xl px-4 py-2 text-[13px] font-bold text-white"
+                style={{ background: "#7c3aed" }}
+              >
+                {copied ? "Copied ✓" : "Copy"}
+              </button>
+            </div>
             <button
-              onClick={() => { navigator.clipboard?.writeText(`${window.location.origin}/join?code=${done.joinCode}`); setCopied(true); setTimeout(() => setCopied(false), 1600); }}
-              className="mt-3 w-full rounded-xl py-2.5 text-[13px] font-bold text-white"
-              style={{ background: "#7c3aed" }}
+              onClick={() => { if (navigator.share) navigator.share({ title: done.name, url: inviteLink }); else { navigator.clipboard?.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 1600); } }}
+              className="absolute flex items-center justify-center"
+              style={{ left: 32, top: 520, width: 338, height: 48, borderRadius: 16, background: "#f3f1f8" }}
             >
-              {copied ? "Link copied ✓" : "Copy invite link"}
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#1d1b44" }}>Share to…</span>
             </button>
-          </div>
+          </>
         )}
-        <Link href={`/project/${done.projectId}`} className="mt-6 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-4 text-[16px] font-bold text-white">Go to project</Link>
-        <Link href="/discover" className="mt-3 w-full rounded-2xl bg-[#f3f1f8] py-4 text-[16px] font-bold text-navy">Back to Discover</Link>
+
+        <Link href={`/project/${done.projectId}`} className="absolute flex items-center justify-center gap-2" style={{ left: 32, top: 800, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
+          <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>Go to Project →</span>
+        </Link>
       </div>
     );
   }
