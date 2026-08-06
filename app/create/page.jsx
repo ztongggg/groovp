@@ -31,10 +31,13 @@ export default function CreateProjectPage() {
   const [done, setDone] = useState(null); // {projectId, name, joinCode}
   const [copied, setCopied] = useState(false);
   const [d, setD] = useState({ type: "academic", name: "", description: "", photo_url: "", cover_image_url: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, number_of_groups: 1, skills: [], interests: [], project_link: "", resource_files: [], privacy: "public", joining_method: "approval" });
+  const [touched, setTouched] = useState(false);
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
-  const canNext = () => (step === 1 ? d.name.trim().length > 0 : true);
+  const canNext = () => (step === 1 ? d.name.trim().length > 0 && d.description.trim().length > 0 : true);
+  const nameErr = touched && step === 1 && !d.name.trim() ? "This field cannot be left empty." : "";
+  const descErr = touched && step === 1 && !d.description.trim() ? "Please add a short description of your project." : "";
 
   // Team-size steppers that keep min ≤ max at all times.
   const bumpMin = (delta) => setD((s) => ({ ...s, min_size: Math.min(s.max_size, Math.max(1, s.min_size + delta)) }));
@@ -52,7 +55,11 @@ export default function CreateProjectPage() {
     if (res?.error) { setError(res.error); return; }
     setDone({ projectId: res.projectId, name: res.name, joinCode: res.joinCode });
   }
-  const next = () => (step < 3 ? setStep(step + 1) : finish());
+  const next = () => {
+    if (!canNext()) { setTouched(true); return; }
+    setTouched(false);
+    step < 3 ? setStep(step + 1) : finish();
+  };
   const back = () => (step > 0 ? setStep(step - 1) : router.push("/discover"));
 
   /* congrats */
@@ -114,8 +121,10 @@ export default function CreateProjectPage() {
           <div className="flex flex-col gap-3">
             <CoverImageUpload url={d.cover_image_url} onChange={(url) => set("cover_image_url", url)} />
             <div className="mb-1 flex justify-center"><AvatarUpload url={d.photo_url} onChange={(url) => set("photo_url", url)} /></div>
-            <input className={inputCls} style={{ height: 52 }} placeholder="Project name" value={d.name} onChange={(e) => set("name", e.target.value)} />
-            <textarea className="w-full rounded-[14px] bg-[#f5f0ff] p-4 text-[13px] text-navy focus:outline-none" rows={5} placeholder="Describe your project — goals, what you're building, and what kind of teammates you need…" value={d.description} onChange={(e) => set("description", e.target.value)} />
+            <input className={inputCls} style={{ height: 52, background: nameErr ? "#fae0e0" : undefined, border: nameErr ? "1px solid #d44d52" : undefined }} placeholder="Project name" value={d.name} onChange={(e) => set("name", e.target.value)} />
+            {nameErr && <p className="text-[12px] font-semibold" style={{ color: "#d44d52" }}>{nameErr}</p>}
+            <textarea className="w-full rounded-[14px] p-4 text-[13px] text-navy focus:outline-none" style={{ background: descErr ? "#fae0e0" : "#f5f0ff", border: descErr ? "1px solid #d44d52" : undefined }} rows={5} placeholder="Describe your project — goals, what you're building, and what kind of teammates you need…" value={d.description} onChange={(e) => set("description", e.target.value)} />
+            {descErr && <p className="text-[12px] font-semibold" style={{ color: "#d44d52" }}>{descErr}</p>}
             <div className="flex gap-3">
               <div className="flex-1"><p className="mb-1 text-[12px] font-semibold text-muted">Start</p><input type="date" className={inputCls} style={{ height: 44 }} value={d.timeline_start} onChange={(e) => set("timeline_start", e.target.value)} /></div>
               <div className="flex-1"><p className="mb-1 text-[12px] font-semibold text-muted">End</p><input type="date" className={inputCls} style={{ height: 44 }} value={d.timeline_end} onChange={(e) => set("timeline_end", e.target.value)} /></div>
@@ -187,7 +196,7 @@ export default function CreateProjectPage() {
         {error && <p className="mt-4 text-[14px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
       </div>
 
-      <button onClick={next} disabled={!canNext() || saving} className="absolute flex items-center justify-center disabled:opacity-50" style={{ left: 32, top: 792, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
+      <button onClick={next} disabled={saving} className="absolute flex items-center justify-center disabled:opacity-50" style={{ left: 32, top: 792, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
         <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>{saving ? "Creating…" : step < 3 ? "Next →" : "Create Project"}</span>
       </button>
     </div>
