@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { saveRecruiting } from "@/app/recruiting/[groupId]/actions";
 
 const SKILLS = ["Python", "React", "TypeScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "AI/ML", "Design"];
-const PERSONALITY = ["Introvert", "Extrovert", "Online", "Face-to-face", "Morning", "Night owl"];
+const WORKING_STYLE = [
+  { label: "Personality", options: ["Introvert", "Extrovert"] },
+  { label: "Meeting Mode", options: ["Online", "Face-to-face"] },
+  { label: "Active Time", options: ["Morning", "Night owl"] },
+];
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
 function Chip({ active, onClick, children }) {
@@ -51,12 +55,12 @@ export default function RecruitingForm({ groupId, initial }) {
 
       {d.recruiting && (
         <>
-          <div>
-            <p className="mb-2 text-[13px] font-bold text-navy">How many more members?</p>
-            <div className="flex w-fit items-center gap-5 rounded-2xl bg-[#f3f1f8] px-5 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[14px] font-bold text-navy" style={{ maxWidth: 180 }}>How many more members are you looking for?</p>
+            <div className="flex items-center gap-3">
               <button type="button" onClick={() => set("members_wanted", Math.max(0, d.members_wanted - 1))} className="text-[20px] font-bold text-purple-600">−</button>
               <span className="text-[18px] font-bold text-navy">{d.members_wanted}</span>
-              <button type="button" onClick={() => set("members_wanted", d.members_wanted + 1)} className="text-[20px] font-bold text-purple-600">+</button>
+              <button type="button" onClick={() => set("members_wanted", d.members_wanted + 1)} className="flex h-8 w-8 items-center justify-center rounded-full text-[16px] font-bold text-white" style={{ background: "#7c3aed" }}>+</button>
             </div>
           </div>
 
@@ -65,8 +69,15 @@ export default function RecruitingForm({ groupId, initial }) {
             <div className="flex flex-wrap gap-2">{SKILLS.map((s) => <Chip key={s} active={d.skills_wanted.includes(s)} onClick={() => toggle("skills_wanted", s)}>{s}</Chip>)}</div>
           </div>
           <div>
-            <p className="mb-2 text-[13px] font-bold text-navy">Personality wanted</p>
-            <div className="flex flex-wrap gap-2">{PERSONALITY.map((s) => <Chip key={s} active={d.personality_wanted.includes(s)} onClick={() => toggle("personality_wanted", s)}>{s}</Chip>)}</div>
+            <p className="mb-3 text-[13px] font-bold uppercase tracking-wide text-muted">Working style wanted</p>
+            <div className="flex flex-col gap-3">
+              {WORKING_STYLE.map((w) => (
+                <div key={w.label} className="flex items-center justify-between">
+                  <span className="text-[14px] font-bold text-navy">{w.label}</span>
+                  <div className="flex gap-2">{w.options.map((o) => <Chip key={o} active={d.personality_wanted.includes(o)} onClick={() => toggle("personality_wanted", o)}>{o}</Chip>)}</div>
+                </div>
+              ))}
+            </div>
           </div>
           <div>
             <p className="mb-2 text-[13px] font-bold text-navy">Interests wanted</p>
@@ -77,17 +88,28 @@ export default function RecruitingForm({ groupId, initial }) {
             <textarea value={d.additional_notes} onChange={(e) => set("additional_notes", e.target.value)} rows={3} placeholder="e.g. Someone comfortable with backend APIs, ~10h/week" className="w-full rounded-xl border border-line bg-bgapp px-3 py-2.5 text-[14px] text-navy focus:outline-none" />
           </div>
           <div>
-            <p className="mb-2 text-[13px] font-bold text-navy">Joining method</p>
-            <div className="flex gap-2">
-              {[["approval", "Approval required"], ["auto", "Auto-join"]].map(([v, l]) => <Chip key={v} active={d.joining_method === v} onClick={() => set("joining_method", v)}>{l}</Chip>)}
+            <p className="mb-2 text-[13px] font-bold uppercase tracking-wide text-muted">Joining method</p>
+            <div className="flex flex-col gap-2.5">
+              {[
+                ["approval", "Approval required", "You review each request before they join."],
+                ["auto", "Auto-join", "Anyone can join instantly until the group is full."],
+              ].map(([v, l, sub]) => (
+                <button key={v} type="button" onClick={() => set("joining_method", v)} className="rounded-2xl p-4 text-left" style={{ background: d.joining_method === v ? "#f5f0ff" : "#f3f1f8", border: d.joining_method === v ? "1px solid #7c3aed" : "1px solid transparent" }}>
+                  <p className="text-[14px] font-bold text-navy">{l}</p>
+                  <p className="mt-0.5 text-[12px] text-muted">{sub}</p>
+                </button>
+              ))}
             </div>
           </div>
         </>
       )}
 
-      <button onClick={save} disabled={saving} className="mt-2 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white disabled:opacity-50">
-        {saving ? "Saving…" : saved ? "Saved ✓" : "Save settings"}
-      </button>
+      <div className="mt-2 flex flex-col gap-2.5">
+        <button onClick={save} disabled={saving} className="w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white disabled:opacity-50">
+          {saving ? "Saving…" : saved ? "Saved ✓" : "Save Settings"}
+        </button>
+        <button type="button" onClick={() => router.back()} className="w-full rounded-2xl py-3.5 text-[15px] font-bold text-navy" style={{ background: "#f3f1f8" }}>Cancel</button>
+      </div>
     </div>
   );
 }
