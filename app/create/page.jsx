@@ -85,7 +85,7 @@ export default function CreateProjectPage() {
   const s = STEPS[step];
   return (
     <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
-      <button onClick={back} className="absolute flex items-center justify-center rounded-full border border-line" style={{ left: 24, top: 50, width: 40, height: 40 }}>
+      <button onClick={back} className="absolute flex items-center justify-center rounded-full" style={{ left: 24, top: 48, width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}>
         <span style={{ fontSize: 20, fontWeight: 700, color: "#1e1b4b" }}>‹</span>
       </button>
       <div className="absolute" style={{ left: 75, top: 54, width: 300, fontSize: 24, fontWeight: 800, color: "#1d1b44", lineHeight: "29px" }}>{s.title}</div>
@@ -188,7 +188,7 @@ export default function CreateProjectPage() {
       </div>
 
       <button onClick={next} disabled={!canNext() || saving} className="absolute flex items-center justify-center disabled:opacity-50" style={{ left: 32, top: 792, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
-        <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>{saving ? "Creating…" : step < 3 ? "Next →" : "Create project"}</span>
+        <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>{saving ? "Creating…" : step < 3 ? "Next →" : "Create Project"}</span>
       </button>
     </div>
   );
