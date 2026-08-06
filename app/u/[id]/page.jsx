@@ -3,6 +3,7 @@ import AppShell from "@/components/AppShell";
 import RateForm from "@/components/RateForm";
 import ModerationMenu from "@/components/ModerationMenu";
 import MessageButton from "@/components/MessageButton";
+import ApplicantReviewBar from "@/components/ApplicantReviewBar";
 import { createClient } from "@/lib/supabase/server";
 import { computeMatch } from "@/lib/matching";
 
@@ -30,10 +31,15 @@ async function getData(id, groupId) {
     // Reviewing an applicant against a specific group (from Requests) — compute the
     // Strong Match / highlighted-attributes state (spec §5), only when groupId is passed.
     let match = null;
+    let pendingRequestId = null;
     if (groupId) {
       try {
-        const { data: g } = await supabase.from("groups").select("skills_wanted, interests_wanted, personality_wanted").eq("id", groupId).single();
+        const { data: g } = await supabase.from("groups").select("skills_wanted, interests_wanted, personality_wanted, leader_id").eq("id", groupId).single();
         if (g) match = computeMatch(p || {}, g);
+        if (g && user && g.leader_id === user.id) {
+          const { data: jr } = await supabase.from("join_requests").select("id").eq("group_id", groupId).eq("user_id", id).eq("status", "pending").maybeSingle();
+          pendingRequestId = jr?.id || null;
+        }
       } catch {}
     }
 
@@ -56,14 +62,14 @@ async function getData(id, groupId) {
       } catch {}
     }
 
-    return { me: user?.id || null, p, ratings: ratings || [], blocked, match, rateableProjectId };
+    return { me: user?.id || null, p, ratings: ratings || [], blocked, match, rateableProjectId, pendingRequestId };
   } catch {
-    return { me: null, p: null, ratings: [], blocked: false, match: null, rateableProjectId: null };
+    return { me: null, p: null, ratings: [], blocked: false, match: null, rateableProjectId: null, pendingRequestId: null };
   }
 }
 
 export default async function UserProfilePage({ params, searchParams }) {
-  const { me, p, ratings, blocked, match, rateableProjectId } = await getData(params.id, searchParams?.groupId);
+  const { me, p, ratings, blocked, match, rateableProjectId, pendingRequestId } = await getData(params.id, searchParams?.groupId);
   const groupId = searchParams?.groupId;
   const queue = searchParams?.queue ? searchParams.queue.split(",").filter(Boolean) : [];
   const queueIndex = queue.indexOf(params.id);
@@ -232,7 +238,17 @@ export default async function UserProfilePage({ params, searchParams }) {
             </div>
           )}
         </div>
+        {pendingRequestId && <div style={{ height: 72 }} />}
       </div>
+      {pendingRequestId && (
+        <ApplicantReviewBar
+          requestId={pendingRequestId}
+          groupId={groupId}
+          applicantId={p.id}
+          prevHref={showPaging && queueIndex > 0 ? pagingHref(queueIndex - 1) : null}
+          nextHref={showPaging && queueIndex < queue.length - 1 ? pagingHref(queueIndex + 1) : null}
+        />
+      )}
     </AppShell>
   );
 }
