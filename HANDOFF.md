@@ -417,3 +417,43 @@ Owner pushed the above batch and reported it was still inaccurate. Investigated:
 
 ## Working style / prefs
 British/clean copy. Owner wants exact Figma fidelity + real backend. Deploy cadence: build+commit locally, user pushes via GitHub Desktop + says "deployed", then verify live on Vercel. Caveman mode was on (terse). This session (2026-08-06): explicitly asked for a full "start over" interface rebuild from `figma-backend-spec/`, backend frozen, and chose full-depth-on-everything over a faster lighter pass, and a single final report over per-batch check-ins.
+
+## Progress 2026-08-07 — updated spec folder (`figma-backend-spec-updated/`), owner-decision round, partial rebuild
+
+Owner supplied a **new** spec folder at `figma-backend-spec-updated/figma-backend-spec/` (89 screens). The old `figma-backend-spec/` is gone. **The new thing in it: each screen folder now has a `.html` export alongside the `.md` + `.png`** — Figma's own absolute-positioned markup with exact px coordinates, hex colours, font weights and copy. This removes the eyeballing that caused the repeated "still not accurate" verdicts.
+
+**Tooling built this session (reusable, keep it):** `distill.mjs` in the session scratchpad parses all 89 HTML exports into compact geometry+colour+copy summaries — 953KB → 291KB, so a screen costs ~1-2k tokens to read instead of 15k. Re-create it if needed; without it, reading all 89 raw exports will exhaust any context window well before finishing.
+
+**Method lesson — important:** the HTML exports' `top:`/`left:` values are **z-order, not visual order**. Discover's export lists the search bar above the heading; the PNG shows the reverse. **Use the PNG for layout order, the HTML for exact values.** Getting this backwards will produce confidently wrong layouts.
+
+### Owner decisions taken 2026-08-07 (all previously blocking, now closed)
+1. **Delete Project = soft-archive.** `status='Deleted'` + `deleted_at`; leaves feeds and stops taking requests, but groups/members/chats/past-projects survive. **BUILT.**
+2. **Ratings editable indefinitely.** Re-rating upserts. This is already what the code did — no change was needed.
+3. **Popular sort = join-request count + save count.** **BUILT.**
+4. **Discover sort = most matching skills+interests, highest first** (owner added this beyond the question asked). **BUILT** in `lib/discoverData.js`.
+5. **Profile completeness = 8 equally-weighted fields** (avatar, bio, year, major, skills, interests, personality, ≥1 link). **BUILT** — `lib/completeness.js`, meter on `/profile`, hidden at 100%.
+6. **Profile-visibility tiers (Public/Teammates-only/Private): DO NOT BUILD.** Owner chose to drop it. The two working Privacy toggles stay. This item is now closed, not deferred — do not re-raise it.
+- Backend was **unfrozen** for this session (previous session was markup-only).
+
+### THE BIG SYSTEMATIC FINDING — font
+`app/layout.jsx` loaded **only Inter**, and `globals.css` set Inter on `body`. But the Figma file uses **Nunito** on the project-feed surfaces. Across all 89 exports: 345 Nunito text nodes vs 1414 Inter. Nunito was **never loaded at all**, so every one of those screens rendered in the wrong typeface. This is very likely a large part of why previous passes kept reading as "not accurate" despite correct geometry.
+- Fixed: Nunito added to the font link; `.font-nunito` class in `globals.css`; applied to HomeView, DiscoverList/page, Saved, ProjectDetailView. Tutorials inherit it via the real components they reuse. Bottom nav explicitly opts back out (it is Inter in the design).
+- **Nunito screens are exactly:** Home, Home-No-Recent, Discover, Saved Projects, Project Details (+Groups), Tutorials 1/2/3/5. Everything else is Inter and was already correct. (Scattered Nunito on Filter Panel / Start a New Group / Create Project Step 2 is only the `+`/`−` stepper glyphs — ignore.)
+
+### Screens rebuilt at full depth this session (5 of 89)
+- **Home** — cyan "swirl" banner mascot replaces the wrong white Cloudy; bell gets its solid `#5B21B6` chip + `#F04545` dot; Popular/Latest wired to the real metrics. **Real bug fixed:** Latest was `[...projects].reverse()` over a `created_at DESC` query, i.e. it rendered **oldest first**. Card: removed a hardcoded fake progress bar (`progress = 0.4`), real member-count face-blobs replacing a hardcoded "JK" chip, Join button always purple, exact radii.
+- **Discover** — match-count ordering, always-purple filter button with the sliders icon, exact card metrics, shared member blobs.
+- **Teams** — was the biggest data gap. Now real last-message previews ("You: …" / "Priya: …"), compact 2m/1h/3d/2w stamps, unread badges, ended-project row treatment, inbox sorted by recent activity, 76px rows, CSS face-tile avatars (rounded-square for groups, circular for people), header search *button* per spec. **New schema:** `group_members.last_read_at` (DMs already had `conversation_participants.last_read_at`); both chat pages stamp it on open, which is what clears the badge.
+- **Project Details** — **real bug:** `things_to_note` rendered a hardcoded placeholder sentence instead of the project's actual note, and `project_link` / `resource_files` were never displayed at all (write-only data). All three now render. Added "More projects like this" (new similarity query). Banner rebuilt to navy + decorative discs at 260px.
+- **Edit Project** — Delete Project (soft-archive) with an explicit confirmation.
+
+### `supabase/schema_v11.sql` — NOT YET RUN
+Adds: `projects.status` + `projects.deleted_at` + index, `group_members.last_read_at`, `messages(group_id, created_at desc)` index.
+**RUN THIS BEFORE DEPLOYING.** Home and Discover now `select` `projects.status`; until the column exists those queries error and both feeds fall into their `catch` and render **empty**. This is the one real deploy hazard in this batch.
+
+### Still to do — the honest remainder
+**84 of 89 screens were not rebuilt this session.** Prior sessions covered many of them to a decent standard from PNGs/`get_design_context`, but none have been checked against the new HTML exports. Highest-value remaining, roughly in order: My Profile, User A/B Profile (+Requested variants), Notifications, Group Chat / Private Chat, Group Info variants, Settings sub-pages, all ~13 Create Project step/error/congrats variants, Signup steps 1-6 + variants, Filter Panel, Rate Teammates, Request History, Invite Member, Start a New Group, Edit Profile wizard, Ratings History, Past Project Detail, empty/error states.
+
+Still genuinely unbuilt features (unchanged from before): `cover_image` upload exists but Group Info still lacks a parent-project summary card and an inline accept/decline list; Signup Step 6's richer modal variants remain blocked on a missing `past_projects.name` column and on Storage needing an authenticated session that doesn't exist mid-signup.
+
+**Not pushed as of this note** — 5 commits local (`3efbf50`, `edee375`, `d035a30`, `3cd3f67` + this HANDOFF update). Owner pushes via GitHub Desktop, then run `schema_v11.sql`, then verify live.
