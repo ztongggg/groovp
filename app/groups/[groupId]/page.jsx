@@ -43,6 +43,7 @@ async function getData(groupId) {
       isMember,
       match,
       pendingCount,
+      meId: user?.id || null,
       members: (members || []).map((m) => ({
         userId: m.user_id,
         role: m.role,
@@ -70,7 +71,7 @@ export default async function GroupInfoPage({ params }) {
     );
   }
 
-  const { group, isLeader, isMember, match, pendingCount, members } = data;
+  const { group, isLeader, isMember, match, pendingCount, meId, members } = data;
   const recruiting = group.recruiting !== false && group.status !== "Ended";
 
   return (
@@ -97,10 +98,16 @@ export default async function GroupInfoPage({ params }) {
 
         <div className="mt-6 px-6">
           <p className="mb-2 text-[13px] font-bold uppercase tracking-wide text-muted">Members ({members.length}/{group.max_members || "–"})</p>
-          <div className="flex -space-x-2">
-            {members.slice(0, 6).map((m, i) => (
-              <Link key={m.userId} href={`/u/${m.userId}`} className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white text-[12px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
-                {(m.name || "?").slice(0, 2).toUpperCase()}
+          <div className="flex flex-col gap-2">
+            {members.map((m, i) => (
+              <Link key={m.userId} href={`/u/${m.userId}`} className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: "#f9f8fb" }}>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
+                  {(m.name || "?").slice(0, 2).toUpperCase()}
+                </span>
+                <span>
+                  <p className="text-[14px] font-semibold text-navy">{m.name}{m.userId === meId ? " (You)" : ""}</p>
+                  <p className="text-[12px] text-muted">{m.role === "leader" ? "Group Leader" : "Member"}</p>
+                </span>
               </Link>
             ))}
           </div>
