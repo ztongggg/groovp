@@ -98,7 +98,7 @@ export default function HomeProjectCard({
         className="absolute flex items-center justify-center"
         style={{ left: 13, top: 246, width: 257, height: 35, borderRadius: 12, background: joinBg }}
       >
-        <span style={{ fontSize: 10.9, fontWeight: 800, color: joinColor }}>View project</span>
+        <span style={{ fontSize: 10.9, fontWeight: 800, color: joinColor }}>Join Project</span>
       </span>
     </Link>
   );

@@ -66,11 +66,13 @@ export default async function NotificationsPage() {
 
   return (
     <AppShell>
-      <div className="min-h-full bg-white pb-6">
+      <div className="min-h-full pb-6" style={{ background: "#f9f8fb" }}>
         <StatusBar />
         <div className="flex items-center gap-3 px-6">
-          <Link href="/home" className="text-[22px] text-navy">‹</Link>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1e1b4b" }}>Notifications</h1>
+          <Link href="/home" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}>
+            <span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span>
+          </Link>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: "#1d1b44" }}>Updates</h1>
         </div>
 
         {notifs.length === 0 ? (
@@ -91,11 +93,14 @@ export default async function NotificationsPage() {
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={ic.stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={ic.d} /></svg>
                   </span>
                   <p className="flex-1 text-[14px] text-navy">{n.body}</p>
-                  <span className="shrink-0 text-[12px] text-muted">{relTime(n.created_at)}</span>
+                  <span className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="text-[12px] text-muted">{relTime(n.created_at)}</span>
+                    {!n.read && <span className="rounded-full" style={{ width: 6, height: 6, background: "#7c3aed" }} />}
+                  </span>
                 </>
               );
-              const cls = "flex items-center gap-3 rounded-2xl border border-line p-4";
-              const bg = { background: n.read ? "#fff" : "#faf9ff" };
+              const cls = "flex items-center gap-3 p-4";
+              const bg = { background: "#fff", border: "1px solid #f3f1f8", borderRadius: 16, boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" };
               return href ? (
                 <Link key={n.id} href={href} className={cls} style={bg}>{inner}</Link>
               ) : (

@@ -5,43 +5,52 @@ import Link from "next/link";
 import StatusBar from "@/components/StatusBar";
 import HomeProjectCard from "@/components/HomeProjectCard";
 
+function BannerCloudy() {
+  // Figma instance "Cloudy" 283.4x283.4, positioned left 142 top -18.9 inside the 342x168 banner (overflow-clip crops it)
+  return (
+    <div className="absolute overflow-hidden" style={{ left: 142, top: -18.92, width: 283.425, height: 283.425 }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 157.09, top: 160.66, width: 69.912, height: 69.912 }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 249.92, top: 160.66, width: 69.912, height: 69.912 }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/splash-cloudy-bump-b.svg" alt="" className="absolute" style={{ left: 249.92, top: 242.78, width: 69.912, height: 68.022 }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 160.66, top: 249.92, width: 69.912, height: 69.912 }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 139.24, top: 228.49, width: 41.569, height: 41.569 }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/splash-cloudy-bump-d.svg" alt="" className="absolute" style={{ left: 228.49, top: 139.24, width: 39.68, height: 41.569 }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 321.32, top: 232.06, width: 41.569, height: 41.569 }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 239.2, top: 321.32, width: 41.569, height: 41.569 }} />
+      <div className="absolute rounded-full" style={{ background: "#0b2a5b", left: 214.21, top: 246.35, width: 16.279, height: 20.785 }} />
+      <div className="absolute rounded-full" style={{ background: "#0b2a5b", left: 297.7, top: 246.35, width: 16.279, height: 20.785 }} />
+      <div className="absolute rounded-full" style={{ background: "#1d4ed8", left: 260.63, top: 303.47, width: 9.448, height: 13.227 }} />
+    </div>
+  );
+}
+
 function GreetingBanner({ name, unread = 0 }) {
   return (
-    <div className="relative overflow-hidden" style={{ height: 178, borderRadius: 24, background: "#1e1b4b" }}>
-      {[[20, 22], [38, 22], [20, 40], [38, 40]].map(([l, t], i) => (
-        <span key={i} className="absolute rounded-full" style={{ left: l, top: t, width: 9, height: 9, background: "#f472b6" }} />
-      ))}
-      <Link href="/notifications" aria-label="Notifications" className="absolute" style={{ right: 18, top: 18, zIndex: 3 }}>
-        <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
-          {unread > 0 && <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full border-2 border-[#1e1b4b] bg-[#f472b6]" />}
-        </span>
+    <div className="relative overflow-hidden" style={{ width: 342, height: 168, borderRadius: 22.674, background: "#7c3aed" }}>
+      <span className="absolute rounded-full" style={{ left: 263.35, top: 92.35, width: 4.25, height: 4.25, background: "#c7c3e0" }} />
+      <span className="absolute rounded-full" style={{ left: 295.47, top: 92.35, width: 4.25, height: 4.25, background: "#c7c3e0" }} />
+      <Link href="/notifications" aria-label="Notifications" className="absolute flex items-center justify-center rounded-full" style={{ left: 292.87, top: 18.9, width: 30.23, height: 30.23, background: "rgba(255,255,255,0.15)", zIndex: 3 }}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+        {unread > 0 && <span className="absolute rounded-full" style={{ right: -1, top: -1, width: 8.5, height: 8.5, background: "#f472b6", border: "2px solid #7c3aed" }} />}
       </Link>
-      <div className="absolute" style={{ left: 20, top: 90, width: 210, fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: "32px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</div>
-      <div className="absolute" style={{ left: 20, top: 130, fontSize: 12.5, fontWeight: 600, color: "#c7c3e0" }}>Ready to find your next project?</div>
-      {/* skin (exact: #c4b5fd) */}
-      <div className="absolute rounded-full" style={{ left: 222, top: 50, width: 150, height: 150, background: "#c4b5fd" }} />
-      {/* antenna curl */}
-      <span className="absolute" style={{ left: 204, top: 50, width: 18, height: 42, borderLeft: "2px solid #1f1a26", borderTop: "2px solid #1f1a26", borderTopLeftRadius: 18 }} />
-      {/* legs */}
-      <span className="absolute" style={{ left: 279, top: 173, width: 0, height: 22, borderLeft: "2px solid #1f1a26" }} />
-      <span className="absolute" style={{ left: 315, top: 173, width: 0, height: 22, borderLeft: "2px solid #1f1a26" }} />
-      {/* white glasses */}
-      <span className="absolute rounded-full" style={{ left: 266, top: 85, width: 30, height: 30, border: "3px solid #fff" }} />
-      <span className="absolute rounded-full" style={{ left: 298, top: 83, width: 34, height: 34, border: "3px solid #fff" }} />
-      <span className="absolute" style={{ left: 296, top: 99, width: 4, height: 3, background: "#fff" }} />
-      {/* eyes */}
-      <span className="absolute rounded-full" style={{ left: 279, top: 98, width: 5, height: 5, background: "#14121a" }} />
-      <span className="absolute rounded-full" style={{ left: 313, top: 98, width: 5, height: 5, background: "#14121a" }} />
-      {/* smile */}
-      <span className="absolute" style={{ left: 291, top: 118, width: 12, height: 6, borderBottom: "2px solid #14121a", borderRadius: "0 0 8px 8px" }} />
+      <div className="absolute" style={{ left: 18.9, top: 85, width: 200, fontSize: 26.5, fontWeight: 900, color: "#fff", lineHeight: "34px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</div>
+      <div className="absolute" style={{ left: 18.9, top: 122.8, fontSize: 12, fontWeight: 700, color: "#c7c3e0" }}>Ready to find your next project?</div>
+      <BannerCloudy />
     </div>
   );
 }
 
 function ShortcutButton({ label, href, children }) {
   const cls = "flex flex-1 items-center gap-3";
-  const style = { height: 44, borderRadius: 14, background: "#1e1b4b", paddingLeft: 18 };
+  const style = { height: 44, borderRadius: 14, background: "#7c3aed", paddingLeft: 18 };
   const inner = (
     <>
       {children}
@@ -67,7 +76,7 @@ export default function HomeView({ name = "there", projects = [], recentlyViewed
     <div className="bg-white pb-3">
       <StatusBar />
 
-      <div className="px-5">
+      <div className="flex justify-center px-[30px]">
         <div className="mt-2">
           <GreetingBanner name={name} unread={unread} />
         </div>
@@ -75,14 +84,14 @@ export default function HomeView({ name = "there", projects = [], recentlyViewed
 
       <div className="mt-3 flex gap-4 px-[30px]">
         <ShortcutButton label="Saved" href="/saved">
-          <svg width="12" height="15" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h12v18l-6-4-6 4V3Z" /></svg>
+          <svg width="12" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3h12v18l-6-4-6 4V3Z" /></svg>
         </ShortcutButton>
         <ShortcutButton label="Requests" href="/applicants">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7.5V12l3 2" /></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7.5V12l3 2" /></svg>
         </ShortcutButton>
         {invites > 0 && (
           <ShortcutButton label={`Invites (${invites})`} href="/invites">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f472b6" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16v12H4z" /><path d="m4 7 8 6 8-6" /></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16v12H4z" /><path d="m4 7 8 6 8-6" /></svg>
           </ShortcutButton>
         )}
       </div>
