@@ -6,29 +6,40 @@ import { useRouter } from "next/navigation";
 import { signUpFull } from "@/app/auth/actions";
 
 const SKILL_OPTIONS = ["Python", "React", "TypeScript", "JavaScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "C++", "TensorFlow", "AWS", "Docker", "Research", "Product", "Design", "Business"];
-const INTEREST_OPTIONS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
+const INTEREST_OPTIONS = [
+  { name: "Sustainability", icon: "/interest-sustainability.svg" },
+  { name: "EdTech", icon: "/interest-edtech.svg" },
+  { name: "Web Dev", icon: "/interest-webdev.svg" },
+  { name: "Healthcare", icon: "/interest-healthcare.svg" },
+  { name: "Data Science", icon: "/interest-datascience.svg" },
+  { name: "Social Impact", icon: "/interest-socialimpact.svg" },
+  { name: "Robotics", icon: "/interest-robotics.svg" },
+  { name: "AI & ML", icon: "/interest-aiml.svg" },
+  { name: "Design", icon: "/interest-design.svg" },
+];
 const YEARS = ["Y1", "Y2", "Y3", "Y4", "Y5"];
 const PERSONALITY = [
-  { key: "personality", q: "Are you more introvert or extrovert?", options: ["Introvert", "Extrovert"] },
-  { key: "prefer_working", q: "Prefer working online or face-to-face?", options: ["Online", "Face-to-face"] },
-  { key: "best_work_time", q: "When do you do your best work?", options: ["In the morning", "At night"] },
-  { key: "location", q: "Where do you stay?", options: ["On Campus", "East", "West", "North", "South", "Central"] },
+  { key: "personality", q: "Are you more...", options: ["Introvert", "Extrovert"] },
+  { key: "prefer_working", q: "You prefer meeting...", options: ["Online", "Face-to-face"] },
+  { key: "best_work_time", q: "You do your best work...", options: ["In the morning", "At night"] },
 ];
+const LOCATIONS = ["North", "South", "East", "West", "On Campus", "Central"];
 
 const STEPS = [
   { title: "Introduce yourself!", sub: "Let's start with the basics! This is how teammates will find you." },
-  { title: "About you", sub: "Tell us where you study." },
-  { title: "Your working style", sub: "This helps us match you with the right people." },
-  { title: "Your skills", sub: "Pick what you bring to a team." },
-  { title: "Your interests", sub: "What kind of projects excite you?" },
+  { title: "About me", sub: "A little more so teammates know who they're working with." },
+  { title: "How do you work best?", sub: "This helps us match you with the right teammates." },
+  { title: "What skills do you have?", sub: "Pick as many as apply. This helps teams find you for the right role." },
+  { title: "Choose your interests", sub: "What kinds of projects excite you? Pick a few." },
   { title: "Projects & Links", sub: "Add links to your GitHub, portfolio, or other work! Or you can always do this later." },
 ];
 
-function Field({ icon, ...props }) {
+function Field({ icon, optional, ...props }) {
   return (
     <div className="relative flex items-center" style={{ height: 52, borderRadius: 14, background: "#f3f1f8", paddingLeft: 48, paddingRight: 16 }}>
       <span className="absolute" style={{ left: 16 }}>{icon}</span>
       <input {...props} className="w-full bg-transparent focus:outline-none" style={{ fontSize: 14, fontWeight: 400, color: "#1d1b44" }} />
+      {optional && <span className="absolute" style={{ right: 16, fontSize: 10, fontWeight: 800, letterSpacing: 0.4, color: "#c4b5fd" }}>optional</span>}
     </div>
   );
 }
@@ -65,8 +76,8 @@ export default function SignupPage() {
   const setSkillLevel = (n, level) => setD((s) => ({ ...s, skills: s.skills.map((x) => (x.name === n ? { ...x, level } : x)) }));
   const canNext = () => {
     if (step === 0) return d.full_name && d.username && d.email && d.password.length >= 6;
-    if (step === 1) return d.major && d.year;
-    if (step === 2) return PERSONALITY.every((p) => d[p.key]);
+    if (step === 1) return d.year && d.gender;
+    if (step === 2) return PERSONALITY.every((p) => d[p.key]) && d.location;
     if (step === 3) return d.skills.length > 0;
     return true;
   };
@@ -119,7 +130,7 @@ export default function SignupPage() {
   return (
     <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
       {/* back + title */}
-      <button onClick={back} className="absolute flex items-center justify-center rounded-full border border-line" style={{ left: 24, top: 50, width: 40, height: 40 }}>
+      <button onClick={back} className="absolute flex items-center justify-center rounded-full" style={{ left: 24, top: 48, width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}>
         <span style={{ fontSize: 20, fontWeight: 700, color: "#1e1b4b" }}>‹</span>
       </button>
       <div className="absolute" style={{ left: 75, top: 52, fontSize: 24, fontWeight: 800, color: "#1e1b4b" }}>{s.title}</div>
@@ -155,23 +166,51 @@ export default function SignupPage() {
           </>
         )}
         {step === 1 && (
-          <div className="flex flex-col gap-2.5">
-            <Field icon={I.book} placeholder="University" value={d.university} onChange={(e) => set("university", e.target.value)} />
-            <Field icon={I.book} placeholder="Major (e.g. Computer Science)" value={d.major} onChange={(e) => set("major", e.target.value)} />
-            <p className="mt-2 text-[13px] font-bold uppercase tracking-wide text-muted">Year of study</p>
-            <div className="flex flex-wrap gap-2">{YEARS.map((y) => <Chip key={y} active={d.year === y} onClick={() => set("year", y)}>{y}</Chip>)}</div>
-            <p className="mt-2 text-[13px] font-bold uppercase tracking-wide text-muted">How do you identify?</p>
-            <div className="flex flex-wrap gap-2">{["Woman", "Man", "Prefer not to say"].map((g) => <Chip key={g} active={d.gender === g} onClick={() => set("gender", g)}>{g}</Chip>)}</div>
+          <div className="flex flex-col gap-3">
+            <Field icon={I.book} optional placeholder="University" value={d.university} onChange={(e) => set("university", e.target.value)} />
+            <Field icon={I.book} optional placeholder="Major (e.g. Computer Science)" value={d.major} onChange={(e) => set("major", e.target.value)} />
+            <div>
+              <p className="text-[13px] font-semibold text-navy">Year of study</p>
+              <div className="mt-2 flex flex-wrap gap-2.5">{YEARS.map((y) => (
+                <button key={y} type="button" onClick={() => set("year", y)} className="flex items-center justify-center rounded-full" style={{ width: 60, height: 40, background: d.year === y ? "#ece8fc" : "#f3f1f8", border: d.year === y ? "1px solid #7c3aed" : "1px solid transparent" }}>
+                  <span style={{ fontSize: 13, fontWeight: d.year === y ? 600 : 400, color: d.year === y ? "#7c3aed" : "#1d1b44" }}>{y}</span>
+                </button>
+              ))}</div>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <p className="text-[14px] font-semibold text-navy">How do you identify?</p>
+              {["Woman", "Man", "Prefer not to say"].map((g) => (
+                <button key={g} type="button" onClick={() => set("gender", g)} className="flex items-center justify-center rounded-full" style={{ height: 52, background: d.gender === g ? "#ece8fc" : "#f3f1f8", border: d.gender === g ? "1px solid #7c3aed" : "1px solid transparent" }}>
+                  <span style={{ fontSize: 14, fontWeight: d.gender === g ? 600 : 400, color: d.gender === g ? "#7c3aed" : "#1d1b44" }}>{g}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
         {step === 2 && (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-6">
             {PERSONALITY.map((p) => (
               <div key={p.key}>
-                <p className="mb-2 text-[15px] font-semibold text-navy">{p.q}</p>
-                <div className="flex flex-wrap gap-2">{p.options.map((o) => <Chip key={o} active={d[p.key] === o} onClick={() => set(p.key, o)}>{o}</Chip>)}</div>
+                <p className="mb-2.5 text-[13.5px] font-semibold text-navy">{p.q}</p>
+                <div className="flex gap-2.5">
+                  {p.options.map((o) => (
+                    <button key={o} type="button" onClick={() => set(p.key, o)} className="flex flex-1 items-center justify-center rounded-full" style={{ height: 46, background: d[p.key] === o ? "#ece8fc" : "#f3f1f8", border: d[p.key] === o ? "1px solid #7c3aed" : "1px solid transparent" }}>
+                      <span style={{ fontSize: 13, fontWeight: d[p.key] === o ? 600 : 400, color: d[p.key] === o ? "#7c3aed" : "#1d1b44" }}>{o}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             ))}
+            <div>
+              <p className="mb-2.5 text-[13.5px] font-semibold text-navy">Where do you stay?</p>
+              <div className="flex flex-wrap gap-2.5">
+                {LOCATIONS.map((loc) => (
+                  <button key={loc} type="button" onClick={() => set("location", loc)} className="flex items-center justify-center rounded-full px-4" style={{ height: 40, background: d.location === loc ? "#ece8fc" : "#f3f1f8", border: d.location === loc ? "1px solid #7c3aed" : "1px solid transparent" }}>
+                    <span style={{ fontSize: 12.5, fontWeight: d.location === loc ? 600 : 400, color: d.location === loc ? "#7c3aed" : "#1d1b44" }}>{loc === "On Campus" ? "Campus" : loc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
         {step === 3 && (
@@ -181,7 +220,10 @@ export default function SignupPage() {
             </div>
             {d.skills.length > 0 && (
               <div className="flex flex-col gap-2">
-                <p className="text-[13px] font-bold uppercase tracking-wide text-muted">Set your level</p>
+                <div>
+                  <p className="text-[15px] font-semibold text-navy">Set your skill level</p>
+                  <p className="text-[11.5px] text-muted">For each skill, pick how confident you are.</p>
+                </div>
                 {d.skills.map((s) => (
                   <div key={s.name} className="flex items-center justify-between rounded-xl bg-[#f3f1f8] px-3 py-2">
                     <span className="text-[14px] font-semibold text-navy">{s.name}</span>
@@ -196,7 +238,22 @@ export default function SignupPage() {
             )}
           </div>
         )}
-        {step === 4 && <div className="flex flex-wrap gap-2.5">{INTEREST_OPTIONS.map((x) => <Chip key={x} active={d.interests.includes(x)} onClick={() => toggle("interests", x)}>{x}</Chip>)}</div>}
+        {step === 4 && (
+          <div className="grid grid-cols-3 gap-x-2 gap-y-6">
+            {INTEREST_OPTIONS.map(({ name, icon }) => {
+              const active = d.interests.includes(name);
+              return (
+                <button key={name} type="button" onClick={() => toggle("interests", name)} className="flex flex-col items-center gap-2">
+                  <span className="flex items-center justify-center rounded-full" style={{ width: 72, height: 72, background: active ? "#7c3aed" : "#f3f1f8" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={icon} alt="" width={28} height={28} style={{ filter: active ? "brightness(0) invert(1)" : "none" }} />
+                  </span>
+                  <span className="text-center" style={{ fontSize: 11.5, fontWeight: active ? 600 : 400, color: active ? "#1d1b44" : "#757080" }}>{name}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
         {step === 5 && (
           <div className="flex flex-col gap-5">
             <div>

@@ -15,7 +15,7 @@ export default function SplashPage() {
       </div>
 
       {/* Shapey */}
-      <div className="absolute" style={{ left: 0, top: 361, width: 200, height: 200 }}>
+      <div className="absolute" style={{ left: -26, top: 367, width: 200, height: 200 }}>
         <div className="absolute flex items-center justify-center" style={{ left: 59.47, top: 99.7, width: 83.787, height: 68.661 }}>
           <div style={{ transform: "rotate(169.78deg)", background: "#ffb800", width: 74.999, height: 56.249, borderTopLeftRadius: 70.312, borderTopRightRadius: 70.312 }} />
         </div>
@@ -39,7 +39,7 @@ export default function SplashPage() {
       </div>
 
       {/* Starry */}
-      <div className="absolute" style={{ left: 208, top: 324, width: 200, height: 200 }}>
+      <div className="absolute" style={{ left: 182, top: 330, width: 200, height: 200 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/splash-starry-star.svg" alt="" className="absolute" style={{ left: 5.33, top: 5.33, width: 189.333, height: 189.333 }} />
         <div className="absolute rounded-full" style={{ background: "#111827", left: 72, top: 88, width: 14.667, height: 14.667 }} />
@@ -48,7 +48,7 @@ export default function SplashPage() {
       </div>
 
       {/* Blobby */}
-      <div className="absolute" style={{ left: 13, top: 622, width: 200, height: 200 }}>
+      <div className="absolute" style={{ left: -13, top: 628, width: 200, height: 200 }}>
         <div className="absolute" style={{ background: "#ff4625", inset: "25.33% 30.67% 25.33% 31.33%", borderTopLeftRadius: 37.333, borderTopRightRadius: 37.333, borderBottomLeftRadius: 6.667, borderBottomRightRadius: 6.667 }} />
         <div className="absolute" style={{ background: "#6d1b2a", inset: "49.33% 45.33% 45.33% 46.67%", borderTopLeftRadius: 6.667, borderTopRightRadius: 6.667, borderBottomLeftRadius: 37.333, borderBottomRightRadius: 37.333 }} />
         <div className="absolute rounded-full" style={{ background: "#071a3d", left: 101.33, top: 117.33, width: 9.333, height: 9.333 }} />
@@ -56,7 +56,7 @@ export default function SplashPage() {
       </div>
 
       {/* Cloudy */}
-      <div className="absolute overflow-hidden" style={{ left: 142, top: 517, width: 200, height: 200 }}>
+      <div className="absolute overflow-hidden" style={{ left: 116, top: 523, width: 200, height: 200 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 78.22, top: 80, width: 49.333, height: 49.333 }} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
