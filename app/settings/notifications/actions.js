@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-const ALLOWED_KEYS = ["notify_join_requests", "notify_join_accepted", "notify_invites"];
+const ALLOWED_KEYS = ["notify_join_requests", "notify_join_accepted", "notify_invites", "notify_new_message", "notify_rate_reminder"];
 
 export async function updateNotificationPrefs(key, value) {
   if (!ALLOWED_KEYS.includes(key)) return { error: "Unknown preference." };

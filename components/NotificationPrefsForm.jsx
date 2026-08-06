@@ -24,6 +24,18 @@ export default function NotificationPrefsForm({ prefs }) {
         initial={prefs.notify_invites}
         onSave={(v) => updateNotificationPrefs("notify_invites", v)}
       />
+      <PreferenceToggle
+        label="New messages"
+        sub="When someone sends you a chat or DM message"
+        initial={prefs.notify_new_message}
+        onSave={(v) => updateNotificationPrefs("notify_new_message", v)}
+      />
+      <PreferenceToggle
+        label="Rate reminder"
+        sub="When a project you were on ends, reminding you to rate teammates"
+        initial={prefs.notify_rate_reminder}
+        onSave={(v) => updateNotificationPrefs("notify_rate_reminder", v)}
+      />
     </div>
   );
 }
