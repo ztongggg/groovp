@@ -46,7 +46,17 @@ export default function ChatView({ groupId, conversationId, title, meId, message
       {/* messages */}
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-4">
         {messages.length === 0 ? (
-          <p className="mt-10 text-center text-[14px] text-muted">No messages yet. Say hi 👋</p>
+          <div className="mt-16 flex flex-col items-center text-center">
+            <div className="relative" style={{ width: 180, height: 180 }}>
+              <div className="absolute rounded-full" style={{ background: "#f29c38", left: 40, top: 0, width: 100, height: 100 }} />
+              <div className="absolute" style={{ background: "#f29c38", left: 20, top: 70, width: 140, height: 90, borderTopLeftRadius: 60, borderTopRightRadius: 60 }} />
+              <div className="absolute rounded-full" style={{ background: "#111827", left: 68, top: 105, width: 14, height: 14 }} />
+              <div className="absolute rounded-full" style={{ background: "#111827", left: 98, top: 105, width: 14, height: 14 }} />
+              <div className="absolute" style={{ background: "#c2410c", left: 82, top: 125, width: 16, height: 9, borderRadius: 6 }} />
+            </div>
+            <p className="mt-2 text-[16px] font-extrabold text-navy">Say hello!</p>
+            <p className="mt-1 text-[13px] text-muted">This is the start of your conversation.</p>
+          </div>
         ) : (
           messages.map((m) => {
             const mine = m.sender_id === meId;

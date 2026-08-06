@@ -6,6 +6,19 @@ import FilterPanel from "@/components/FilterPanel";
 
 const EMPTY_FILTERS = { skills: [], interests: [], teamSize: "", timelineStart: "", timelineEnd: "" };
 
+// "Shapey" mascot, Figma node 1203:1377 (Empty - No Search Results), normalized to origin at the head's top-left
+function Shapey() {
+  return (
+    <div className="relative" style={{ width: 213, height: 203 }}>
+      <div className="absolute rounded-full" style={{ background: "#ffb800", left: 0, top: 0, width: 98.341, height: 98.341 }} />
+      <div className="absolute" style={{ background: "#ffb800", left: 101.96, top: 119.31, width: 111.067, height: 83.3, borderTopLeftRadius: 104.125, borderTopRightRadius: 104.125 }} />
+      <div className="absolute rounded-full" style={{ background: "#111827", left: 31.67, top: 39.48, width: 10.413, height: 19.669 }} />
+      <div className="absolute rounded-full" style={{ background: "#111827", left: 67.54, top: 39.48, width: 10.413, height: 19.669 }} />
+      <div className="absolute rounded-full" style={{ background: "#c2410c", left: 38.28, top: 60.56, width: 9.375, height: 20.625, transform: "rotate(90deg)" }} />
+    </div>
+  );
+}
+
 function matchesFilters(p, f) {
   if (f.skills.length && !f.skills.some((s) => (p.skills || []).includes(s))) return false;
   if (f.interests.length && !f.interests.some((s) => (p.interests || []).includes(s))) return false;
@@ -64,9 +77,11 @@ export default function DiscoverList({ items = [] }) {
       <FilterPanel open={panelOpen} onClose={() => setPanelOpen(false)} value={filters} onApply={(f) => { setFilters(f); setPanelOpen(false); }} />
 
       {filtered.length === 0 ? (
-        <div className="mt-16 px-8 text-center">
-          <p className="text-[15px] font-semibold text-navy">{query ? `No projects match "${q}".` : "No projects match these filters."}</p>
-          <p className="mt-1 text-[13px] text-muted">{query ? "Try a different keyword." : "Try clearing a filter or two."}</p>
+        <div className="mt-8 flex flex-col items-center px-8 text-center">
+          <Shapey />
+          <p className="mt-4 text-[19px] font-extrabold text-navy">No projects found</p>
+          <p className="mt-1 text-[12.5px] text-muted">{query ? "Try different keywords or clear your filters to see more projects." : "Try clearing a filter or two."}</p>
+          <button onClick={() => { setQ(""); setFilters(EMPTY_FILTERS); }} className="mt-4 rounded-full px-6 py-3 text-[13px] font-semibold text-navy" style={{ background: "#f3f1f8" }}>Clear filters</button>
         </div>
       ) : (
         <div className="mt-5 flex flex-col items-center gap-6">

@@ -39,8 +39,6 @@ export default async function DiscoverPage() {
         {/* Projects */}
         {items.length === 0 ? (
           <div className="mt-16 flex flex-col items-center px-8 text-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/empty-search.png" alt="" className="mb-4 h-40 w-40" />
             <p className="text-[16px] font-semibold text-navy">No projects yet</p>
             <p className="mt-1 text-[14px] text-muted">Be the first to create one.</p>
             <Link href="/create" className="mt-5 rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 text-[15px] font-bold text-white">

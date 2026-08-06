@@ -38,14 +38,23 @@ export default async function RatingsHistoryPage({ params }) {
         <StatusBar />
         <div className="flex items-center gap-3 px-6">
           <Link href={`/u/${params.userId}`} className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d1b44" }}>Ratings History</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d1b44" }}>Ratings</h1>
         </div>
-        <p className="mt-1 px-6 text-[13px] text-muted">{name}</p>
 
         {!visible ? (
           <p className="mt-16 text-center text-[14px] text-muted">{name} has chosen to keep ratings private.</p>
         ) : count === 0 ? (
-          <p className="mt-16 text-center text-[14px] text-muted">No ratings yet.</p>
+          <div className="mt-16 flex flex-col items-center px-8 text-center">
+            <div className="relative" style={{ width: 200, height: 200 }}>
+              <div className="absolute" style={{ background: "#2ed573", left: 30.67, top: 112, width: 66.667, height: 52, borderTopLeftRadius: 60 }} />
+              <div className="absolute" style={{ background: "#2ed573", left: 89.33, top: 34.67, width: 80, height: 129.333, borderTopRightRadius: 60 }} />
+              <div className="absolute rounded-full" style={{ background: "#0b2a5b", left: 46.67, top: 138.67, width: 12, height: 12 }} />
+              <div className="absolute rounded-full" style={{ background: "#0b2a5b", left: 73.33, top: 138.67, width: 12, height: 12 }} />
+              <div className="absolute rounded-full" style={{ background: "#115e59", left: 36, top: 156, width: 22.667, height: 5.333 }} />
+            </div>
+            <p className="mt-2 text-[19px] font-extrabold text-navy">No ratings yet</p>
+            <p className="mt-1 text-[13px] text-muted">Complete your first project to start building your reputation.</p>
+          </div>
         ) : (
           <>
             <div className="mx-6 mt-5 rounded-2xl border border-line bg-white p-5">
