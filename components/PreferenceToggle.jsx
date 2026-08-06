@@ -16,7 +16,7 @@ export default function PreferenceToggle({ label, sub, initial, onSave }) {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-line bg-white p-4">
+    <div className="flex items-center justify-between rounded-2xl bg-white p-4" style={{ boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" }}>
       <div className="min-w-0 pr-3">
         <p className="text-[15px] font-bold text-navy">{label}</p>
         {sub && <p className="mt-0.5 text-[12.5px] text-muted">{sub}</p>}
