@@ -56,26 +56,26 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
 
   return (
     <div className="relative w-[402px] bg-white pb-28">
-      {/* navy cover banner */}
-      <div className="relative" style={{ height: 260, background: "#1e1b4b" }}>
-        <Link href="/discover" className="absolute left-5 top-14 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-[18px] text-white">‹</Link>
+      {/* full-bleed cover banner */}
+      <div className="relative" style={{ height: 220 }}>
+        {coverImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={coverImageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        ) : (
+          <div className="absolute inset-0" style={{ background: "#d9d9d9" }} />
+        )}
+        <Link href="/discover" className="absolute left-5 top-14 flex h-9 w-9 items-center justify-center rounded-full bg-white text-[18px] text-navy shadow">‹</Link>
         <div className="absolute right-5 top-14 flex items-center gap-2">
           {isOwner && (
-            <Link href={`/project/${projectId}/edit`} aria-label="Edit project" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-[15px] text-white">✎</Link>
+            <Link href={`/project/${projectId}/edit`} aria-label="Edit project" className="flex h-9 items-center justify-center rounded-full bg-white px-3.5 text-[13px] font-bold text-navy shadow">✎ Edit</Link>
           )}
           <FavoriteButton projectId={projectId} initial={favorited} />
         </div>
-        {coverImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={coverImageUrl} alt="" className="absolute object-cover" style={{ left: 34, top: 103, width: 334, height: 130, borderRadius: 16 }} />
-        ) : (
-          <div className="absolute" style={{ left: 34, top: 103, width: 334, height: 130, borderRadius: 16, background: "#d9d9d9" }} />
-        )}
+        <span className="absolute bottom-3 left-5 inline-block rounded-full px-3 py-1 text-[11px] font-bold text-white" style={{ background: type === "personal" ? "#7c3aed" : "#e0546a" }}>{type === "personal" ? "Personal" : "🎓 Academic"}</span>
       </div>
 
       {/* overlapping content card */}
       <div className="relative -mt-7 rounded-t-[28px] bg-white px-9 pt-7">
-        <span className="mb-3 inline-block rounded-full bg-purple-100 px-3 py-1 text-[11px] font-bold text-purple-600">{type === "personal" ? "Personal" : "🎓 Academic"}</span>
         <h1 className="text-[20px] font-extrabold text-navy">{name}</h1>
         <p className="mt-2 text-[15px] leading-snug text-[#434343]">{description}</p>
 
@@ -108,7 +108,7 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
                 <p className="text-[14px] font-bold text-navy">Join this project</p>
                 <p className="mt-1 text-[13px] text-muted">Join to form your own group or request to join one.</p>
                 <button onClick={enrol} disabled={pending} className="mt-3 w-full rounded-xl py-2.5 text-[13px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>
-                  {pending ? "Joining…" : "Join project"}
+                  {pending ? "Joining…" : "Join Project"}
                 </button>
               </div>
             )}
@@ -173,7 +173,7 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
       <div className="fixed bottom-0 left-1/2 z-20 flex w-[402px] -translate-x-1/2 justify-center border-t border-line bg-white px-6 py-3">
         {!enrolled && !isOwner ? (
           <button onClick={enrol} disabled={pending} className="w-full rounded-2xl py-3.5 text-[15px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>
-            {pending ? "Joining…" : "Join project"}
+            {pending ? "Joining…" : "Join Project"}
           </button>
         ) : tab === "info" ? (
           <button onClick={() => setTab("groups")} className="w-full rounded-2xl py-3.5 text-[15px] font-bold text-white" style={{ background: "#7c3aed" }}>See groups to join</button>
