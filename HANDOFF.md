@@ -402,5 +402,18 @@ Owner pushed the above batch and reported it was still inaccurate. Investigated:
 
 **Not yet pushed as of this note.**
 
+## Progress 2026-08-06 (same day, continued yet further still) — ~10 more commits
+
+- **Signup Step 1** — field icons were gray, spec shows purple; avatar placeholder got the dashed lavender ring shown in the design; password field was missing the show/hide toggle every other password field in the app already has.
+- **Group Info "Off" state — real gap fixed**: the whole Recruiting section was wrapped in `{recruiting && ...}`, so turning recruiting off made it disappear completely instead of showing spec's "Closed to join requests / No one can request to join right now" + Manage link. Merged the redundant standalone "Recruiting settings" leader link into this section (same destination).
+- **Create Project Congrats** — same broken teal-blob-PNG-with-emoji issue Signup Complete had, fixed the same way (real Blobby + confetti). Kept the app's real join-code mechanism rather than spec's unbuilt vanity-URL-slug concept, matched the visual layout (code + Copy, separate "Share to…" using the Web Share API, single CTA).
+- **Group Chat** — header only ever showed one of {group name, project name}; spec shows group name as title + "N members · Project name" subtitle. Added one lightweight member-count query.
+- **Request History (Applicants)** — Accept was purple like every other button; spec uses green specifically for Accept, Decline is a compact red circular X (was a full-width text button). Subtitle was "@username · wants to join X"; spec shows "Y2 · Design & AI" + a separate "Applied Xh/d ago" line — both fields were one query-extension away (year/major already joinable, created_at was already fetched and just dropped).
+- **User A/B Profile - Requested — real gap fixed**: spec's applicant-review screen has a bottom Accept/Decline+paging bar; this page had zero accept/decline affordance, only reachable via the separate Requests list. Added `ApplicantReviewBar` (same `acceptRequest`/`declineRequest` actions, same paging queue already built) plus one lookup query to resolve the specific pending `join_requests` row for that leader+applicant+group combination.
+- **Verified, no action needed**: swept all remaining `public/*.png` assets by hash for the same kind of swap bug found earlier (empty-notif/empty-search) — no other duplicates found. `empty-search.png` is now fully unreferenced (safe to delete later, not urgent).
+- **Checked, deliberately not built**: Signup Step 6's richer "Add Project" modal variant needs a project-name field with nowhere to store it (`past_projects` has no `name` column for freestanding, not-linked-to-a-real-project entries) and photo upload before the account exists (no authenticated session yet for Storage during signup) — both real schema/technical blockers, not scope-only.
+
+**Not yet pushed as of this note — this is a good checkpoint for another push+deploy+verify cycle.**
+
 ## Working style / prefs
 British/clean copy. Owner wants exact Figma fidelity + real backend. Deploy cadence: build+commit locally, user pushes via GitHub Desktop + says "deployed", then verify live on Vercel. Caveman mode was on (terse). This session (2026-08-06): explicitly asked for a full "start over" interface rebuild from `figma-backend-spec/`, backend frozen, and chose full-depth-on-everything over a faster lighter pass, and a single final report over per-batch check-ins.
