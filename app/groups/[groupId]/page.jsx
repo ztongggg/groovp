@@ -131,12 +131,19 @@ export default async function GroupInfoPage({ params }) {
           </div>
         )}
 
-        {recruiting && (
+        {group.status !== "Ended" && (
           <div className="mt-6 flex flex-col gap-4 px-6">
-            {group.members_wanted > 0 && (
+            <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: recruiting ? "#f5f0ff" : "#f9f8fb" }}>
+              <div>
+                <p className="text-[14px] font-bold text-navy">{recruiting ? "Open to join requests" : "Closed to join requests"}</p>
+                <p className="mt-0.5 text-[12px] text-muted">{recruiting ? "Anyone can request to join this group" : "No one can request to join right now"}</p>
+              </div>
+              {isLeader && <Link href={`/recruiting/${group.id}`} className="shrink-0 text-[12.5px] font-bold text-purple-600">Manage ›</Link>}
+            </div>
+            {recruiting && group.members_wanted > 0 && (
               <p className="text-[13px] font-semibold text-navy">Looking for {group.members_wanted} more member{group.members_wanted === 1 ? "" : "s"}</p>
             )}
-            {group.skills_wanted?.length > 0 && (
+            {recruiting && group.skills_wanted?.length > 0 && (
               <div>
                 <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Skills wanted</p>
                 <div className="flex flex-wrap gap-2">{group.skills_wanted.map((s) => {
@@ -145,7 +152,7 @@ export default async function GroupInfoPage({ params }) {
                 })}</div>
               </div>
             )}
-            {group.personality_wanted?.length > 0 && (
+            {recruiting && group.personality_wanted?.length > 0 && (
               <div>
                 <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Personality wanted</p>
                 <div className="flex flex-wrap gap-2">{group.personality_wanted.map((s) => {
@@ -154,7 +161,7 @@ export default async function GroupInfoPage({ params }) {
                 })}</div>
               </div>
             )}
-            {group.interests_wanted?.length > 0 && (
+            {recruiting && group.interests_wanted?.length > 0 && (
               <div>
                 <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Interests wanted</p>
                 <div className="flex flex-wrap gap-2">{group.interests_wanted.map((s) => {
@@ -163,7 +170,7 @@ export default async function GroupInfoPage({ params }) {
                 })}</div>
               </div>
             )}
-            {group.additional_notes && (
+            {recruiting && group.additional_notes && (
               <div className="rounded-2xl bg-[#f9f7ff] p-4">
                 <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-muted">Notes</p>
                 <p className="text-[13.5px] text-navy">{group.additional_notes}</p>
@@ -180,10 +187,6 @@ export default async function GroupInfoPage({ params }) {
                 <span className="text-[16px] text-muted">›</span>
               </Link>
             )}
-            <Link href={`/recruiting/${group.id}`} className="flex items-center justify-between rounded-2xl border border-line bg-white px-4 py-3.5">
-              <span className="text-[14px] font-semibold text-navy">Recruiting settings</span>
-              <span className="text-[16px] text-muted">›</span>
-            </Link>
             <Link href={`/groups/${group.id}/edit`} className="flex items-center justify-between rounded-2xl border border-line bg-white px-4 py-3.5">
               <span className="text-[14px] font-semibold text-navy">Edit group</span>
               <span className="text-[16px] text-muted">›</span>
