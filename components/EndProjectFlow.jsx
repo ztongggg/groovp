@@ -5,6 +5,43 @@ import { useRouter } from "next/navigation";
 import RateTeammatesList from "@/components/RateTeammatesList";
 import { endProject } from "@/app/groups/[groupId]/actions";
 import { addPastProjectForProject } from "@/app/groups/[groupId]/end/actions";
+import { createClient } from "@/lib/supabase/client";
+
+function PhotoPicker({ photos, onChange }) {
+  const [uploading, setUploading] = useState(false);
+
+  async function onPick(e, i) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !["image/jpeg", "image/png"].includes(file.type)) return;
+    setUploading(true);
+    const supabase = createClient();
+    const path = `${crypto.randomUUID()}-${file.name}`;
+    const { error } = await supabase.storage.from("project-resources").upload(path, file);
+    setUploading(false);
+    if (error) return;
+    const { data } = supabase.storage.from("project-resources").getPublicUrl(path);
+    const next = [...photos];
+    next[i] = data.publicUrl;
+    onChange(next.filter(Boolean));
+  }
+
+  return (
+    <div className="flex gap-2">
+      {[0, 1, 2].map((i) => (
+        <label key={i} className="flex flex-1 items-center justify-center rounded-2xl border-[1.5px] border-dashed" style={{ height: 72, borderColor: "#c9c5d3" }}>
+          {photos[i] ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photos[i]} alt="" className="h-full w-full rounded-2xl object-cover" />
+          ) : (
+            <span style={{ fontSize: 20, color: "#7c3aed" }}>{uploading ? "…" : "+"}</span>
+          )}
+          <input type="file" accept="image/jpeg,image/png" className="hidden" onChange={(e) => onPick(e, i)} disabled={uploading} />
+        </label>
+      ))}
+    </div>
+  );
+}
 
 export default function EndProjectFlow({ groupId, groupName, groupStatus, projectId, members }) {
   const router = useRouter();
@@ -13,6 +50,7 @@ export default function EndProjectFlow({ groupId, groupName, groupStatus, projec
   const [error, setError] = useState("");
   const [role, setRole] = useState("");
   const [writeUp, setWriteUp] = useState("");
+  const [photos, setPhotos] = useState([]);
   const [saving, setSaving] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -26,7 +64,7 @@ export default function EndProjectFlow({ groupId, groupName, groupStatus, projec
 
   async function onAddProject() {
     setSaving(true); setError("");
-    const r = await addPastProjectForProject(projectId, role, writeUp);
+    const r = await addPastProjectForProject(projectId, role, writeUp, photos);
     setSaving(false);
     if (r?.error) { setError(r.error); return; }
     setAdded(true);
@@ -73,18 +111,25 @@ export default function EndProjectFlow({ groupId, groupName, groupStatus, projec
       );
     }
     return (
-      <div className="mt-6 flex flex-col gap-3 px-6 text-center">
-        <p className="text-[20px] font-extrabold text-navy">Add this to your profile?</p>
-        <p className="text-[14px] text-muted">Showcase what you built — visible on your profile&apos;s Project tab.</p>
-        <div className="mt-3 flex flex-col gap-2 text-left">
-          <input placeholder="Your role (e.g. Frontend Lead)" value={role} onChange={(e) => setRole(e.target.value)} className="rounded-xl border border-line px-3 py-2.5 text-[14px] focus:outline-none" />
-          <textarea placeholder="What did you build?" value={writeUp} onChange={(e) => setWriteUp(e.target.value)} rows={3} className="rounded-xl border border-line px-3 py-2.5 text-[14px] focus:outline-none" />
+      <div className="mt-6 flex flex-col gap-3 px-6 text-left">
+        <div className="text-center">
+          <p className="text-[20px] font-extrabold text-navy">Add this to your profile?</p>
+          <p className="mt-1 text-[13px] text-muted">Show off what you built{groupName ? ` on "${groupName}"` : ""} — write a short summary and add a few photos.</p>
+        </div>
+        <div className="mt-2 flex flex-col gap-2">
+          {groupName && <div className="rounded-xl px-3 py-2.5 text-[14px] font-semibold text-navy" style={{ background: "#f3f1f8" }}>{groupName}</div>}
+          <p className="mt-1 text-[13px] font-bold text-muted">Your role</p>
+          <input placeholder="e.g. Frontend Lead" value={role} onChange={(e) => setRole(e.target.value)} className="rounded-xl px-3 py-2.5 text-[14px] focus:outline-none" style={{ background: "#f3f1f8" }} />
+          <p className="mt-1 text-[13px] font-bold text-muted">Write-up</p>
+          <textarea placeholder="What did you build? What are you proud of? (visible on your public profile)" value={writeUp} onChange={(e) => setWriteUp(e.target.value)} rows={3} className="rounded-xl px-3 py-2.5 text-[14px] focus:outline-none" style={{ background: "#f3f1f8" }} />
+          <p className="mt-1 text-[13px] font-bold text-muted">Photos (optional)</p>
+          <PhotoPicker photos={photos} onChange={setPhotos} />
         </div>
         {error && <p className="text-[13px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
         <button onClick={onAddProject} disabled={saving} className="mt-2 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white disabled:opacity-50">
-          {saving ? "Adding…" : "Add to profile"}
+          {saving ? "Adding…" : "Add to Profile"}
         </button>
-        <button onClick={() => router.push("/profile")} className="py-2 text-[14px] font-semibold text-muted">Skip for now</button>
+        <button onClick={() => router.push("/profile")} className="w-full rounded-2xl py-3 text-[14px] font-semibold text-muted" style={{ background: "#f3f1f8" }}>Skip for now</button>
       </div>
     );
   }
