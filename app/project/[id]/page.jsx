@@ -14,7 +14,7 @@ async function getProject(id) {
     const { data: { user } } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("projects")
-      .select("id,name,description,type,owner_id,join_code,allow_multiple_groups,number_of_groups,skills_needed,timeline_start,timeline_end,max_size,cover_image_url, owner:profiles!projects_owner_id_fkey(username), groups(id,name,leader_id,recruiting,members_wanted, group_members(user_id, profiles(full_name,username)))")
+      .select("id,name,description,type,owner_id,join_code,allow_multiple_groups,number_of_groups,skills_needed,interests,timeline_start,timeline_end,max_size,cover_image_url,project_link,resource_files,things_to_note, owner:profiles!projects_owner_id_fkey(username), groups(id,name,leader_id,recruiting,members_wanted, group_members(user_id, profiles(full_name,username)))")
       .eq("id", id)
       .single();
     if (error) return null;
@@ -32,7 +32,41 @@ async function getProject(id) {
       // Recently Viewed log — best-effort, upsert so repeat views just bump viewed_at.
       supabase.from("project_views").upsert({ user_id: user.id, project_id: id, viewed_at: new Date().toISOString() }).then(() => {}, () => {});
     }
-    return { ...data, meId: user?.id || null, favorited, enrolled };
+    // "More projects like this" — ranked by shared skills/interests with this
+    // project, which is the same overlap signal the rest of the app matches on.
+    let similar = [];
+    try {
+      const tags = [...(data.skills_needed || []), ...(data.interests || [])].map((t) => (t || "").toLowerCase());
+      const { data: others } = await supabase
+        .from("projects")
+        .select("id,name,description,skills_needed,interests,timeline_start,timeline_end,max_size,cover_image_url,status, groups(id, group_members(count))")
+        .neq("id", id)
+        .limit(50);
+      similar = (others || [])
+        .filter((o) => o.status !== "Deleted")
+        .map((o) => {
+          const otherTags = [...(o.skills_needed || []), ...(o.interests || [])];
+          const shared = otherTags.filter((t) => tags.includes((t || "").toLowerCase())).length;
+          const members = o.groups?.[0]?.group_members?.[0]?.count ?? 0;
+          return {
+            id: o.id,
+            title: o.name,
+            desc: o.description || "",
+            skills: o.skills_needed || [],
+            memberCount: members,
+            count: `${members}/${o.max_size || 0}`,
+            date: `${fmt(o.timeline_start)} - ${fmt(o.timeline_end)}`,
+            coverImageUrl: o.cover_image_url,
+            groupId: o.groups?.[0]?.id,
+            shared,
+          };
+        })
+        .filter((o) => o.shared > 0)
+        .sort((a, b) => b.shared - a.shared)
+        .slice(0, 3);
+    } catch {}
+
+    return { ...data, meId: user?.id || null, favorited, enrolled, similar };
   } catch {
     return null;
   }
@@ -68,6 +102,7 @@ export default async function ProjectDetailPage({ params }) {
       dateRange={`${fmt(p.timeline_start)} - ${fmt(p.timeline_end)}`}
       skills={p.skills_needed || []}
       memberCount={`${total}/${p.max_size || 0}`}
+      memberTotal={total}
       maxSize={p.max_size}
       groups={groups}
       meId={p.meId}
@@ -79,6 +114,10 @@ export default async function ProjectDetailPage({ params }) {
       allowMultipleGroups={p.allow_multiple_groups !== false}
       coverImageUrl={p.cover_image_url}
       numberOfGroups={p.number_of_groups}
+      projectLink={p.project_link}
+      resourceFiles={p.resource_files || []}
+      thingsToNote={p.things_to_note}
+      similar={p.similar || []}
     />
   );
 }
