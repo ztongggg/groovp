@@ -51,10 +51,7 @@ export default function DiscoverCard({ title, desc, skills = [], avatarColor = "
       </div>
       <div className="absolute" style={{ right: 12, top: 215, fontSize: 10, fontWeight: 700, color: "#6b7280" }}>{count} members</div>
 
-      <div className="absolute" style={{ left: 15, top: 250, width: 307, height: 2, background: "#e5e7eb", borderRadius: 2 }}>
-        <div style={{ width: 118, height: 2, background: "#7c3aed", borderRadius: 2 }} />
-      </div>
-      <div className="absolute" style={{ left: 15, top: 261, fontSize: 12, fontWeight: 700, color: "#6b7280" }}>{date}</div>
+      <div className="absolute" style={{ left: 15, top: 253, fontSize: 12, fontWeight: 700, color: "#6b7280" }}>{date}</div>
 
       <RequestButton groupId={groupId} />
     </div>
