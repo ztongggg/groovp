@@ -11,7 +11,7 @@ function Chip({ active, onClick, children }) {
 
 const inputCls = "w-full rounded-[14px] bg-[#f3f1f8] px-4 py-2.5 text-[13px] text-navy focus:outline-none";
 
-const EMPTY = { skills: [], interests: [], teamSize: "", timelineStart: "", timelineEnd: "" };
+const EMPTY = { skills: [], interests: [], teamMin: 2, teamMax: 5, timelineStart: "", timelineEnd: "" };
 
 // Filter Panel (Figma node 616:1961) — skills/interests/team-size/timeline only,
 // deliberately NO personality filter (spec: "filtering is for projects... not personality").
@@ -25,9 +25,10 @@ export default function FilterPanel({ open, onClose, value, onApply }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
       <div className="mx-auto flex max-h-[85vh] w-[402px] flex-col rounded-t-3xl bg-white" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 pt-5">
+        <div className="flex justify-center pt-2"><span className="rounded-full" style={{ width: 40, height: 4, background: "#ece8fc" }} /></div>
+        <div className="flex items-center justify-between px-6 pt-3">
           <p className="text-[18px] font-extrabold text-navy">Filters</p>
-          <button onClick={onClose} className="text-[20px] text-muted">×</button>
+          <button onClick={() => setD(EMPTY)} className="text-[13px] font-bold text-purple-600">Clear all</button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
@@ -38,8 +39,17 @@ export default function FilterPanel({ open, onClose, value, onApply }) {
           <div className="mb-5 flex flex-wrap gap-2">{INTERESTS.map((s) => <Chip key={s} active={d.interests.includes(s)} onClick={() => toggle("interests", s)}>{s}</Chip>)}</div>
 
           <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Team size</p>
-          <div className="mb-5 flex flex-wrap gap-2">
-            {["1-3", "4-6", "7+"].map((s) => <Chip key={s} active={d.teamSize === s} onClick={() => setD((x) => ({ ...x, teamSize: x.teamSize === s ? "" : s }))}>{s}</Chip>)}
+          <div className="mb-5 flex gap-3">
+            {[["Min", "teamMin"], ["Max", "teamMax"]].map(([label, key]) => (
+              <div key={key} className="flex flex-1 items-center justify-between rounded-2xl bg-[#f3f1f8] px-4 py-2.5">
+                <span className="text-[11px] font-bold uppercase text-muted">{label}</span>
+                <div className="flex items-center gap-2">
+                  <button type="button" onClick={() => setD((x) => ({ ...x, [key]: Math.max(1, x[key] - 1) }))} className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold" style={{ background: "#ece8fc", color: "#7c3aed" }}>−</button>
+                  <span className="w-4 text-center text-[15px] font-bold text-navy">{d[key]}</span>
+                  <button type="button" onClick={() => setD((x) => ({ ...x, [key]: Math.min(50, x[key] + 1) }))} className="flex h-7 w-7 items-center justify-center rounded-full text-[16px] font-bold" style={{ background: "#ece8fc", color: "#7c3aed" }}>+</button>
+                </div>
+              </div>
+            ))}
           </div>
 
           <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Timeline</p>
@@ -49,9 +59,8 @@ export default function FilterPanel({ open, onClose, value, onApply }) {
           </div>
         </div>
 
-        <div className="flex gap-3 border-t border-line px-6 py-4">
-          <button onClick={() => { setD(EMPTY); onApply(EMPTY); }} className="flex-1 rounded-2xl py-3 text-[14px] font-bold text-navy" style={{ background: "#f3f1f8" }}>Clear</button>
-          <button onClick={() => onApply(d)} className="flex-1 rounded-2xl py-3 text-[14px] font-bold text-white" style={{ background: "#7c3aed" }}>Apply</button>
+        <div className="border-t border-line px-6 py-4">
+          <button onClick={() => onApply(d)} className="w-full rounded-2xl py-3.5 text-[14px] font-bold text-white" style={{ background: "#7c3aed" }}>Apply Filters</button>
         </div>
       </div>
     </div>

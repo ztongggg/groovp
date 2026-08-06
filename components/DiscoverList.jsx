@@ -4,7 +4,7 @@ import { useState } from "react";
 import DiscoverCard from "@/components/DiscoverCard";
 import FilterPanel from "@/components/FilterPanel";
 
-const EMPTY_FILTERS = { skills: [], interests: [], teamSize: "", timelineStart: "", timelineEnd: "" };
+const EMPTY_FILTERS = { skills: [], interests: [], teamMin: 2, teamMax: 5, timelineStart: "", timelineEnd: "" };
 
 // "Shapey" mascot, Figma node 1203:1377 (Empty - No Search Results), normalized to origin at the head's top-left
 function Shapey() {
@@ -22,11 +22,9 @@ function Shapey() {
 function matchesFilters(p, f) {
   if (f.skills.length && !f.skills.some((s) => (p.skills || []).includes(s))) return false;
   if (f.interests.length && !f.interests.some((s) => (p.interests || []).includes(s))) return false;
-  if (f.teamSize) {
-    const max = p.maxSize || 0;
-    if (f.teamSize === "1-3" && !(max >= 1 && max <= 3)) return false;
-    if (f.teamSize === "4-6" && !(max >= 4 && max <= 6)) return false;
-    if (f.teamSize === "7+" && !(max >= 7)) return false;
+  if (f.teamMin != null && f.teamMax != null) {
+    const min = p.minSize || 1, max = p.maxSize || 99;
+    if (max < f.teamMin || min > f.teamMax) return false;
   }
   if (f.timelineStart && (!p.timelineStart || p.timelineStart < f.timelineStart)) return false;
   if (f.timelineEnd && (!p.timelineEnd || p.timelineEnd > f.timelineEnd)) return false;
@@ -38,7 +36,8 @@ export default function DiscoverList({ items = [] }) {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [panelOpen, setPanelOpen] = useState(false);
 
-  const activeFilterCount = filters.skills.length + filters.interests.length + (filters.teamSize ? 1 : 0) + (filters.timelineStart ? 1 : 0) + (filters.timelineEnd ? 1 : 0);
+  const teamSizeChanged = filters.teamMin !== EMPTY_FILTERS.teamMin || filters.teamMax !== EMPTY_FILTERS.teamMax;
+  const activeFilterCount = filters.skills.length + filters.interests.length + (teamSizeChanged ? 1 : 0) + (filters.timelineStart ? 1 : 0) + (filters.timelineEnd ? 1 : 0);
 
   const query = q.trim().toLowerCase();
   const filtered = items

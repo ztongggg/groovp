@@ -53,7 +53,7 @@ export default function DiscoverCard({ title, desc, skills = [], avatarColor = "
 
       <div className="absolute" style={{ left: 15, top: 253, fontSize: 12, fontWeight: 700, color: "#6b7280" }}>{date}</div>
 
-      <RequestButton groupId={groupId} />
+      <RequestButton groupId={groupId} subtitle={title} />
     </div>
   );
 }
