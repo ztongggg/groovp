@@ -41,13 +41,13 @@ function TeamRow({ top, color, title, subtitle, href, photoUrl }) {
     <Link href={href} className="absolute" style={{ left: 24, top, width: 354, height: 92, borderRadius: 18, background: "#fff", border: "1px solid #f3f1f8" }}>
       <div className="absolute" style={{ left: 16, top: 22 }}><AvatarBlob color={color} photoUrl={photoUrl} /></div>
       <div className="absolute" style={{ left: 76, top: 24, fontSize: 14, fontWeight: 700, color: "#1d1b44" }}>{title}</div>
-      <div className="absolute" style={{ left: 76, top: 46, fontSize: 11, fontWeight: 400, color: "#757080" }}>{subtitle} · open chat ›</div>
+      <div className="absolute" style={{ left: 76, top: 46, fontSize: 11, fontWeight: 400, color: "#757080", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", width: 260 }}>{subtitle}</div>
     </Link>
   );
 }
 
 export default function TeamsView({ requests = [], teams = [] }) {
-  const [tab, setTab] = useState("requested");
+  const [tab, setTab] = useState("my");
   const [q, setQ] = useState("");
 
   const query = q.trim().toLowerCase();
