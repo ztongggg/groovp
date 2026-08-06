@@ -37,8 +37,31 @@ async function getData() {
 
     const { data: rows } = await supabase
       .from("projects")
-      .select("id,name,description,skills_needed,timeline_start,timeline_end,max_size,cover_image_url, groups(group_members(count))")
+      .select("id,name,description,skills_needed,timeline_start,timeline_end,max_size,cover_image_url,created_at,status, groups(group_members(count))")
       .order("created_at", { ascending: false });
+
+    const visible = (rows || []).filter((p) => p.status !== "Deleted");
+
+    // Popularity = join-request count + save count (owner-confirmed metric).
+    // join_requests is keyed by group, so resolve group -> project first.
+    const score = {};
+    try {
+      const ids = visible.map((p) => p.id);
+      const [{ data: grps }, { data: favs }] = await Promise.all([
+        supabase.from("groups").select("id,project_id").in("project_id", ids),
+        supabase.from("project_favorites").select("project_id").in("project_id", ids),
+      ]);
+      const groupToProject = Object.fromEntries((grps || []).map((g) => [g.id, g.project_id]));
+      const { data: reqs } = await supabase
+        .from("join_requests")
+        .select("group_id")
+        .in("group_id", Object.keys(groupToProject));
+      for (const r of reqs || []) {
+        const pid = groupToProject[r.group_id];
+        if (pid) score[pid] = (score[pid] || 0) + 1;
+      }
+      for (const f of favs || []) score[f.project_id] = (score[f.project_id] || 0) + 1;
+    } catch {}
 
     const mapProject = (p) => {
       const members = p.groups?.[0]?.group_members?.[0]?.count ?? 0;
@@ -47,12 +70,17 @@ async function getData() {
         title: p.name,
         desc: p.description || "",
         skills: p.skills_needed || [],
+        memberCount: members,
         count: `${members}/${p.max_size || 0}`,
         date: `${fmt(p.timeline_start)} - ${fmt(p.timeline_end)}`,
         coverImageUrl: p.cover_image_url,
       };
     };
-    const projects = (rows || []).map(mapProject);
+    // `visible` is already created_at DESC from the query, so it doubles as Latest.
+    const projects = visible.map(mapProject);
+    const popular = [...visible]
+      .sort((a, b) => (score[b.id] || 0) - (score[a.id] || 0))
+      .map(mapProject);
 
     let recentlyViewed = [];
     if (user) {
@@ -63,22 +91,22 @@ async function getData() {
           .eq("user_id", user.id)
           .order("viewed_at", { ascending: false })
           .limit(10);
-        const byId = Object.fromEntries((rows || []).map((p) => [p.id, p]));
+        const byId = Object.fromEntries(visible.map((p) => [p.id, p]));
         recentlyViewed = (views || []).map((v) => byId[v.project_id]).filter(Boolean).map(mapProject);
       } catch {}
     }
 
-    return { name, projects, recentlyViewed, unread, invites };
+    return { name, projects, popular, recentlyViewed, unread, invites };
   } catch {
-    return { name: "there", projects: [], recentlyViewed: [], unread: 0, invites: 0 };
+    return { name: "there", projects: [], popular: [], recentlyViewed: [], unread: 0, invites: 0 };
   }
 }
 
 export default async function HomePage() {
-  const { name, projects, recentlyViewed, unread, invites } = await getData();
+  const { name, projects, popular, recentlyViewed, unread, invites } = await getData();
   return (
     <AppShell>
-      <HomeView name={name} projects={projects} recentlyViewed={recentlyViewed} unread={unread} invites={invites} />
+      <HomeView name={name} projects={projects} popular={popular} recentlyViewed={recentlyViewed} unread={unread} invites={invites} />
     </AppShell>
   );
 }

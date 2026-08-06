@@ -55,7 +55,7 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
 
 
   return (
-    <div className="relative w-[402px] bg-white pb-28">
+    <div className="font-nunito relative w-[402px] bg-white pb-28">
       {/* full-bleed cover banner */}
       <div className="relative" style={{ height: 220 }}>
         {coverImageUrl ? (

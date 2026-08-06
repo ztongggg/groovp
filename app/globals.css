@@ -7,3 +7,14 @@ body {
   background: #f9f8fb;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+
+/* The Figma file sets Nunito on the project-feed surfaces (Home, Discover,
+   Saved, Project Details, Tutorials) and Inter everywhere else. Applied at the
+   screen wrapper; the bottom nav opts back out since it is Inter in the design. */
+.font-nunito {
+  font-family: "Nunito", "Inter", system-ui, sans-serif;
+}
+
+.font-nunito nav {
+  font-family: "Inter", system-ui, sans-serif;
+}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import RequestButton from "@/components/RequestButton";
+import MemberBlobs from "@/components/MemberBlobs";
 
 function ShareIcon() {
   return (
@@ -18,7 +19,7 @@ function HeartIcon() {
 }
 
 // Exact 334x357 Discover project card, driven by DB data.
-export default function DiscoverCard({ title, desc, skills = [], avatarColor = "#e8863b", initials = "JK", count, date, groupId, projectId, strongMatch, coverImageUrl }) {
+export default function DiscoverCard({ title, desc, skills = [], memberCount = 0, count, date, groupId, projectId, strongMatch, coverImageUrl }) {
   return (
     <div className="relative shrink-0" style={{ width: 334, height: 357, borderRadius: 21, background: "#fff", border: "1px solid #e4e3e3" }}>
       <Link href={projectId ? `/project/${projectId}` : "#"} className="absolute left-0 top-0" style={{ width: 334, height: 285, borderRadius: 21, zIndex: 5 }} aria-label={`Open ${title}`} />
@@ -29,8 +30,8 @@ export default function DiscoverCard({ title, desc, skills = [], avatarColor = "
         <div className="absolute left-0 top-0" style={{ width: 334, height: 90, background: "#d9d9d9", borderTopLeftRadius: 21, borderTopRightRadius: 21 }} />
       )}
       {strongMatch && (
-        <div className="absolute flex items-center gap-1" style={{ left: 12, top: 12, zIndex: 6, height: 26, padding: "0 12px", borderRadius: 999, background: "#7c3aed" }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>✨ Strong Match</span>
+        <div className="absolute flex items-center justify-center" style={{ left: 12, top: 12, zIndex: 6, height: 24, padding: "0 12px", borderRadius: 999, background: "rgba(124,58,237,0.90)" }}>
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: "#e8e6f5" }}>✨ Strong Match</span>
         </div>
       )}
       <div className="absolute flex items-center justify-center rounded-full bg-white" style={{ left: 259, top: 13, width: 27, height: 27 }}><ShareIcon /></div>
@@ -45,13 +46,12 @@ export default function DiscoverCard({ title, desc, skills = [], avatarColor = "
         ))}
       </div>
 
-      <div className="absolute flex -space-x-1.5" style={{ left: 16, top: 211 }}>
-        <span style={{ width: 23, height: 23, borderRadius: 999, background: avatarColor, border: "1px solid #fff" }} />
-        <span className="inline-flex items-center justify-center" style={{ width: 23, height: 23, borderRadius: 999, background: "#7c3aed", border: "1px solid #fff", fontSize: 10, fontWeight: 800, color: "#fff" }}>{initials}</span>
+      <div className="absolute" style={{ left: 16, top: 211 }}>
+        <MemberBlobs count={memberCount} size={23} />
       </div>
-      <div className="absolute" style={{ right: 12, top: 215, fontSize: 10, fontWeight: 700, color: "#6b7280" }}>{count} members</div>
+      <div className="absolute" style={{ right: 12, top: 215, fontSize: 10, fontWeight: 700, color: "#6b7280", lineHeight: "16px" }}>{count} members</div>
 
-      <div className="absolute" style={{ left: 15, top: 253, fontSize: 12, fontWeight: 700, color: "#6b7280" }}>{date}</div>
+      <div className="absolute" style={{ left: 15, top: 261, fontSize: 12, fontWeight: 700, color: "#6b7280", lineHeight: "16px" }}>{date}</div>
 
       <RequestButton groupId={groupId} subtitle={title} />
     </div>

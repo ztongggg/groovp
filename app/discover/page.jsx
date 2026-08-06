@@ -22,7 +22,7 @@ export default async function DiscoverPage() {
 
   return (
     <AppShell>
-      <div className="min-h-full bg-white pb-6">
+      <div className="font-nunito min-h-full bg-white pb-6">
         <StatusBar />
 
         {/* Header */}

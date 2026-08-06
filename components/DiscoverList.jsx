@@ -65,8 +65,13 @@ export default function DiscoverList({ items = [] }) {
             <button onClick={() => setQ("")} aria-label="Clear search" className="px-3 text-[16px] text-muted">×</button>
           )}
         </div>
-        <button onClick={() => setPanelOpen(true)} aria-label="Filters" className="relative flex items-center justify-center" style={{ width: 42, height: 42, borderRadius: 14, background: activeFilterCount ? "#7c3aed" : "#f5f0ff", border: activeFilterCount ? "none" : "1px solid #ede9fe" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={activeFilterCount ? "#fff" : "#9ca3af"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
+        <button onClick={() => setPanelOpen(true)} aria-label="Filters" className="relative flex items-center justify-center" style={{ width: 42, height: 42, borderRadius: 14, background: "#7c3aed" }}>
+          {/* two sliders, per the Figma icon */}
+          <svg width="21" height="16" viewBox="0 0 21 16" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
+            <path d="M0 5h21M0 11h21" />
+            <circle cx="14" cy="5" r="3" fill="#7c3aed" />
+            <circle cx="5" cy="11" r="3" fill="#7c3aed" />
+          </svg>
           {activeFilterCount > 0 && (
             <span className="absolute flex items-center justify-center rounded-full text-white" style={{ right: -4, top: -4, width: 18, height: 18, fontSize: 10, fontWeight: 800, background: "#bf4247" }}>{activeFilterCount}</span>
           )}
@@ -92,8 +97,7 @@ export default function DiscoverList({ items = [] }) {
               skills={p.skills}
               count={p.count}
               date={p.date}
-              avatarColor={p.avatarColor}
-              initials={p.initials}
+              memberCount={p.memberCount}
               groupId={p.groupId}
               projectId={p.id}
               strongMatch={p.strongMatch}

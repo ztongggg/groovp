@@ -5,29 +5,28 @@ import Link from "next/link";
 import StatusBar from "@/components/StatusBar";
 import HomeProjectCard from "@/components/HomeProjectCard";
 
-function BannerCloudy() {
-  // Figma instance "Cloudy" 283.4x283.4, positioned left 142 top -18.9 inside the 342x168 banner (overflow-clip crops it)
+// Figma "swirl" mascot — eight cyan lobes with eyes and a mouth, drawn as plain
+// divs the same way the design file constructs it. 283x283, cropped by the banner.
+const SWIRL_LOBES = [
+  { left: 83, top: 85, width: 70, height: 70 },
+  { left: 132, top: 85, width: 70, height: 70 },
+  { left: 132, top: 128, width: 70, height: 68 },
+  { left: 85, top: 132, width: 70, height: 70 },
+  { left: 74, top: 121, width: 42, height: 42 },
+  { left: 121, top: 74, width: 40, height: 42 },
+  { left: 170, top: 123, width: 42, height: 42 },
+  { left: 127, top: 170, width: 42, height: 42 },
+];
+
+function BannerSwirl() {
   return (
-    <div className="absolute overflow-hidden" style={{ left: 142, top: -18.92, width: 283.425, height: 283.425 }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 157.09, top: 160.66, width: 69.912, height: 69.912 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 249.92, top: 160.66, width: 69.912, height: 69.912 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-b.svg" alt="" className="absolute" style={{ left: 249.92, top: 242.78, width: 69.912, height: 68.022 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 160.66, top: 249.92, width: 69.912, height: 69.912 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 139.24, top: 228.49, width: 41.569, height: 41.569 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-d.svg" alt="" className="absolute" style={{ left: 228.49, top: 139.24, width: 39.68, height: 41.569 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 321.32, top: 232.06, width: 41.569, height: 41.569 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 239.2, top: 321.32, width: 41.569, height: 41.569 }} />
-      <div className="absolute rounded-full" style={{ background: "#0b2a5b", left: 214.21, top: 246.35, width: 16.279, height: 20.785 }} />
-      <div className="absolute rounded-full" style={{ background: "#0b2a5b", left: 297.7, top: 246.35, width: 16.279, height: 20.785 }} />
-      <div className="absolute rounded-full" style={{ background: "#1d4ed8", left: 260.63, top: 303.47, width: 9.448, height: 13.227 }} />
+    <div className="absolute" style={{ left: 142, top: -19, width: 283, height: 283 }}>
+      {SWIRL_LOBES.map((l, i) => (
+        <div key={i} className="absolute rounded-full" style={{ ...l, background: "#35d7ff" }} />
+      ))}
+      <div className="absolute" style={{ left: 113, top: 130, width: 16, height: 21, background: "#0b2a5b", borderRadius: 52.91 }} />
+      <div className="absolute" style={{ left: 158, top: 130, width: 16, height: 21, background: "#0b2a5b", borderRadius: 52.91 }} />
+      <div className="absolute" style={{ left: 138, top: 161, width: 9, height: 13, background: "#1d4ed8", borderRadius: 52.91 }} />
     </div>
   );
 }
@@ -35,15 +34,15 @@ function BannerCloudy() {
 function GreetingBanner({ name, unread = 0 }) {
   return (
     <div className="relative overflow-hidden" style={{ width: 342, height: 168, borderRadius: 22.674, background: "#7c3aed" }}>
-      <span className="absolute rounded-full" style={{ left: 263.35, top: 92.35, width: 4.25, height: 4.25, background: "#c7c3e0" }} />
-      <span className="absolute rounded-full" style={{ left: 295.47, top: 92.35, width: 4.25, height: 4.25, background: "#c7c3e0" }} />
-      <Link href="/notifications" aria-label="Notifications" className="absolute flex items-center justify-center rounded-full" style={{ left: 292.87, top: 18.9, width: 30.23, height: 30.23, background: "rgba(255,255,255,0.15)", zIndex: 3 }}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
-        {unread > 0 && <span className="absolute rounded-full" style={{ right: -1, top: -1, width: 8.5, height: 8.5, background: "#f472b6", border: "2px solid #7c3aed" }} />}
+      <BannerSwirl />
+      <span className="absolute rounded-full" style={{ left: 263, top: 92, width: 4, height: 4, background: "#7c3aed" }} />
+      <span className="absolute rounded-full" style={{ left: 295, top: 92, width: 4, height: 4, background: "#7c3aed" }} />
+      <Link href="/notifications" aria-label="Notifications" className="absolute flex items-center justify-center rounded-full" style={{ left: 293, top: 19, width: 30, height: 30, background: "#5b21b6", zIndex: 3 }}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+        {unread > 0 && <span className="absolute rounded-full" style={{ left: 20, top: -2, width: 9, height: 9, background: "#f04545" }} />}
       </Link>
-      <div className="absolute" style={{ left: 18.9, top: 85, width: 200, fontSize: 26.5, fontWeight: 900, color: "#fff", lineHeight: "34px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</div>
-      <div className="absolute" style={{ left: 18.9, top: 122.8, fontSize: 12, fontWeight: 700, color: "#c7c3e0" }}>Ready to find your next project?</div>
-      <BannerCloudy />
+      <div className="absolute" style={{ left: 19, top: 85, width: 240, fontSize: 26.45, fontWeight: 900, color: "#fff", lineHeight: "34px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", zIndex: 2 }}>{name}</div>
+      <div className="absolute" style={{ left: 19, top: 123, fontSize: 12, fontWeight: 700, color: "#c7c3e0", zIndex: 2 }}>Ready to find your next project?</div>
     </div>
   );
 }
@@ -68,12 +67,14 @@ function EmptyRow() {
   return <div className="px-[30px] py-6 text-[14px] text-muted">No projects yet — create one from Discover.</div>;
 }
 
-export default function HomeView({ name = "there", projects = [], recentlyViewed = [], unread = 0, invites = 0 }) {
+export default function HomeView({ name = "there", projects = [], popular = [], recentlyViewed = [], unread = 0, invites = 0 }) {
   const [feed, setFeed] = useState("popular");
-  const latest = [...projects].reverse();
+  // `projects` arrives created_at DESC (Latest); `popular` is pre-sorted by
+  // join-request + save count server-side.
+  const shown = feed === "popular" ? (popular.length ? popular : projects) : projects;
 
   return (
-    <div className="bg-white pb-3">
+    <div className="font-nunito bg-white pb-3">
       <StatusBar />
 
       <div className="flex justify-center px-[30px]">
@@ -89,12 +90,17 @@ export default function HomeView({ name = "there", projects = [], recentlyViewed
         <ShortcutButton label="Requests" href="/applicants">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7.5V12l3 2" /></svg>
         </ShortcutButton>
-        {invites > 0 && (
+      </div>
+
+      {/* Not in the Figma frame (which has exactly two shortcuts) — kept as its own
+          row so the two designed buttons keep their 163px width. */}
+      {invites > 0 && (
+        <div className="mt-3 flex px-[30px]">
           <ShortcutButton label={`Invites (${invites})`} href="/invites">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16v12H4z" /><path d="m4 7 8 6 8-6" /></svg>
           </ShortcutButton>
-        )}
-      </div>
+        </div>
+      )}
 
       <h2 className="mt-4 px-[30px]" style={{ fontSize: 20, fontWeight: 800, color: "#434343" }}>Recently viewed</h2>
       {recentlyViewed.length === 0 ? (
@@ -102,7 +108,7 @@ export default function HomeView({ name = "there", projects = [], recentlyViewed
       ) : (
         <div className="mt-[18px] flex gap-[14px] overflow-x-auto px-[30px] pb-2">
           {recentlyViewed.map((p) => (
-            <HomeProjectCard key={p.id} {...p} members={["JK"]} join="purple" />
+            <HomeProjectCard key={p.id} {...p} />
           ))}
         </div>
       )}
@@ -119,8 +125,8 @@ export default function HomeView({ name = "there", projects = [], recentlyViewed
         <EmptyRow />
       ) : (
         <div className="mt-[23px] flex gap-[14px] overflow-x-auto px-[30px] pb-2">
-          {(feed === "popular" ? projects : latest).map((p) => (
-            <HomeProjectCard key={p.id} {...p} members={["JK"]} join="green" />
+          {shown.map((p) => (
+            <HomeProjectCard key={p.id} {...p} />
           ))}
         </div>
       )}
