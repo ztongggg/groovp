@@ -61,6 +61,9 @@ async function getProfile() {
       pastProjects,
       linkedinVerified: !!p?.linkedin_verified,
       githubVerified: !!p?.github_verified,
+      linkedinUrl: p?.linkedin_url || "",
+      githubUrl: p?.github_url || "",
+      portfolioUrl: p?.portfolio_url || "",
     };
   } catch {
     return fallback;

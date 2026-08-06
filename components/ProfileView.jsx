@@ -57,7 +57,24 @@ function SkillsCard({ skills }) {
   );
 }
 
-export default function ProfileView({ userId, name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [], pastProjects = [], linkedinVerified = false, githubVerified = false }) {
+function LinkRow({ icon, iconBg, label, url, verified }) {
+  if (!url) return null;
+  const display = url.replace(/^https?:\/\//, "");
+  return (
+    <a href={url.startsWith("http") ? url : `https://${url}`} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-2xl border border-[#ede9fe] bg-white p-4">
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white" style={{ background: iconBg }}>{icon}</span>
+        <div className="min-w-0">
+          <p className="text-[13px] font-bold text-navy">{label}</p>
+          <p className="truncate text-[12.5px] text-purple-600" style={{ maxWidth: 200 }}>{display}</p>
+        </div>
+      </div>
+      {verified && <span className="shrink-0 text-[11px] font-bold text-[#298c52]">✓ Verified</span>}
+    </a>
+  );
+}
+
+export default function ProfileView({ userId, name, username, subtitle, ratingLabel, ratingCount, personality = {}, skills = [], interests = [], pastProjects = [], linkedinVerified = false, githubVerified = false, linkedinUrl = "", githubUrl = "", portfolioUrl = "" }) {
   const [tab, setTab] = useState("about");
 
   return (
@@ -76,20 +93,15 @@ export default function ProfileView({ userId, name, username, subtitle, ratingLa
             <span className="absolute rounded-full bg-white" style={{ bottom: "30%", left: "50%", transform: "translateX(-50%)", width: 28, height: 8 }} />
           </div>
           <div className="pb-2">
-            <h1 className="flex items-center gap-1.5 text-[26px] font-extrabold leading-tight text-navy">
-              {name}
-              {linkedinVerified && (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0a66c2" aria-label="LinkedIn verified"><title>LinkedIn verified</title><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z" /></svg>
-              )}
-              {githubVerified && (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1f2328" aria-label="GitHub verified"><title>GitHub verified</title><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.4-1.27.74-1.56-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.28 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z" /></svg>
-              )}
-            </h1>
+            <h1 className="text-[26px] font-extrabold leading-tight text-navy">{name}</h1>
             <p className="text-[15px] text-muted">@{username}</p>
           </div>
         </div>
 
-        <p className="mt-3 text-[15px] text-muted">{subtitle}</p>
+        <div className="mt-3 flex items-center justify-between">
+          <p className="text-[15px] text-muted">{subtitle}</p>
+          <Link href="/edit-profile" className="shrink-0 rounded-full px-4 py-2 text-[12.5px] font-bold text-purple-600" style={{ background: "#f0eef5" }}>Edit Profile</Link>
+        </div>
         <Link href={`/ratings/${userId}`} className="mt-1 flex items-center gap-2">
           <StarIcon />
           <span className="text-[20px] font-extrabold text-navy">{ratingLabel}</span>
@@ -115,6 +127,14 @@ export default function ProfileView({ userId, name, username, subtitle, ratingLa
                 <StatCard icon={<PinIcon />} tint="#fbebcf" label="Location" value={personality.location} />
               </div>
             </div>
+
+            {(linkedinUrl || githubUrl || portfolioUrl) && (
+              <div className="flex flex-col gap-2.5">
+                <LinkRow icon="in" iconBg="#0a66c2" label="LinkedIn" url={linkedinUrl} verified={linkedinVerified} />
+                <LinkRow icon="◘" iconBg="#1f2328" label="GitHub" url={githubUrl} verified={githubVerified} />
+                <LinkRow icon="🌐" iconBg="#7c3aed" label="Portfolio Website" url={portfolioUrl} />
+              </div>
+            )}
 
             <SkillsCard skills={skills} />
             <TagCard label="Interests" tags={interests} />
