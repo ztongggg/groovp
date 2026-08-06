@@ -10,7 +10,7 @@ async function getData(id) {
     if (!pp) return null;
 
     const { data: owner } = await supabase.from("profiles").select("full_name, username").eq("id", pp.user_id).single();
-    const { data: project } = pp.project_id ? await supabase.from("projects").select("id, name").eq("id", pp.project_id).single() : { data: null };
+    const { data: project } = pp.project_id ? await supabase.from("projects").select("id, name, timeline_start, timeline_end").eq("id", pp.project_id).single() : { data: null };
 
     return { ...pp, ownerName: owner?.full_name || owner?.username || "Someone", project };
   } catch {
@@ -32,39 +32,55 @@ export default async function PastProjectDetailPage({ params }) {
     );
   }
 
+  const ongoing = pp.project?.timeline_end ? new Date(pp.project.timeline_end) > new Date() : !pp.project?.timeline_end;
+  const dateRange = pp.project?.timeline_start
+    ? `${new Date(pp.project.timeline_start).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} — ${pp.project.timeline_end ? new Date(pp.project.timeline_end).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "Present"}`
+    : null;
+
   return (
     <AppShell>
       <div className="min-h-full bg-white pb-8">
-        <StatusBar />
-        <div className="flex items-center gap-3 px-6">
-          <Link href="/profile" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d1b44" }}>Past Project</h1>
+        <div className="relative flex flex-col justify-between px-6 pb-4 pt-14" style={{ height: 180, background: "linear-gradient(135deg,#4ac7b2,#2d6b5f)" }}>
+          <Link href="/profile" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "rgba(255,255,255,0.9)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold text-navy" style={{ background: "rgba(255,255,255,0.9)" }}>
+            {ongoing ? "In progress" : "✓ Completed"}
+          </span>
         </div>
 
         <div className="mt-5 px-6">
-          <p className="text-[20px] font-extrabold text-navy">{pp.role || "Untitled project"}</p>
-          <p className="mt-1 text-[13px] text-muted">{pp.ownerName}</p>
+          <p className="text-[20px] font-extrabold text-navy">{pp.project?.name || "Untitled project"}</p>
+          {pp.role && <p className="mt-0.5 text-[14px] font-semibold text-purple-600">{pp.role}</p>}
 
-          {pp.project && (
-            <Link href={`/project/${pp.project.id}`} className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold text-purple-600" style={{ background: "#f5f0ff" }}>
-              Part of {pp.project.name} ›
-            </Link>
+          {dateRange && (
+            <div className="mt-4">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Timeline</p>
+              <p className="mt-1 text-[14px] font-semibold text-navy">{dateRange}</p>
+            </div>
           )}
 
           {pp.write_up && (
-            <div className="mt-5 rounded-2xl bg-[#f9f7ff] p-4">
-              <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-muted">About</p>
-              <p className="text-[14px] leading-relaxed text-navy">{pp.write_up}</p>
+            <div className="mt-4">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Write-up</p>
+              <p className="mt-1 text-[14px] leading-relaxed text-navy">{pp.write_up}</p>
             </div>
           )}
 
           {pp.photos?.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {pp.photos.map((url) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={url} src={url} alt="" className="h-24 w-24 rounded-2xl object-cover" />
-              ))}
+            <div className="mt-4">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted">Photos</p>
+              <div className="flex flex-wrap gap-2">
+                {pp.photos.map((url) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={url} src={url} alt="" className="h-24 w-24 rounded-2xl object-cover" />
+                ))}
+              </div>
             </div>
+          )}
+
+          {pp.project && (
+            <Link href={`/project/${pp.project.id}`} className="mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold text-purple-600" style={{ background: "#f5f0ff" }}>
+              View full project ›
+            </Link>
           )}
         </div>
       </div>

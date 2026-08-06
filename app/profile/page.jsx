@@ -37,8 +37,14 @@ async function getProfile() {
 
     let pastProjects = [];
     try {
-      const { data: pp } = await supabase.from("past_projects").select("id, role, write_up, created_at").eq("user_id", user.id).order("created_at", { ascending: false });
-      pastProjects = pp || [];
+      const { data: pp } = await supabase.from("past_projects").select("id, role, write_up, created_at, project_id").eq("user_id", user.id).order("created_at", { ascending: false });
+      const projIds = (pp || []).map((r) => r.project_id).filter(Boolean);
+      let projById = {};
+      if (projIds.length) {
+        const { data: projs } = await supabase.from("projects").select("id, name, timeline_start, timeline_end").in("id", projIds);
+        projById = Object.fromEntries((projs || []).map((p) => [p.id, p]));
+      }
+      pastProjects = (pp || []).map((r) => ({ ...r, project: r.project_id ? projById[r.project_id] : null }));
     } catch {}
 
     const subtitleParts = [p?.year, p?.major, p?.university || "SUTD"].filter(Boolean);

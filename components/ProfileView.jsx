@@ -149,15 +149,24 @@ export default function ProfileView({ userId, name, username, subtitle, ratingLa
             {pastProjects.length === 0 ? (
               <p className="py-8 text-center text-[14px] text-muted">No past projects yet.</p>
             ) : (
-              pastProjects.map((pp) => (
-                <Link key={pp.id} href={`/past-projects/${pp.id}`} className="flex items-center justify-between rounded-2xl border border-line bg-white p-4">
-                  <div className="min-w-0">
-                    <p className="truncate text-[15px] font-bold text-navy">{pp.role || "Untitled project"}</p>
-                    {pp.write_up && <p className="mt-1 truncate text-[13px] text-muted">{pp.write_up}</p>}
-                  </div>
-                  <span className="shrink-0 text-[16px] text-muted">›</span>
-                </Link>
-              ))
+              pastProjects.map((pp, i) => {
+                const ongoing = pp.project?.timeline_end ? new Date(pp.project.timeline_end) > new Date() : !pp.project?.timeline_end;
+                const bandColors = ["#4ac7b2", "#7c3aed", "#c4b5fd", "#f2a5bd"];
+                return (
+                  <Link key={pp.id} href={`/past-projects/${pp.id}`} className="block overflow-hidden rounded-2xl border border-line bg-white">
+                    <div style={{ height: 64, background: bandColors[i % bandColors.length] }} />
+                    <div className="p-4">
+                      <p className="text-[15px] font-bold text-navy">{pp.project?.name || "Untitled project"}</p>
+                      <p className="mt-0.5 text-[12.5px] font-semibold text-purple-600">{pp.role || "Contributor"} · {ongoing ? "Ongoing" : "Completed"}</p>
+                      {pp.write_up && <p className="mt-1.5 line-clamp-2 text-[13px] text-muted">{pp.write_up}</p>}
+                      <div className="mt-2 flex items-center justify-between">
+                        <p className="text-[11.5px] text-muted">{pp.project?.timeline_start ? new Date(pp.project.timeline_start).toLocaleDateString("en-GB") : ""}{pp.project?.timeline_start ? ` - ${pp.project.timeline_end ? new Date(pp.project.timeline_end).toLocaleDateString("en-GB") : "Present"}` : ""}</p>
+                        <span className="shrink-0 text-[12px] font-bold text-purple-600">View more ›</span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })
             )}
           </div>
         )}
