@@ -66,7 +66,7 @@ export default function HelpSupportPage() {
             </Row>
           </div>
 
-          <p className="mt-8 text-center text-[12px] text-muted">Groovp version 1.0.0</p>
+          <div className="mt-5 rounded-2xl bg-[#f3f1f8] px-4 py-4 text-center text-[12px] text-muted">Groovp version 1.0.0</div>
         </div>
       </div>
     </AppShell>

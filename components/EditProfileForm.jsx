@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { updateProfile } from "@/app/edit-profile/actions";
 import AvatarUpload from "@/components/AvatarUpload";
 
-const YEARS = ["Y1", "Y2", "Y3", "Y4", "Y5"];
+const YEARS = ["Y1", "Y2", "Y3", "Y4", "Other"];
 const SKILL_OPTIONS = ["Python", "React", "TypeScript", "JavaScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "C++", "TensorFlow", "AWS", "Docker", "Research", "Product", "Design", "Business"];
 const INTEREST_OPTIONS = [
   { name: "Sustainability", icon: "/interest-sustainability.svg" },
@@ -22,7 +22,7 @@ const INTEREST_OPTIONS = [
 const PERSONALITY = [
   { key: "personality", label: "Personality", options: ["Introvert", "Extrovert"] },
   { key: "prefer_working", label: "Prefer Working", options: ["Online", "Face-to-face"] },
-  { key: "best_work_time", label: "Best Work Time", options: ["In the morning", "At night"] },
+  { key: "best_work_time", label: "Best Work Time", options: ["In the day time", "At night"] },
 ];
 const LOCATIONS = ["North", "South", "East", "West", "On Campus", "Central"];
 const STEPS = ["Edit Profile", "Edit Skills", "Edit Interests", "Projects & Links"];

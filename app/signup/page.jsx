@@ -17,13 +17,18 @@ const INTEREST_OPTIONS = [
   { name: "AI & ML", icon: "/interest-aiml.svg" },
   { name: "Design", icon: "/interest-design.svg" },
 ];
-const YEARS = ["Y1", "Y2", "Y3", "Y4", "Y5"];
+const YEARS = ["Y1", "Y2", "Y3", "Y4", "Other"];
 const PERSONALITY = [
   { key: "personality", q: "Are you more...", options: ["Introvert", "Extrovert"] },
   { key: "prefer_working", q: "You prefer meeting...", options: ["Online", "Face-to-face"] },
-  { key: "best_work_time", q: "You do your best work...", options: ["In the morning", "At night"] },
+  { key: "best_work_time", q: "You do your best work...", options: ["In the day time", "At night"] },
 ];
 const LOCATIONS = ["North", "South", "East", "West", "On Campus", "Central"];
+// The signup HTML export folder for "Step 3 Personality" is a duplicate of
+// "Step 2 About Me" (same markup) — a Figma export mislabel, not a real
+// content change. Cross-checked against that screen's own PNG instead, which
+// shows the real "How do you work best?" step this code already renders,
+// confirming "In the day time" above is the one genuine copy fix from it.
 
 const STEPS = [
   { title: "Introduce yourself!", sub: "Let's start with the basics! This is how teammates will find you." },
@@ -66,6 +71,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [], linkedin_url: "", github_url: "", portfolio_url: "", pending_projects: [] });
   const [showLinks, setShowLinks] = useState(false);
+  const [skillQuery, setSkillQuery] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [addingProject, setAddingProject] = useState(false);
   const [newProject, setNewProject] = useState({ role: "", write_up: "" });
@@ -243,8 +249,12 @@ export default function SignupPage() {
         )}
         {step === 3 && (
           <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2.5 rounded-full" style={{ height: 50, background: "#f3f1f8", padding: "0 18px" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d1b44" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
+              <input value={skillQuery} onChange={(e) => setSkillQuery(e.target.value)} placeholder="Find more of your skills" className="flex-1 bg-transparent focus:outline-none" style={{ fontSize: 13, color: "#1d1b44" }} />
+            </div>
             <div className="flex flex-wrap gap-2.5">
-              {SKILL_OPTIONS.map((x) => <Chip key={x} active={hasSkill(x)} onClick={() => toggleSkill(x)}>{x}</Chip>)}
+              {SKILL_OPTIONS.filter((x) => x.toLowerCase().includes(skillQuery.trim().toLowerCase())).map((x) => <Chip key={x} active={hasSkill(x)} onClick={() => toggleSkill(x)}>{x}</Chip>)}
             </div>
             {d.skills.length > 0 && (
               <div className="flex flex-col gap-2">
@@ -272,9 +282,9 @@ export default function SignupPage() {
               const active = d.interests.includes(name);
               return (
                 <button key={name} type="button" onClick={() => toggle("interests", name)} className="flex flex-col items-center gap-2">
-                  <span className="flex items-center justify-center rounded-full" style={{ width: 72, height: 72, background: active ? "#7c3aed" : "#f3f1f8" }}>
+                  <span className="flex items-center justify-center rounded-full" style={{ width: 72, height: 72, background: active ? "#ECE8FC" : "#f3f1f8" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={icon} alt="" width={28} height={28} style={{ filter: active ? "brightness(0) invert(1)" : "none" }} />
+                    <img src={icon} alt="" width={28} height={28} />
                   </span>
                   <span className="text-center" style={{ fontSize: 11.5, fontWeight: active ? 600 : 400, color: active ? "#1d1b44" : "#757080" }}>{name}</span>
                 </button>

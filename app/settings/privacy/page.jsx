@@ -22,8 +22,8 @@ async function getPrefs() {
 
 // Scoped to the 2 concretely-specifiable, enforceable toggles from the Figma
 // Privacy screen. The 3-tier profile-visibility selector (Public/Teammates-only/
-// Private) it also showed is NOT built — no spec guidance on enforcement scope
-// (which queries/surfaces would need to filter by it), see HANDOFF.
+// Private) it also shows was owner-decided CLOSED on 2026-08-07 — not building
+// it, not deferred, see HANDOFF.
 export default async function PrivacyPage() {
   const prefs = await getPrefs();
 
