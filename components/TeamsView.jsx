@@ -80,7 +80,7 @@ function TeamRow({ color, title, subtitle, href, photoUrl, time, unread = 0, end
   );
 }
 
-export default function TeamsView({ requests = [], teams = [] }) {
+export default function TeamsView({ requests = [], teams = [], wrapUps = [] }) {
   const [tab, setTab] = useState("my");
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -94,6 +94,21 @@ export default function TeamsView({ requests = [], teams = [] }) {
   const total = tab === "requested" ? requests.length : teams.length;
 
   return (
+    <>
+      {/* Leader-facing nudge: a project's timeline ended but nobody hit "End
+          Project" yet, so its ratings — the app's whole "evaluate teammates"
+          point — never get collected. Passive (no cron/infra), just surfaces
+          at read-time whenever a leader opens Teams. */}
+      {wrapUps.length > 0 && (
+        <div className="mx-auto flex w-[402px] flex-col gap-2 px-6 pt-4">
+          {wrapUps.map((w) => (
+            <Link key={w.groupId} href={`/groups/${w.groupId}/end`} className="flex items-center justify-between rounded-2xl px-4 py-3" style={{ background: "#FFF4E5", border: "1px solid #FFD79A" }}>
+              <span style={{ fontSize: 12.5, fontWeight: 600, color: "#1D1B44" }}>&ldquo;{w.title}&rdquo; timeline&apos;s up — wrap up &amp; rate your team</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#B45309" }}>›</span>
+            </Link>
+          ))}
+        </div>
+      )}
     <div className="relative w-[402px] pb-6" style={{ minHeight: 794, background: "#f9f8fb" }}>
       {/* Search is its own screen state in Figma: the title and tabs give way to
           a back button, an inline field, and a result count. */}
@@ -180,5 +195,6 @@ export default function TeamsView({ requests = [], teams = [] }) {
         )}
       </div>
     </div>
+    </>
   );
 }

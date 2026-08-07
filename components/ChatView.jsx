@@ -39,6 +39,7 @@ export default function ChatView({
   meId,
   messages = [],
   backHref = "/teams",
+  archived = false,
 }) {
   const router = useRouter();
   const [text, setText] = useState("");
@@ -86,6 +87,15 @@ export default function ChatView({
 
         {infoHref ? <Link href={infoHref} style={{ minWidth: 0, flex: 1 }}>{titleBlock}</Link> : <div style={{ minWidth: 0, flex: 1 }}>{titleBlock}</div>}
       </div>
+
+      {/* The project itself was archived (soft-deleted by its owner) — the
+          chat, group, and members deliberately survive that (see
+          deleteProject's comment), but nothing told anyone still in here. */}
+      {archived && (
+        <div style={{ background: "#FFF4E5", borderBottom: "1px solid #FFD79A", padding: "10px 24px", fontSize: 12, fontWeight: 600, color: "#92400E", textAlign: "center" }}>
+          This project has been archived by its owner. This conversation stays open, but the project is no longer active.
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex flex-1 flex-col overflow-y-auto" style={{ padding: "28px 24px", gap: 18 }}>

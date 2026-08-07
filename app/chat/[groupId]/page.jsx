@@ -10,7 +10,7 @@ async function getData(groupId) {
 
     const { data: g } = await supabase
       .from("groups")
-      .select("name, projects(name)")
+      .select("name, projects(name, status)")
       .eq("id", groupId)
       .single();
 
@@ -46,6 +46,7 @@ async function getData(groupId) {
       subtitle: [memberCount ? `${memberCount} member${memberCount === 1 ? "" : "s"}` : null, g?.projects?.name].filter(Boolean).join(" · "),
       meId: user?.id || null,
       avatars: memberIds.slice(0, 3).map((id) => ({ url: profById[id]?.avatar_url || "" })),
+      archived: g?.projects?.status === "Deleted",
       messages: (msgs || []).map((m) => ({
         id: m.id,
         body: m.body,
@@ -56,12 +57,12 @@ async function getData(groupId) {
       })),
     };
   } catch {
-    return { title: "Chat", subtitle: "", meId: null, messages: [], avatars: [] };
+    return { title: "Chat", subtitle: "", meId: null, messages: [], avatars: [], archived: false };
   }
 }
 
 export default async function ChatPage({ params }) {
-  const { title, subtitle, meId, messages, avatars } = await getData(params.groupId);
+  const { title, subtitle, meId, messages, avatars, archived } = await getData(params.groupId);
   return (
     <ChatView
       groupId={params.groupId}
@@ -71,6 +72,7 @@ export default async function ChatPage({ params }) {
       avatars={avatars}
       meId={meId}
       messages={messages}
+      archived={archived}
     />
   );
 }

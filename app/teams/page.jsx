@@ -51,8 +51,15 @@ async function getData() {
 
     const { data: mem } = await supabase
       .from("group_members")
-      .select("group_id, last_read_at, groups(id, name, photo_url, status, projects(name))")
+      .select("group_id, last_read_at, groups(id, name, photo_url, status, leader_id, projects(name, timeline_end))")
       .eq("user_id", user.id);
+
+    // Nudge: this user leads a group whose project timeline has passed but
+    // nobody has hit "End Project" yet, so ratings for it never get collected
+    // — the app's whole "evaluate teammates" point silently not happening.
+    const wrapUps = (mem || [])
+      .filter((m) => m.groups?.leader_id === user.id && m.groups?.status !== "Ended" && m.groups?.projects?.timeline_end && new Date(m.groups.projects.timeline_end) < new Date())
+      .map((m) => ({ groupId: m.groups.id, title: m.groups.projects?.name || m.groups.name }));
 
     // Last message + unread count per group. Fetched as one flat query and
     // folded in JS — nested embeds are unreliable on Vercel (see HANDOFF).
@@ -171,17 +178,17 @@ async function getData() {
     // Most recent conversation first, exactly as an inbox behaves.
     const inbox = [...teams, ...dms].sort((a, b) => (b.sortAt || "").localeCompare(a.sortAt || ""));
 
-    return { requests, teams: inbox };
+    return { requests, teams: inbox, wrapUps };
   } catch {
-    return { requests: [], teams: [] };
+    return { requests: [], teams: [], wrapUps: [] };
   }
 }
 
 export default async function TeamsPage() {
-  const { requests, teams } = await getData();
+  const { requests, teams, wrapUps } = await getData();
   return (
     <AppShell>
-      <TeamsView requests={requests} teams={teams} />
+      <TeamsView requests={requests} teams={teams} wrapUps={wrapUps} />
     </AppShell>
   );
 }
