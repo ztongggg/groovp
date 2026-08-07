@@ -106,8 +106,8 @@ export default function ProfileView({
               </div>
             )}
 
-            <SkillsCard skills={skills} editHref="/edit-profile?step=1" />
-            <InterestsCard interests={interests} editHref="/edit-profile?step=2" />
+            <SkillsCard skills={skills} editHref="/edit-profile/skills" />
+            <InterestsCard interests={interests} editHref="/edit-profile/interests" />
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
