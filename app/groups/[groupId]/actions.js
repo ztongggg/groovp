@@ -89,7 +89,7 @@ export async function searchInviteCandidates(groupId, query) {
 
   const { data: candidates } = await supabase
     .from("profiles")
-    .select("id, full_name, username, year, major, university")
+    .select("id, full_name, username, avatar_url, year, major, university")
     .or(`full_name.ilike.%${q}%,username.ilike.%${q}%`)
     .limit(20);
 

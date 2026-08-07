@@ -9,17 +9,18 @@ const COLORS = ["#4ac7b2", "#f29c38", "#b1b4ed", "#f2a5bd"];
 
 // Figma draws inbox avatars as a 50px tile with a face: rounded-square for a
 // group, circle for a person.
-function AvatarTile({ color, photoUrl, round, muted }) {
-  const radius = round ? 25 : 16;
+function AvatarTile({ color, photoUrl, round, muted, size = 50 }) {
+  const radius = round ? size / 2 : size === 50 ? 16 : 14;
   if (photoUrl) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={photoUrl} alt="" style={{ width: 50, height: 50, borderRadius: radius, objectFit: "cover" }} />;
+    return <img src={photoUrl} alt="" style={{ width: size, height: size, borderRadius: radius, objectFit: "cover" }} />;
   }
+  const k = size / 50;
   return (
-    <div className="relative" style={{ width: 50, height: 50, borderRadius: radius, background: muted ? "#bfbac7" : color }}>
-      <span className="absolute rounded-full" style={{ left: 9, top: 18, width: 7, height: 7, background: muted ? "#111827" : "#fff" }} />
-      <span className="absolute rounded-full" style={{ left: 34, top: 18, width: 7, height: 7, background: muted ? "#111827" : "#fff" }} />
-      <span className="absolute" style={{ left: 18, top: 28, width: 14, height: 3, borderRadius: 45.61, background: muted ? "#be185d" : "#fff" }} />
+    <div className="relative" style={{ width: size, height: size, borderRadius: radius, background: muted ? "#bfbac7" : color }}>
+      <span className="absolute rounded-full" style={{ left: 9 * k, top: 18 * k, width: 7 * k, height: 7 * k, background: muted ? "#111827" : "#fff" }} />
+      <span className="absolute rounded-full" style={{ left: 34 * k, top: 18 * k, width: 7 * k, height: 7 * k, background: muted ? "#111827" : "#fff" }} />
+      <span className="absolute" style={{ left: 18 * k, top: 28 * k, width: 14 * k, height: 3 * k, borderRadius: 45.61, background: muted ? "#be185d" : "#fff" }} />
     </div>
   );
 }
@@ -42,15 +43,15 @@ const ROW_STYLE = {
 function RequestRow({ color, title, subtitle, applied, status, photoUrl }) {
   const s = STATUS[status] || STATUS.pending;
   return (
-    <div className="relative" style={ROW_STYLE}>
-      <div className="absolute" style={{ left: 13, top: 13 }}>
-        <AvatarTile color={color} photoUrl={photoUrl} />
+    <div className="relative" style={{ ...ROW_STYLE, height: 92 }}>
+      <div className="absolute" style={{ left: 16, top: 22 }}>
+        <AvatarTile color={color} photoUrl={photoUrl} size={48} />
       </div>
-      <div className="absolute truncate" style={{ left: 74, top: 14, width: 165, fontSize: 14, fontWeight: 700, color: "#1d1b44" }}>{title}</div>
-      <div className="absolute truncate" style={{ left: 74, top: 34, width: 200, fontSize: 11.5, fontWeight: 400, color: "#757080" }}>{subtitle}</div>
-      <div className="absolute" style={{ left: 74, top: 52, fontSize: 10.5, fontWeight: 400, color: "#757080" }}>{applied}</div>
-      <div className="absolute flex items-center" style={{ right: 14, top: 15, height: 22, padding: "0 12px", borderRadius: 11, background: s.bg }}>
-        <span style={{ fontSize: 10.5, fontWeight: 600, color: s.color }}>{s.label}</span>
+      <div className="absolute truncate" style={{ left: 76, top: 16, width: 180, fontSize: 13.5, fontWeight: 700, color: "#1d1b44" }}>{title}</div>
+      <div className="absolute truncate" style={{ left: 76, top: 36, width: 180, fontSize: 11, fontWeight: 400, color: "#757080" }}>{subtitle}</div>
+      <div className="absolute" style={{ left: 76, top: 56, fontSize: 10, fontWeight: 400, color: "#757080" }}>{applied}</div>
+      <div className="absolute flex items-center justify-center" style={{ right: 18, top: 33, height: 26, minWidth: 73, padding: "0 15px", borderRadius: 13, background: s.bg }}>
+        <span style={{ fontSize: 11, fontWeight: 600, color: s.color }}>{s.label}</span>
       </div>
     </div>
   );
@@ -94,42 +95,65 @@ export default function TeamsView({ requests = [], teams = [] }) {
 
   return (
     <div className="relative w-[402px] pb-6" style={{ minHeight: 794, background: "#f9f8fb" }}>
-      <div className="absolute" style={{ left: 24, top: 48, fontSize: 26, fontWeight: 800, color: "#1d1b44" }}>Messages</div>
+      {/* Search is its own screen state in Figma: the title and tabs give way to
+          a back button, an inline field, and a result count. */}
+      {searchOpen ? (
+        <>
+          <button
+            onClick={() => { setSearchOpen(false); setQ(""); }}
+            aria-label="Close search"
+            className="absolute flex items-center justify-center"
+            style={{ left: 24, top: 48, width: 40, height: 40, borderRadius: 20, background: "#fff" }}
+          >
+            <span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span>
+          </button>
+          <div className="absolute flex items-center" style={{ left: 80, top: 48, width: 310, height: 44, borderRadius: 22, background: "#f3f1f8", paddingLeft: 14 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d1b44" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
+            {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+            <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search messages" className="ml-2 w-full bg-transparent focus:outline-none" style={{ fontSize: 13, fontWeight: 600, color: "#1d1b44" }} />
+          </div>
+          <div className="absolute" style={{ left: 24, top: 112, fontSize: 12, fontWeight: 600, color: "#757080" }}>
+            {list.length} result{list.length === 1 ? "" : "s"}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="absolute" style={{ left: 24, top: 48, fontSize: 26, fontWeight: 800, color: "#1d1b44" }}>Messages</div>
 
-      <button
-        onClick={() => { setSearchOpen((v) => !v); if (searchOpen) setQ(""); }}
-        aria-label="Search messages"
-        className="absolute flex items-center justify-center"
-        style={{ left: 334, top: 44, width: 44, height: 44, borderRadius: 22, background: "#f3f1f8" }}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e1e1e" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
-      </button>
+          <button
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search messages"
+            className="absolute flex items-center justify-center"
+            style={{ left: 334, top: 44, width: 44, height: 44, borderRadius: 22, background: "#f3f1f8" }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e1e1e" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
+          </button>
 
-      <button onClick={() => setTab("my")} className="absolute flex items-center justify-center" style={{ left: 24, top: 100, width: 82, height: 36, borderRadius: 18, background: tab === "my" ? "#7c3aed" : "#f3f1f8" }}>
-        <span style={{ fontSize: 12.5, fontWeight: 600, color: tab === "my" ? "#fff" : "#1d1b44" }}>My Teams</span>
-      </button>
-      <button onClick={() => setTab("requested")} className="absolute flex items-center justify-center" style={{ left: 114, top: 100, width: 89, height: 36, borderRadius: 18, background: tab === "requested" ? "#7c3aed" : "#f3f1f8" }}>
-        <span style={{ fontSize: 12.5, fontWeight: 600, color: tab === "requested" ? "#fff" : "#1d1b44" }}>Requested</span>
-      </button>
-
-      {searchOpen && (
-        <div className="absolute flex items-center" style={{ left: 24, top: 146, width: 354, height: 40, borderRadius: 14, background: "#f0eef5", paddingLeft: 14 }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#757080" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
-          {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
-          <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" className="ml-2.5 w-full bg-transparent text-[13px] text-navy focus:outline-none" />
-        </div>
+          <button onClick={() => setTab("my")} className="absolute flex items-center justify-center" style={{ left: 24, top: 100, width: 82, height: 36, borderRadius: 18, background: tab === "my" ? "#7c3aed" : "#f3f1f8" }}>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: tab === "my" ? "#fff" : "#1d1b44" }}>My Teams</span>
+          </button>
+          <button onClick={() => setTab("requested")} className="absolute flex items-center justify-center" style={{ left: 114, top: 100, width: 89, height: 36, borderRadius: 18, background: tab === "requested" ? "#7c3aed" : "#f3f1f8" }}>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: tab === "requested" ? "#fff" : "#1d1b44" }}>Requested</span>
+          </button>
+        </>
       )}
 
-      <div className="absolute flex flex-col" style={{ left: 24, top: searchOpen ? 198 : 150, gap: ROW_GAP }}>
+      <div className="absolute flex flex-col" style={{ left: 24, top: searchOpen ? 140 : 150, gap: tab === "requested" ? 16 : ROW_GAP }}>
         {total === 0 ? (
           tab === "requested" ? (
             <div style={{ fontSize: 13, color: "#757080" }}>No requests yet. Request to join a project from Discover.</div>
           ) : (
-            <div className="flex w-[354px] flex-col items-center px-8 text-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/empty-teams.png" alt="" className="mb-4 h-40 w-40" />
-              <p className="text-[16px] font-semibold text-navy">You&apos;re not on a team yet</p>
-              <p className="mt-1 text-[14px] text-muted">Browse Discover to find a project, or start your own.</p>
+            <div className="flex w-[354px] flex-col items-center text-center" style={{ marginTop: 60 }}>
+              <div className="relative" style={{ width: 300, height: 300 }}>
+                <div className="absolute" style={{ background: "#2ED573", left: 40.6, top: 148.2, width: 167.7, height: 68.8 }} />
+                <div className="absolute" style={{ background: "#2ED573", left: 118.2, top: 45.9, width: 105.9, height: 171.2 }} />
+                <div className="absolute rounded-full" style={{ background: "#0B2A5B", left: 135.9, top: 98.8, width: 15.9, height: 15.9 }} />
+                <div className="absolute rounded-full" style={{ background: "#0B2A5B", left: 190.6, top: 98.8, width: 15.9, height: 15.9 }} />
+                <div className="absolute rounded-full" style={{ background: "#115E59", left: 157.1, top: 123.5, width: 30, height: 7.1 }} />
+              </div>
+              <p style={{ marginTop: 16, fontSize: 19, fontWeight: 800, color: "#1d1b44" }}>You&apos;re not on a team yet</p>
+              <p style={{ marginTop: 10, fontSize: 12.5, color: "#757080", lineHeight: "18px" }}>Browse Discover to find a project,<br />or start your own and invite people to join.</p>
+              <Link href="/discover" style={{ marginTop: 34, width: 240, height: 50, borderRadius: 25, background: "linear-gradient(90deg, #7C3AED 0%, #6D28D9 100%)", boxShadow: "0px 6px 18px rgba(124,58,237,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 600, color: "#fff" }}>Browse Discover</Link>
             </div>
           )
         ) : list.length === 0 ? (

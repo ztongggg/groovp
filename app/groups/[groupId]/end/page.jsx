@@ -12,11 +12,16 @@ async function getData(groupId) {
     const { data: g } = await supabase.from("groups").select("id, name, leader_id, project_id, status").eq("id", groupId).single();
     if (!g || g.leader_id !== user.id) return null;
 
-    const { data: members } = await supabase.from("group_members").select("user_id, profiles(full_name, username)").eq("group_id", groupId).neq("user_id", user.id);
+    const { data: members } = await supabase.from("group_members").select("user_id, role, profiles(full_name, username, avatar_url)").eq("group_id", groupId).neq("user_id", user.id);
 
     return {
       group: g,
-      members: (members || []).map((m) => ({ userId: m.user_id, name: m.profiles?.full_name || m.profiles?.username || "Someone" })),
+      members: (members || []).map((m) => ({
+        userId: m.user_id,
+        role: m.role,
+        name: m.profiles?.full_name || m.profiles?.username || "Someone",
+        avatarUrl: m.profiles?.avatar_url || "",
+      })),
     };
   } catch {
     return null;

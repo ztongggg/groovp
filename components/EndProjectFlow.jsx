@@ -70,32 +70,40 @@ export default function EndProjectFlow({ groupId, groupName, groupStatus, projec
     setAdded(true);
   }
 
+  // End Project Confirmation is a centred modal over a dimmed screen, not a page.
   if (step === "confirm") {
     return (
-      <div className="mt-16 flex flex-col items-center px-8 text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#d44d52" }}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z" /></svg>
-        </span>
-        <p className="mt-4 text-[20px] font-extrabold text-navy">End this project?</p>
-        <p className="mt-2 text-[14px] text-muted">This will close the Group chat {groupName ? `"${groupName}"` : ""}. Members will be prompted to rate each other, and the group chat will be archived.</p>
-        {error && <p className="mt-3 text-[13px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
-        <button onClick={onConfirmEnd} disabled={ending} className="mt-6 w-full rounded-2xl py-3.5 text-[15px] font-bold" style={{ background: "#fae0e0", color: "#bf4247" }}>
-          {ending ? "Ending…" : "Yes, End Project"}
-        </button>
-        <button onClick={() => router.back()} className="mt-2 w-full rounded-2xl py-3.5 text-[15px] font-bold text-navy" style={{ background: "#f3f1f8" }}>Cancel</button>
+      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.40)" }}>
+        <div style={{ width: 354, background: "#fff", borderRadius: 24, boxShadow: "0px 8px 30px rgba(25,20,51,0.18)", padding: "28px 24px 24px", textAlign: "center" }}>
+          <span style={{ width: 64, height: 64, borderRadius: 9999, background: "#D44D52", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z" /></svg>
+          </span>
+          <p style={{ marginTop: 20, fontSize: 19, fontWeight: 800, color: "#1D1B44" }}>End this project?</p>
+          <p style={{ marginTop: 14, fontSize: 12, color: "#757080", lineHeight: "18px" }}>
+            This will close the Group chat<br />
+            {groupName && <span style={{ fontWeight: 700 }}>&ldquo;{groupName}&rdquo;.</span>}
+            {" "}Members will be prompted to rate each other, and the group chat will be archived.
+          </p>
+          {error && <p style={{ marginTop: 12, fontSize: 13, fontWeight: 500, color: "#bf4247" }}>{error}</p>}
+          <button onClick={onConfirmEnd} disabled={ending} style={{ marginTop: 24, width: "100%", height: 52, borderRadius: 26, background: "#FAE0E0", color: "#BF4247", fontSize: 13.5, fontWeight: 600 }}>
+            {ending ? "Ending…" : "Yes, End Project"}
+          </button>
+          <button onClick={() => router.back()} style={{ marginTop: 6, width: "100%", height: 48, borderRadius: 24, background: "#F3F1F8", color: "#1D1B44", fontSize: 13, fontWeight: 600 }}>Cancel</button>
+        </div>
       </div>
     );
   }
 
   if (step === "rate") {
     return (
-      <div className="mt-6 flex flex-col gap-4 px-6">
+      <div style={{ marginTop: 24, padding: "0 24px", display: "flex", flexDirection: "column", gap: 24 }}>
         <div>
-          <p className="text-[22px] font-extrabold text-navy">Rate your teammates</p>
-          <p className="mt-1 text-[13px] text-muted">{groupName ? `"${groupName}" has ended.` : "This project has ended."} Leave a rating for each teammate.</p>
+          <p style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Rate your teammates</p>
+          <p style={{ marginTop: 12, fontSize: 12.5, color: "#757080", lineHeight: "18px" }}>
+            {groupName ? `“${groupName}” has ended.` : "This project has ended."} Leave a rating for each teammate.
+          </p>
         </div>
         <RateTeammatesList members={members} projectId={projectId} onDone={() => setStep("addProject")} />
-        <button onClick={() => setStep("addProject")} className="w-full rounded-2xl py-3 text-[14px] font-semibold text-muted">Skip for now</button>
       </div>
     );
   }

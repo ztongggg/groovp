@@ -10,7 +10,36 @@ function fmtTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-export default function ChatView({ groupId, conversationId, title, subtitle, meId, messages = [], backHref = "/teams" }) {
+const FACE_COLOURS = ["#FBBF24", "#4AC7B2", "#F2A5BD", "#A78BFA", "#9496F4"];
+
+/** Circular face tile — the placeholder used everywhere a person has no photo. */
+function Face({ size, colour, url, ring = false, style = {} }) {
+  const s = { width: size, height: size, borderRadius: 9999, flexShrink: 0, ...(ring ? { border: "2px solid #fff" } : {}), ...style };
+  if (url) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={url} alt="" style={{ ...s, objectFit: "cover" }} />;
+  }
+  const eye = size * 0.1375;
+  return (
+    <span style={{ ...s, position: "relative", background: colour, display: "block" }}>
+      <span style={{ position: "absolute", left: size * 0.18, top: size * 0.39, width: eye, height: eye, borderRadius: 9999, background: "#fff" }} />
+      <span style={{ position: "absolute", left: size * 0.68, top: size * 0.39, width: eye, height: eye, borderRadius: 9999, background: "#fff" }} />
+      <span style={{ position: "absolute", left: size * 0.365, top: size * 0.59, width: size * 0.27, height: size * 0.068, borderRadius: 9999, background: "#fff" }} />
+    </span>
+  );
+}
+
+export default function ChatView({
+  groupId,
+  conversationId,
+  title,
+  subtitle,
+  infoHref,
+  avatars = [],
+  meId,
+  messages = [],
+  backHref = "/teams",
+}) {
   const router = useRouter();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -30,50 +59,67 @@ export default function ChatView({ groupId, conversationId, title, subtitle, meI
     router.refresh();
   }
 
+  const titleBlock = (
+    <div style={{ minWidth: 0 }}>
+      <p style={{ fontSize: 15, fontWeight: 700, color: "#1D1B44", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{title}</p>
+      {subtitle && <p style={{ fontSize: 10.5, color: "#757080", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subtitle}{infoHref ? " ›" : ""}</p>}
+    </div>
+  );
+
   return (
-    <div className="flex h-full w-[402px] flex-col bg-bgapp">
-      {/* header */}
-      <div className="flex items-center gap-3 border-b border-line bg-white px-5 py-4">
-        <Link href={backHref} className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
-        <div className="flex-1 min-w-0">
-          <p className="truncate text-[17px] font-bold text-navy">{title}</p>
-          {subtitle && <p className="truncate text-[11.5px] text-muted">{subtitle}</p>}
-        </div>
-        {groupId && (
-          <Link href={`/groups/${groupId}`} aria-label="Group info" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "#f3f1f8" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d1b44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" /></svg>
-          </Link>
+    <div className="flex h-full w-[402px] flex-col" style={{ background: "#F9F8FB" }}>
+      {/* Header. Group Info is reached by tapping the title block — the Figma
+          frame has no separate gear icon, the subtitle carries the chevron. */}
+      <div style={{ height: 100, background: "#fff", borderBottom: "1px solid #F3F1F8", display: "flex", alignItems: "center", gap: 11, padding: "48px 16px 12px 24px" }}>
+        <Link href={backHref} aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44", flexShrink: 0 }}>‹</Link>
+
+        {avatars.length > 0 && (
+          <span style={{ display: "flex", flexShrink: 0 }}>
+            {avatars.slice(0, 3).map((a, i) => (
+              <Face key={i} size={avatars.length === 1 ? 44 : 40} colour={a.colour || FACE_COLOURS[i % FACE_COLOURS.length]} url={a.url} ring={avatars.length > 1} style={i > 0 ? { marginLeft: -18 } : {}} />
+            ))}
+          </span>
         )}
+
+        {infoHref ? <Link href={infoHref} style={{ minWidth: 0, flex: 1 }}>{titleBlock}</Link> : <div style={{ minWidth: 0, flex: 1 }}>{titleBlock}</div>}
       </div>
 
-      {/* messages */}
-      <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-4">
+      {/* Messages */}
+      <div className="flex flex-1 flex-col overflow-y-auto" style={{ padding: "28px 24px", gap: 18 }}>
         {messages.length === 0 ? (
-          <div className="mt-16 flex flex-col items-center text-center">
-            <div className="relative" style={{ width: 180, height: 180 }}>
-              <div className="absolute rounded-full" style={{ background: "#f29c38", left: 40, top: 0, width: 100, height: 100 }} />
-              <div className="absolute" style={{ background: "#f29c38", left: 20, top: 70, width: 140, height: 90, borderTopLeftRadius: 60, borderTopRightRadius: 60 }} />
-              <div className="absolute rounded-full" style={{ background: "#111827", left: 68, top: 105, width: 14, height: 14 }} />
-              <div className="absolute rounded-full" style={{ background: "#111827", left: 98, top: 105, width: 14, height: 14 }} />
-              <div className="absolute" style={{ background: "#c2410c", left: 82, top: 125, width: 16, height: 9, borderRadius: 6 }} />
+          <div style={{ marginTop: 60, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+            <div style={{ position: "relative", width: 300, height: 300 }}>
+              <div style={{ position: "absolute", background: "#FFB800", left: 110.7, top: 147.5, width: 118, height: 88.5 }} />
+              <div style={{ position: "absolute", background: "#FFB800", left: 52.9, top: 79.9, width: 104.5, height: 104.5, borderRadius: 9999 }} />
+              <div style={{ position: "absolute", background: "#111827", left: 132.8, top: 191.8, width: 11.1, height: 20.9, borderRadius: 9999 }} />
+              <div style={{ position: "absolute", background: "#111827", left: 170.9, top: 191.8, width: 11.1, height: 20.9, borderRadius: 9999 }} />
+              <div style={{ position: "absolute", background: "#C2410C", left: 167.4, top: 219.2, width: 10, height: 21.9, borderRadius: 9999, transform: "rotate(90deg)" }} />
             </div>
-            <p className="mt-2 text-[16px] font-extrabold text-navy">Say hello!</p>
-            <p className="mt-1 text-[13px] text-muted">This is the start of your conversation.</p>
+            <p style={{ marginTop: 16, fontSize: 19, fontWeight: 800, color: "#1D1B44" }}>Say hello!</p>
+            <p style={{ marginTop: 10, fontSize: 12.5, color: "#757080" }}>This is the start of your conversation.</p>
           </div>
         ) : (
-          messages.map((m) => {
+          messages.map((m, i) => {
             const mine = m.sender_id === meId;
+            // Only label a run of messages once, the way the frame does.
+            const startsRun = i === 0 || messages[i - 1].sender_id !== m.sender_id;
+            if (mine) {
+              return (
+                <div key={m.id} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                  <div style={{ maxWidth: 260, background: "linear-gradient(90deg, #7C3AED 0%, #6D28D9 100%)", color: "#fff", fontSize: 12.5, lineHeight: "19px", padding: "13px 16px", borderRadius: 16, borderBottomRightRadius: 6 }}>{m.body}</div>
+                  <p suppressHydrationWarning style={{ marginTop: 6, fontSize: 10.5, color: "#757080" }}>{fmtTime(m.created_at)}</p>
+                </div>
+              );
+            }
             return (
-              <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                <div className="max-w-[75%]">
-                  {!mine && <p className="mb-0.5 pl-3 text-[11px] font-semibold text-muted">{m.name}</p>}
-                  <div
-                    className="rounded-2xl px-4 py-2.5 text-[14px]"
-                    style={mine ? { background: "#7c3aed", color: "#fff", borderBottomRightRadius: 6 } : { background: "#fff", color: "#1d1b44", border: "1px solid #f0edf5", borderBottomLeftRadius: 6 }}
-                  >
-                    {m.body}
+              <div key={m.id}>
+                {startsRun && m.name && <p style={{ marginLeft: 30, marginBottom: 6, fontSize: 10, fontWeight: 600, color: "#757080" }}>{m.name}</p>}
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 5 }}>
+                  <Face size={25} colour={FACE_COLOURS[(m.sender_id || "").charCodeAt(0) % FACE_COLOURS.length || 0]} url={m.avatarUrl} style={{ visibility: startsRun ? "visible" : "hidden" }} />
+                  <div>
+                    <div style={{ maxWidth: 260, background: "#F3F1F8", color: "#1D1B44", fontSize: 12.5, lineHeight: "19px", padding: "13px 16px", borderRadius: 16, borderBottomLeftRadius: 6 }}>{m.body}</div>
+                    <p suppressHydrationWarning style={{ marginTop: 6, fontSize: 10.5, color: "#757080" }}>{fmtTime(m.created_at)}</p>
                   </div>
-                  <p suppressHydrationWarning className={`mt-1 text-[10.5px] text-muted ${mine ? "text-right pr-1" : "pl-3"}`}>{fmtTime(m.created_at)}</p>
                 </div>
               </div>
             );
@@ -81,15 +127,15 @@ export default function ChatView({ groupId, conversationId, title, subtitle, meI
         )}
       </div>
 
-      {/* input */}
-      <form onSubmit={send} className="flex items-center gap-2 border-t border-line bg-white px-4 py-3">
+      {/* Composer */}
+      <form onSubmit={send} style={{ height: 90, background: "#fff", boxShadow: "0px -2px 12px rgba(25,20,51,0.06)", display: "flex", alignItems: "center", gap: 8, padding: "0 22px" }}>
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Type a message…"
-          className="flex-1 rounded-full bg-bgapp px-4 py-3 text-[14px] text-navy focus:outline-none"
+          placeholder="Type a message..."
+          style={{ flex: 1, height: 48, borderRadius: 24, background: "#F3F1F8", padding: "0 18px", fontSize: 12.5, color: "#1D1B44", outline: "none" }}
         />
-        <button type="submit" disabled={sending} className="flex h-11 w-11 items-center justify-center rounded-full" style={{ background: "#7c3aed" }}>
+        <button type="submit" disabled={sending} aria-label="Send" style={{ width: 48, height: 48, borderRadius: 24, background: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, opacity: sending ? 0.6 : 1 }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" /></svg>
         </button>
       </form>

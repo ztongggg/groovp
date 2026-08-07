@@ -14,14 +14,19 @@ async function getData(groupId) {
       .eq("id", groupId)
       .single();
 
-    const { count: memberCount } = await supabase
-      .from("group_members")
-      .select("user_id", { count: "exact", head: true })
-      .eq("group_id", groupId);
+    // Member avatars sit in the header as an overlapping stack.
+    const { data: members } = await supabase.from("group_members").select("user_id").eq("group_id", groupId);
+    const memberIds = (members || []).map((m) => m.user_id);
+    let profById = {};
+    if (memberIds.length) {
+      const { data: profs } = await supabase.from("profiles").select("id, full_name, username, avatar_url").in("id", memberIds);
+      profById = Object.fromEntries((profs || []).map((p) => [p.id, p]));
+    }
+    const memberCount = memberIds.length;
 
     const { data: msgs } = await supabase
       .from("messages")
-      .select("id, body, sender_id, created_at, profiles:sender_id(full_name, username)")
+      .select("id, body, sender_id, created_at, profiles:sender_id(full_name, username, avatar_url)")
       .eq("group_id", groupId)
       .order("created_at", { ascending: true });
 
@@ -40,20 +45,32 @@ async function getData(groupId) {
       title: g?.name || "Chat",
       subtitle: [memberCount ? `${memberCount} member${memberCount === 1 ? "" : "s"}` : null, g?.projects?.name].filter(Boolean).join(" · "),
       meId: user?.id || null,
+      avatars: memberIds.slice(0, 3).map((id) => ({ url: profById[id]?.avatar_url || "" })),
       messages: (msgs || []).map((m) => ({
         id: m.id,
         body: m.body,
         sender_id: m.sender_id,
         created_at: m.created_at,
         name: m.profiles?.full_name || m.profiles?.username || "User",
+        avatarUrl: m.profiles?.avatar_url || "",
       })),
     };
   } catch {
-    return { title: "Chat", subtitle: "", meId: null, messages: [] };
+    return { title: "Chat", subtitle: "", meId: null, messages: [], avatars: [] };
   }
 }
 
 export default async function ChatPage({ params }) {
-  const { title, subtitle, meId, messages } = await getData(params.groupId);
-  return <ChatView groupId={params.groupId} title={title} subtitle={subtitle} meId={meId} messages={messages} />;
+  const { title, subtitle, meId, messages, avatars } = await getData(params.groupId);
+  return (
+    <ChatView
+      groupId={params.groupId}
+      title={title}
+      subtitle={subtitle}
+      infoHref={`/groups/${params.groupId}`}
+      avatars={avatars}
+      meId={meId}
+      messages={messages}
+    />
+  );
 }

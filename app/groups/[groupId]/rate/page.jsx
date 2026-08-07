@@ -16,13 +16,18 @@ async function getData(groupId) {
     const { data: g } = await supabase.from("groups").select("id, name, project_id, status, projects(name)").eq("id", groupId).single();
     if (!g) return null;
 
-    const { data: members } = await supabase.from("group_members").select("user_id, profiles(full_name, username)").eq("group_id", groupId);
+    const { data: members } = await supabase.from("group_members").select("user_id, role, profiles(full_name, username, avatar_url)").eq("group_id", groupId);
     const wasMember = (members || []).some((m) => m.user_id === user.id);
     if (!wasMember) return null;
 
     return {
       group: g,
-      members: (members || []).filter((m) => m.user_id !== user.id).map((m) => ({ userId: m.user_id, name: m.profiles?.full_name || m.profiles?.username || "Someone" })),
+      members: (members || []).filter((m) => m.user_id !== user.id).map((m) => ({
+        userId: m.user_id,
+        role: m.role,
+        name: m.profiles?.full_name || m.profiles?.username || "Someone",
+        avatarUrl: m.profiles?.avatar_url || "",
+      })),
     };
   } catch {
     return null;
@@ -44,15 +49,17 @@ export default async function RateTeammatesPage({ params }) {
 
   return (
     <AppShell>
-      <div className="min-h-full bg-white pb-8">
+      <div className="min-h-full pb-8" style={{ background: "#F9F8FB" }}>
         <StatusBar />
-        <div className="flex items-center gap-3 px-6">
-          <Link href="/teams" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d1b44" }}>Rate Teammates</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
+          <Link href="/teams" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Rate your teammates</h1>
         </div>
-        <p className="mt-1 px-6 text-[13px] text-muted">{data.group.projects?.name || data.group.name}</p>
+        <p style={{ marginTop: 14, padding: "0 24px", fontSize: 12.5, color: "#757080", lineHeight: "18px" }}>
+          &ldquo;{data.group.projects?.name || data.group.name}&rdquo; has ended. Leave a rating for each teammate.
+        </p>
 
-        <div className="mt-5 px-6">
+        <div style={{ marginTop: 24, padding: "0 24px" }}>
           <RateTeammatesList members={data.members} projectId={data.group.project_id} />
         </div>
       </div>

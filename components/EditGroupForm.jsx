@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateGroupName, updateGroupPhoto, removeMember, transferLeadership, leaveGroup } from "@/app/groups/[groupId]/actions";
 import AvatarUpload from "@/components/AvatarUpload";
@@ -63,39 +62,37 @@ export default function EditGroupForm({ group, meId, isLeader, members }) {
   }
 
   return (
-    <div className="mt-5 flex flex-col gap-5 px-6">
-      <AvatarUpload url={photoUrl} onChange={onPhotoChange} />
+    <div style={{ marginTop: 26, padding: "0 24px", display: "flex", flexDirection: "column", gap: 24 }}>
+      <AvatarUpload url={photoUrl} onChange={onPhotoChange} caption="Change group photo" />
 
-      {/* group name */}
-      <div>
-        <p className="mb-2 text-[13px] font-bold uppercase tracking-wide text-muted">Group name</p>
-        <div className="flex items-center gap-2 rounded-2xl bg-[#f3f1f8] px-4 py-3">
-          <input value={name} onChange={(e) => setName(e.target.value)} onBlur={saveName} className="flex-1 bg-transparent text-[14px] font-semibold text-navy focus:outline-none" />
-          {savingName && <span className="text-[11px] text-muted">Saving…</span>}
-        </div>
+      {/* Group name — a single tappable row, not a labelled field. */}
+      <div style={{ height: 52, background: "#F3F1F8", borderRadius: 14, display: "flex", alignItems: "center", gap: 10, padding: "0 16px" }}>
+        <input value={name} onChange={(e) => setName(e.target.value)} onBlur={saveName} className="flex-1 bg-transparent focus:outline-none" style={{ fontSize: 14, fontWeight: 600, color: "#1D1B44" }} />
+        {savingName ? (
+          <span style={{ fontSize: 11, color: "#757080" }}>Saving…</span>
+        ) : (
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1D1B44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6" /><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z" /></svg>
+        )}
       </div>
 
-      {/* members */}
+      {/* Members */}
       <div>
-        <div className="mb-2 flex items-center justify-between">
-          <p className="text-[13px] font-bold text-navy">Members ({members.length}/{group.max_members || "–"})</p>
-          {isLeader && <Link href={`/groups/${group.id}/invite`} className="text-[12px] font-bold text-purple-600">+ Invite</Link>}
-        </div>
-        <div className="flex flex-col gap-2">
+        <p style={{ fontSize: 13, fontWeight: 700, color: "#1D1B44" }}>Members ({members.length}/{group.max_members || "–"})</p>
+        <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
           {members.map((m, i) => (
-            <div key={m.userId} className="relative flex items-center justify-between rounded-2xl bg-[#f3f1f8] px-4 py-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
-                  {(m.name || "?").slice(0, 2).toUpperCase()}
-                </span>
-                <div>
-                  <p className="text-[13px] font-semibold text-navy">{m.name}{m.userId === meId ? " (You)" : ""}</p>
-                  <p className="text-[11px] text-muted">{m.role === "leader" ? "Group Leader" : "Member"}</p>
-                </div>
+            <div key={m.userId} style={{ position: "relative", height: 60, background: "#F3F1F8", borderRadius: 14, display: "flex", alignItems: "center", gap: 12, padding: "0 8px" }}>
+              <span style={{ position: "relative", width: 44, height: 44, borderRadius: 9999, background: AVATAR[i % AVATAR.length], flexShrink: 0, display: "block" }}>
+                <span style={{ position: "absolute", left: 8, top: 17, width: 6, height: 6, borderRadius: 9999, background: "#fff" }} />
+                <span style={{ position: "absolute", left: 30, top: 17, width: 6, height: 6, borderRadius: 9999, background: "#fff" }} />
+                <span style={{ position: "absolute", left: 16, top: 26, width: 12, height: 3, borderRadius: 9999, background: "#fff" }} />
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>{m.name}{m.userId === meId ? " (You)" : ""}</p>
+                <p style={{ fontSize: 11, color: "#757080", marginTop: 3 }}>{m.role === "leader" ? "Group Leader" : "Member"}</p>
               </div>
               {isLeader && m.userId !== meId && (
                 <>
-                  <button type="button" onClick={() => setMenuFor(menuFor === m.userId ? null : m.userId)} className="px-2 text-[18px] font-bold text-muted">⋯</button>
+                  <button type="button" onClick={() => setMenuFor(menuFor === m.userId ? null : m.userId)} aria-label={`Options for ${m.name}`} style={{ padding: "0 8px", fontSize: 18, fontWeight: 700, color: "#757080" }}>⋯</button>
                   {menuFor === m.userId && (
                     <div className="absolute right-2 top-12 z-10 w-44 rounded-xl border border-line bg-white p-1.5 shadow-card">
                       <button type="button" disabled={busy} onClick={() => onTransfer(m.userId)} className="w-full rounded-lg px-3 py-2 text-left text-[13px] font-semibold text-navy hover:bg-[#f3f1f8]">Make leader</button>
@@ -111,16 +108,15 @@ export default function EditGroupForm({ group, meId, isLeader, members }) {
 
       {error && <p className="text-[13px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
 
-      {/* danger zone */}
-      <div className="mt-4 flex flex-col gap-3">
+      {/* Danger zone */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {isLeader && (
-          <button type="button" onClick={() => router.push(`/groups/${group.id}/end`)} className="w-full rounded-2xl py-3 text-[13px] font-semibold" style={{ background: "#fae0e0", color: "#bf4247" }}>End Project</button>
+          <button type="button" onClick={() => router.push(`/groups/${group.id}/end`)} style={{ height: 50, borderRadius: 14, background: "#FAE0E0", color: "#BF4247", fontSize: 13, fontWeight: 600 }}>End Project</button>
         )}
         <button
           type="button"
           onClick={() => setChoice(isLeader ? "transfer" : "confirmLeave")}
-          className="w-full rounded-2xl py-3 text-[13px] font-semibold"
-          style={{ background: "#fae0e0", color: "#bf4247" }}
+          style={{ height: 50, borderRadius: 14, background: "#FAE0E0", color: "#BF4247", fontSize: 13, fontWeight: 600 }}
         >
           Leave Group
         </button>

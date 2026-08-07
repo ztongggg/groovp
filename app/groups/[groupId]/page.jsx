@@ -4,7 +4,8 @@ import StatusBar from "@/components/StatusBar";
 import { createClient } from "@/lib/supabase/server";
 import LeaveGroupButton from "@/components/LeaveGroupButton";
 import JoinGroupButton from "@/components/JoinGroupButton";
-import { computeMatch } from "@/lib/matching";
+import GroupRequestRow from "@/components/GroupRequestRow";
+import { computeMatch, STRONG_MATCH_THRESHOLD } from "@/lib/matching";
 
 async function getData(groupId) {
   try {
@@ -18,16 +19,38 @@ async function getData(groupId) {
       .single();
     if (!g) return null;
 
-    const { data: members } = await supabase.from("group_members").select("user_id, role, profiles(full_name, username)").eq("group_id", groupId);
+    const { data: members } = await supabase.from("group_members").select("user_id, role, profiles(full_name, username, avatar_url)").eq("group_id", groupId);
 
-    let pendingCount = 0;
+    // Parent-project summary card.
+    const { data: project } = g.project_id
+      ? await supabase.from("projects").select("id, name, course_code, timeline_start, timeline_end").eq("id", g.project_id).single()
+      : { data: null };
+
     const isLeader = user && g.leader_id === user.id;
-    if (isLeader) {
-      const { count } = await supabase.from("join_requests").select("id", { count: "exact", head: true }).eq("group_id", groupId).eq("status", "pending");
-      pendingCount = count || 0;
-    }
-
     const isMember = user && (members || []).some((m) => m.user_id === user.id);
+
+    // Pending requests are listed inline for the leader, with Accept/Decline.
+    let requests = [];
+    if (isLeader) {
+      const { data: jrs } = await supabase.from("join_requests").select("id, user_id, created_at").eq("group_id", groupId).eq("status", "pending").order("created_at", { ascending: true });
+      const ids = (jrs || []).map((r) => r.user_id);
+      if (ids.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, full_name, username, avatar_url, year, major, skills, interests, personality, prefer_working, best_work_time, location").in("id", ids);
+        const byId = Object.fromEntries((profs || []).map((p) => [p.id, p]));
+        requests = (jrs || []).map((r) => {
+          const p = byId[r.user_id] || {};
+          const m = computeMatch(p, g);
+          return {
+            id: r.id,
+            userId: r.user_id,
+            name: p.full_name || p.username || "Someone",
+            avatarUrl: p.avatar_url || "",
+            subtitle: [p.year, p.major].filter(Boolean).join(" · ") || (p.username ? `@${p.username}` : ""),
+            strongMatch: m.overlapCount >= STRONG_MATCH_THRESHOLD,
+          };
+        });
+      }
+    }
 
     // Group Info - Request Others: a non-member viewer sees their own match
     // score against this group's wanted criteria (User↔Group direction).
@@ -39,15 +62,17 @@ async function getData(groupId) {
 
     return {
       group: g,
+      project,
       isLeader,
       isMember,
       match,
-      pendingCount,
+      requests,
       meId: user?.id || null,
       members: (members || []).map((m) => ({
         userId: m.user_id,
         role: m.role,
         name: m.profiles?.full_name || m.profiles?.username || "Someone",
+        avatarUrl: m.profiles?.avatar_url || "",
       })),
     };
   } catch {
@@ -55,11 +80,49 @@ async function getData(groupId) {
   }
 }
 
-const AVATAR = ["#e8863b", "#34b9a8", "#f2a5bd", "#7c3aed", "#4ac7b2"];
+const AVATAR = ["#FBBF24", "#F2A5BD", "#4AC7B2", "#A78BFA", "#FF8671"];
+const LABEL = { fontSize: 12, fontWeight: 700, color: "#757080" };
 
-// Read-only "Group Info" overview (Figma: Group Info - Recruiting On/Off) — every
-// member sees this; Edit Group / Recruiting Settings are leader-only actions reached
-// from here, not the entry point itself.
+function FaceTile({ url, colour, size = 44 }) {
+  if (url) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={url} alt="" style={{ width: size, height: size, borderRadius: 9999, objectFit: "cover", flexShrink: 0 }} />;
+  }
+  return (
+    <span style={{ position: "relative", width: size, height: size, borderRadius: 9999, background: colour, display: "block", flexShrink: 0 }}>
+      <span style={{ position: "absolute", left: 8, top: 17, width: 6, height: 6, borderRadius: 9999, background: "#fff" }} />
+      <span style={{ position: "absolute", left: 30, top: 17, width: 6, height: 6, borderRadius: 9999, background: "#fff" }} />
+      <span style={{ position: "absolute", left: 16, top: 26, width: 12, height: 3, borderRadius: 9999, background: "#fff" }} />
+    </span>
+  );
+}
+
+function WantedChips({ label, items = [], matched = [], labelColour }) {
+  if (!items.length) return null;
+  return (
+    <div style={{ marginTop: 18 }}>
+      <p style={{ fontSize: 9.5, fontWeight: 700, color: labelColour }}>{label}</p>
+      <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {items.map((s) => {
+          const hit = matched.some((m) => String(m).toLowerCase() === String(s).toLowerCase());
+          return (
+            <span key={s} style={{ height: 24, borderRadius: 12, background: "#fff", padding: "0 9px", display: "inline-flex", alignItems: "center", fontSize: 10, fontWeight: 600, color: hit ? "#298C52" : "#1D1B44", border: hit ? "1px solid #298C52" : "none" }}>{s}</span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function shortDate(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+}
+
+// Read-only Group Info (Figma: Recruiting On / Recruiting Off / Request Others).
+// Every member sees this; Edit Group and Recruiting Settings are leader-only
+// actions reached from here, not the entry point itself.
 export default async function GroupInfoPage({ params }) {
   const data = await getData(params.groupId);
 
@@ -71,140 +134,147 @@ export default async function GroupInfoPage({ params }) {
     );
   }
 
-  const { group, isLeader, isMember, match, pendingCount, meId, members } = data;
+  const { group, project, isLeader, isMember, match, requests, meId, members } = data;
   const recruiting = group.recruiting !== false && group.status !== "Ended";
+  const insider = isLeader || isMember;
+  const projectMeta = [project?.course_code, [shortDate(project?.timeline_start), shortDate(project?.timeline_end) || "Present"].filter(Boolean).join(" - ")].filter(Boolean).join(" · ");
 
   return (
     <AppShell>
-      <div className="min-h-full bg-white pb-8">
+      <div className="min-h-full bg-white pb-10">
         <StatusBar />
-        <div className="flex items-center justify-between px-6">
-          <Link href={isMember ? `/chat/${group.id}` : group.project_id ? `/project/${group.project_id}` : "/discover"} className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
+
+        <div style={{ position: "relative", height: 42 }}>
+          <Link
+            href={isMember ? `/chat/${group.id}` : group.project_id ? `/project/${group.project_id}` : "/discover"}
+            aria-label="Back"
+            style={{ position: "absolute", left: 24, top: 0, width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}
+          >‹</Link>
           {isLeader && (
-            <Link href={`/groups/${group.id}/edit`} aria-label="Edit group" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d1b44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /></svg>
+            <Link href={`/groups/${group.id}/edit`} aria-label="Edit group" style={{ position: "absolute", left: 338, top: -2, width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D1B44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6" /><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z" /></svg>
             </Link>
           )}
         </div>
 
-        <div className="mt-5 flex flex-col items-center px-6">
+        <div style={{ marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
           {group.photo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={group.photo_url} alt="" className="object-cover" style={{ width: 90, height: 90, borderRadius: 29 }} />
+            <img src={group.photo_url} alt="" style={{ width: 90, height: 90, borderRadius: 28.8, objectFit: "cover" }} />
           ) : (
-            <div style={{ width: 90, height: 90, borderRadius: 29, background: "#4ac7b2" }} />
+            <div style={{ position: "relative", width: 90, height: 90, borderRadius: 28.8, background: "#4AC7B2" }}>
+              <span style={{ position: "absolute", left: 16.2, top: 32.4, width: 12.3, height: 12.3, borderRadius: 9999, background: "#fff" }} />
+              <span style={{ position: "absolute", left: 61.2, top: 32.4, width: 12.3, height: 12.3, borderRadius: 9999, background: "#fff" }} />
+              <span style={{ position: "absolute", left: 32.6, top: 50.8, width: 24.6, height: 6.1, borderRadius: 9999, background: "#fff" }} />
+            </div>
           )}
-          <p className="mt-3 text-[19px] font-extrabold text-navy">{group.name}</p>
-          <p className="mt-1 text-[12.5px] font-semibold" style={{ color: recruiting ? "#298c52" : "#9ca3af" }}>
-            {group.status === "Ended" ? "Project ended" : recruiting ? "Open to join requests" : "Not recruiting"}
+          <p style={{ marginTop: 20, fontSize: 20, fontWeight: 800, color: "#1D1B44" }}>{group.name}</p>
+          <p style={{ marginTop: 8, fontSize: 12, color: "#757080" }}>
+            {group.status === "Ended" ? "Project ended" : `${members.length} member${members.length === 1 ? "" : "s"}`}
           </p>
         </div>
 
-        <div className="mt-6 px-6">
-          <p className="mb-2 text-[13px] font-bold uppercase tracking-wide text-muted">Members ({members.length}/{group.max_members || "–"})</p>
-          <div className="flex flex-col gap-2">
+        <div style={{ padding: "0 22px" }}>
+          {project && (
+            <>
+              <p style={{ ...LABEL, marginTop: 33 }}>Project</p>
+              <div style={{ marginTop: 10, background: "#F3F1F8", borderRadius: 16, padding: 16 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "#1D1B44" }}>{project.name}</p>
+                {projectMeta && <p style={{ marginTop: 8, fontSize: 11, color: "#59408C" }}>{projectMeta}</p>}
+                <Link href={`/project/${project.id}`} style={{ display: "inline-block", marginTop: 8, fontSize: 11.5, fontWeight: 600, color: "#6126CC" }}>View full project details ›</Link>
+              </div>
+            </>
+          )}
+
+          <p style={{ ...LABEL, marginTop: 22 }}>Members ({members.length}/{group.max_members || "–"})</p>
+          <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
             {members.map((m, i) => (
-              <Link key={m.userId} href={`/u/${m.userId}`} className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: "#f9f8fb" }}>
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
-                  {(m.name || "?").slice(0, 2).toUpperCase()}
-                </span>
-                <span>
-                  <p className="text-[14px] font-semibold text-navy">{m.name}{m.userId === meId ? " (You)" : ""}</p>
-                  <p className="text-[12px] text-muted">{m.role === "leader" ? "Group Leader" : "Member"}</p>
+              <Link key={m.userId} href={`/u/${m.userId}`} style={{ height: 60, background: "#F3F1F8", borderRadius: 14, display: "flex", alignItems: "center", gap: 12, padding: "0 8px" }}>
+                <FaceTile url={m.avatarUrl} colour={AVATAR[i % AVATAR.length]} />
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>{m.name}{m.userId === meId ? " (You)" : ""}</span>
+                  <span style={{ display: "block", fontSize: 11, color: "#757080", marginTop: 3 }}>{m.role === "leader" ? "Group Leader" : "Member"}</span>
                 </span>
               </Link>
             ))}
           </div>
-        </div>
 
-        {match && (
-          <div className="mt-6 px-6">
-            <div className="rounded-2xl p-4" style={{ background: match.isStrongMatch ? "#f5f0ff" : "#f9f8fb", border: match.isStrongMatch ? "1px solid #7c3aed" : "1px solid #eee" }}>
+          {isLeader && (
+            <Link href={`/groups/${group.id}/invite`} style={{ marginTop: 8, height: 48, background: "#F3F1F8", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>+ Invite members</Link>
+          )}
+
+          {isLeader && (
+            <>
+              <div style={{ marginTop: 25, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <p style={LABEL}>{recruiting ? "Join Requests" : "Request History"}</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: "#757080" }}>{requests.length} pending</p>
+              </div>
+              <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+                {requests.length === 0 ? (
+                  <p style={{ fontSize: 12, color: "#757080" }}>No one is waiting right now.</p>
+                ) : (
+                  requests.map((r, i) => <GroupRequestRow key={r.id} request={r} groupId={group.id} index={i} />)
+                )}
+              </div>
+              <Link href="/applicants" style={{ marginTop: 14, height: 44, background: "#F3F1F8", borderRadius: 22, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12.5, fontWeight: 600, color: "#1D1B44" }}>View all requests ›</Link>
+            </>
+          )}
+
+          {group.status !== "Ended" && (
+            <>
+              <p style={{ ...LABEL, marginTop: 25 }}>Recruiting</p>
+              <div style={{ marginTop: 10, background: recruiting && isLeader ? "#ECE8FC" : "#F3F1F8", borderRadius: 16, padding: 16 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: 13.5, fontWeight: 600, color: "#1D1B44" }}>Open to join requests</p>
+                    <p style={{ marginTop: 6, fontSize: 10.5, color: recruiting ? "#59408C" : "#757080" }}>
+                      {recruiting ? "Anyone can request to join this group" : "No one can request to join right now"}
+                    </p>
+                  </div>
+                  {isLeader && <Link href={`/recruiting/${group.id}`} style={{ flexShrink: 0, fontSize: 12, fontWeight: 600, color: "#7C3AED" }}>Manage ›</Link>}
+                </div>
+
+                {recruiting && group.additional_notes && (
+                  <div style={{ marginTop: 14, background: "#fff", borderRadius: 14, padding: "11px 16px" }}>
+                    <p className="font-nunito" style={{ fontSize: 13, fontWeight: 600, color: "#1E1B4B" }}>&ldquo;{group.additional_notes}&rdquo;</p>
+                  </div>
+                )}
+
+                {recruiting && (
+                  <>
+                    <WantedChips label="SKILLS WANTED" items={group.skills_wanted} matched={match?.matchedSkills || []} labelColour={insider ? "#6126CC" : "#757080"} />
+                    <WantedChips label="PERSONALITY WANTED" items={group.personality_wanted} matched={match?.matchedPersonality || []} labelColour={insider ? "#6126CC" : "#757080"} />
+                    <WantedChips label="INTERESTS WANTED" items={group.interests_wanted} matched={match?.matchedInterests || []} labelColour={insider ? "#6126CC" : "#757080"} />
+                  </>
+                )}
+              </div>
+            </>
+          )}
+
+          {match && (
+            <div style={{ marginTop: 16, borderRadius: 16, padding: 14, background: match.isStrongMatch ? "#F5F0FF" : "#F9F8FB", border: match.isStrongMatch ? "1px solid #7C3AED" : "1px solid #EDE9FE" }}>
               {match.isStrongMatch ? (
-                <p className="text-[13.5px] font-bold text-purple-600">✨ Strong Match — you overlap on {match.overlapCount} thing{match.overlapCount === 1 ? "" : "s"} they're looking for.</p>
+                <p style={{ fontSize: 12.5, fontWeight: 700, color: "#7C3AED" }}>✨ Strong Match — you overlap on {match.overlapCount} thing{match.overlapCount === 1 ? "" : "s"} they&apos;re looking for.</p>
               ) : match.overlapCount > 0 ? (
-                <p className="text-[13.5px] font-semibold text-navy">You share {match.overlapCount} thing{match.overlapCount === 1 ? "" : "s"} with what this group wants — matching items are highlighted below.</p>
+                <p style={{ fontSize: 12.5, fontWeight: 600, color: "#1D1B44" }}>You share {match.overlapCount} thing{match.overlapCount === 1 ? "" : "s"} with what this group wants — matching items are highlighted above.</p>
               ) : (
-                <p className="text-[13.5px] text-muted">No overlap yet with what this group is looking for — you can still request to join.</p>
+                <p style={{ fontSize: 12.5, color: "#757080" }}>No overlap yet with what this group is looking for — you can still request to join.</p>
               )}
             </div>
-          </div>
-        )}
+          )}
 
-        {group.status !== "Ended" && (
-          <div className="mt-6 flex flex-col gap-4 px-6">
-            <div className="flex items-center justify-between rounded-2xl p-4" style={{ background: recruiting ? "#f5f0ff" : "#f9f8fb" }}>
-              <div>
-                <p className="text-[14px] font-bold text-navy">{recruiting ? "Open to join requests" : "Closed to join requests"}</p>
-                <p className="mt-0.5 text-[12px] text-muted">{recruiting ? "Anyone can request to join this group" : "No one can request to join right now"}</p>
-              </div>
-              {isLeader && <Link href={`/recruiting/${group.id}`} className="shrink-0 text-[12.5px] font-bold text-purple-600">Manage ›</Link>}
+          {isMember && !isLeader && (
+            <div style={{ marginTop: 24 }}>
+              <LeaveGroupButton groupId={group.id} />
             </div>
-            {recruiting && group.members_wanted > 0 && (
-              <p className="text-[13px] font-semibold text-navy">Looking for {group.members_wanted} more member{group.members_wanted === 1 ? "" : "s"}</p>
-            )}
-            {recruiting && group.skills_wanted?.length > 0 && (
-              <div>
-                <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Skills wanted</p>
-                <div className="flex flex-wrap gap-2">{group.skills_wanted.map((s) => {
-                  const matched = match?.matchedSkills?.some((m) => m.toLowerCase() === s.toLowerCase());
-                  return <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f5f0ff", color: "#7c3aed" }}>{s}</span>;
-                })}</div>
-              </div>
-            )}
-            {recruiting && group.personality_wanted?.length > 0 && (
-              <div>
-                <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Personality wanted</p>
-                <div className="flex flex-wrap gap-2">{group.personality_wanted.map((s) => {
-                  const matched = match?.matchedPersonality?.some((m) => m.toLowerCase() === s.toLowerCase());
-                  return <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f0eef5", color: "#1e1b4b" }}>{s}</span>;
-                })}</div>
-              </div>
-            )}
-            {recruiting && group.interests_wanted?.length > 0 && (
-              <div>
-                <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Interests wanted</p>
-                <div className="flex flex-wrap gap-2">{group.interests_wanted.map((s) => {
-                  const matched = match?.matchedInterests?.some((m) => m.toLowerCase() === s.toLowerCase());
-                  return <span key={s} className="rounded-full px-3 py-1.5 text-[12px] font-semibold" style={matched ? { background: "#d4f2de", color: "#298c52", border: "1px solid #298c52" } : { background: "#f5f0ff", color: "#7c3aed" }}>{s}</span>;
-                })}</div>
-              </div>
-            )}
-            {recruiting && group.additional_notes && (
-              <div className="rounded-2xl bg-[#f9f7ff] p-4">
-                <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-muted">Notes</p>
-                <p className="text-[13.5px] text-navy">{group.additional_notes}</p>
-              </div>
-            )}
-          </div>
-        )}
+          )}
 
-        {isLeader && (
-          <div className="mt-6 flex flex-col gap-3 px-6">
-            {pendingCount > 0 && (
-              <Link href="/applicants" className="flex items-center justify-between rounded-2xl border border-line bg-white px-4 py-3.5">
-                <span className="text-[14px] font-semibold text-navy">{pendingCount} pending request{pendingCount === 1 ? "" : "s"}</span>
-                <span className="text-[16px] text-muted">›</span>
-              </Link>
-            )}
-            <Link href={`/groups/${group.id}/edit`} className="flex items-center justify-between rounded-2xl border border-line bg-white px-4 py-3.5">
-              <span className="text-[14px] font-semibold text-navy">Edit group</span>
-              <span className="text-[16px] text-muted">›</span>
-            </Link>
-          </div>
-        )}
-
-        {isMember && !isLeader && (
-          <div className="mt-6 px-6">
-            <LeaveGroupButton groupId={group.id} />
-          </div>
-        )}
-
-        {!isMember && !isLeader && recruiting && (
-          <div className="mt-6 px-6">
-            <JoinGroupButton groupId={group.id} full={members.length >= (group.max_members || 99)} />
-          </div>
-        )}
+          {!isMember && !isLeader && recruiting && (
+            <div style={{ marginTop: 24 }}>
+              <JoinGroupButton groupId={group.id} full={members.length >= (group.max_members || 99)} />
+            </div>
+          )}
+        </div>
       </div>
     </AppShell>
   );

@@ -4,17 +4,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitRating } from "@/app/rate/actions";
 
-function StarRow({ name, stars, hover, onHover, onSet }) {
+function StarRow({ stars, hover, onHover, onSet }) {
+  const on = hover || stars;
   return (
-    <div className="flex gap-1">
+    <div style={{ display: "flex", gap: 2 }}>
       {[1, 2, 3, 4, 5].map((n) => (
-        <button key={n} type="button" onMouseEnter={() => onHover(n)} onMouseLeave={() => onHover(0)} onClick={() => onSet(n)} style={{ fontSize: 20, lineHeight: 1, color: (hover || stars) >= n ? "#f5b301" : "#d6d3de" }}>★</button>
+        <button key={n} type="button" aria-label={`${n} star${n === 1 ? "" : "s"}`} onMouseEnter={() => onHover(n)} onMouseLeave={() => onHover(0)} onClick={() => onSet(n)} style={{ lineHeight: 0 }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill={on >= n ? "#FFD84D" : "none"} stroke={on >= n ? "#FFD84D" : "#F3F1F8"} strokeWidth="2" strokeLinejoin="round">
+            <path d="m12 3.5 2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.8l6-.7L12 3.5Z" />
+          </svg>
+        </button>
       ))}
     </div>
   );
 }
 
-const AVATAR = ["#f29c38", "#f2a5bd", "#4ac7b2", "#7c3aed", "#34b9a8"];
+const AVATAR = ["#F29C38", "#F2A5BD", "#4AC7B2", "#A78BFA", "#9496F4"];
 
 // Shared "rate each of these teammates" list — used by both the leader's
 // End Project flow and the standalone Rate page any ended-group member can
@@ -32,6 +37,9 @@ export default function RateTeammatesList({ members, projectId, onDone }) {
   }
 
   const set = (id, patch) => setEntries((s) => ({ ...s, [id]: { ...s[id], ...patch } }));
+  // Inside End Project the parent advances the flow; standalone, both
+  // "Submit Ratings" and "Skip for now" land back on Teams.
+  const finish = () => (onDone ? onDone() : router.push("/teams"));
 
   async function submitAll() {
     setSaving(true); setError("");
@@ -43,36 +51,53 @@ export default function RateTeammatesList({ members, projectId, onDone }) {
     }
     setSaving(false);
     router.refresh();
-    onDone?.();
+    finish();
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {members.map((m, i) => {
         const e = entries[m.userId];
         return (
-          <div key={m.userId} className="rounded-2xl bg-white p-4" style={{ boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" }}>
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
-                  {(m.name || "?").slice(0, 2).toUpperCase()}
+          <div key={m.userId} style={{ background: "#fff", borderRadius: 18, border: "1px solid #F3F1F8", boxShadow: "0px 2px 10px rgba(25,20,51,0.05)", padding: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {m.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={m.avatarUrl} alt="" style={{ width: 50, height: 50, borderRadius: 9999, objectFit: "cover", flexShrink: 0 }} />
+              ) : (
+                <span style={{ position: "relative", width: 50, height: 50, borderRadius: 9999, background: AVATAR[i % AVATAR.length], flexShrink: 0, display: "block" }}>
+                  <span style={{ position: "absolute", left: 9.1, top: 19.3, width: 6.8, height: 6.8, borderRadius: 9999, background: "#fff" }} />
+                  <span style={{ position: "absolute", left: 34.1, top: 19.3, width: 6.8, height: 6.8, borderRadius: 9999, background: "#fff" }} />
+                  <span style={{ position: "absolute", left: 18.2, top: 29.6, width: 13.6, height: 3.4, borderRadius: 9999, background: "#fff" }} />
                 </span>
-                <div>
-                  <p className="text-[14px] font-bold text-navy">{m.name}</p>
-                  <p className="text-[12px] text-muted">Member</p>
-                </div>
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "#1D1B44" }}>{m.name}</p>
+                <p style={{ fontSize: 11.5, color: "#757080", marginTop: 4 }}>{m.role === "leader" ? "Group Leader" : "Member"}</p>
               </div>
               <StarRow stars={e.stars} hover={e.hover} onHover={(n) => set(m.userId, { hover: n })} onSet={(n) => set(m.userId, { stars: n })} />
             </div>
-            <input value={e.comment} onChange={(ev) => set(m.userId, { comment: ev.target.value })} placeholder="Add a comment (optional)" className="mt-3 w-full rounded-xl px-3 py-2.5 text-[13px] text-navy focus:outline-none" style={{ background: "#f3f1f8" }} />
+            <input
+              value={e.comment}
+              onChange={(ev) => set(m.userId, { comment: ev.target.value })}
+              placeholder="Add a comment (optional)"
+              style={{ marginTop: 12, width: "100%", height: 44, borderRadius: 12, background: "#F3F1F8", padding: "0 12px", fontSize: 11.5, color: "#1D1B44", outline: "none" }}
+            />
           </div>
         );
       })}
 
-      {error && <p className="text-[13px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
+      {error && <p style={{ fontSize: 13, fontWeight: 500, color: "#bf4247" }}>{error}</p>}
 
-      <button onClick={submitAll} disabled={saving} className="mt-1 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white disabled:opacity-50">
+      <button
+        onClick={submitAll}
+        disabled={saving}
+        style={{ marginTop: 6, width: "100%", height: 56, borderRadius: 28, background: "linear-gradient(90deg, #7C3AED 0%, #6126CC 100%)", boxShadow: "0px 6px 18px rgba(124,58,237,0.22)", fontSize: 16, fontWeight: 600, color: "#fff", opacity: saving ? 0.5 : 1 }}
+      >
         {saving ? "Saving…" : "Submit Ratings"}
+      </button>
+      <button onClick={finish} style={{ width: "100%", height: 44, borderRadius: 22, background: "#F3F1F8", fontSize: 12.5, fontWeight: 600, color: "#1D1B44" }}>
+        Skip for now
       </button>
     </div>
   );

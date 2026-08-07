@@ -1,7 +1,7 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
-import ApplicantCard from "@/components/ApplicantCard";
+import ApplicantCard, { ApplicantFace, StrongMatchPill, CARD_STYLE, appliedLabel } from "@/components/ApplicantCard";
 import { createClient } from "@/lib/supabase/server";
 import { computeMatch } from "@/lib/matching";
 
@@ -25,7 +25,7 @@ async function getApplicants() {
 
     const { data: reqs } = await supabase
       .from("join_requests")
-      .select("id, group_id, user_id, status, comment, created_at, profiles:user_id(full_name, username, year, major, skills, interests, personality, prefer_working, best_work_time)")
+      .select("id, group_id, user_id, status, comment, created_at, profiles:user_id(full_name, username, avatar_url, year, major, skills, interests, personality, prefer_working, best_work_time)")
       .in("group_id", groupIds)
       .order("created_at", { ascending: false });
 
@@ -39,14 +39,13 @@ async function getApplicants() {
         status: r.status,
         name: r.profiles?.full_name || r.profiles?.username || "Someone",
         username: r.profiles?.username || "user",
+        avatarUrl: r.profiles?.avatar_url || "",
         subtitle: [r.profiles?.year, r.profiles?.major].filter(Boolean).join(" · "),
         createdAt: r.created_at,
-        skills: r.profiles?.skills || [],
         comment: r.comment,
         group: group?.name || "Group",
         project: group?.projects?.name || "your project",
         isStrongMatch: match.isStrongMatch,
-        matchedSkills: match.matchedSkills,
       };
     });
   } catch {
@@ -55,10 +54,33 @@ async function getApplicants() {
 }
 
 const HISTORY_STYLE = {
-  accepted: { label: "Accepted", bg: "#d4f2de", color: "#298c52" },
-  declined: { label: "Declined", bg: "#fae0e0", color: "#bf4247" },
-  invited: { label: "Invited", bg: "#fce5b8", color: "#99730d" },
+  accepted: { label: "Accepted", bg: "#D4F2DE", color: "#298C52" },
+  declined: { label: "Declined", bg: "#FAE0E0", color: "#BF4247" },
+  invited: { label: "Invited", bg: "#FCE5B8", color: "#99730D" },
 };
+
+const SECTION = { fontSize: 12, fontWeight: 700, color: "#757080" };
+
+/** A settled request — same card, a status pill instead of the two actions. */
+function HistoryRow({ a, index }) {
+  const s = HISTORY_STYLE[a.status] || HISTORY_STYLE.declined;
+  return (
+    <Link href={`/u/${a.applicantId}`} style={{ ...CARD_STYLE, display: "flex", alignItems: "center", gap: 10 }}>
+      <ApplicantFace url={a.avatarUrl} index={index} />
+      <span style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+        <span style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#1D1B44", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.name}</span>
+          {a.isStrongMatch && <StrongMatchPill />}
+        </span>
+        <span style={{ fontSize: 10.5, color: "#757080", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.subtitle || `@${a.username}`}</span>
+        <span style={{ fontSize: 10, color: "#757080" }}>{appliedLabel(a.createdAt)}</span>
+      </span>
+      <span style={{ minWidth: 80, height: 26, borderRadius: 13, background: s.bg, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <span style={{ fontSize: 11, fontWeight: 600, color: s.color }}>{s.label}</span>
+      </span>
+    </Link>
+  );
+}
 
 export default async function ApplicantsPage() {
   const all = await getApplicants();
@@ -68,60 +90,35 @@ export default async function ApplicantsPage() {
 
   return (
     <AppShell>
-      <div className="min-h-full bg-white pb-6">
+      <div className="min-h-full pb-8" style={{ background: "#F9F8FB" }}>
         <StatusBar />
-        <div className="flex items-center gap-3 px-6">
-          <Link href="/home" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1e1b4b" }}>Requests</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
+          <Link href="/home" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Request History</h1>
         </div>
 
         {all.length === 0 ? (
-          <div className="mt-24 px-8 text-center">
-            <p className="text-[16px] font-semibold text-navy">No requests yet</p>
-            <p className="mt-1 text-[14px] text-muted">When people ask to join your projects, they show up here.</p>
+          <div style={{ marginTop: 96, padding: "0 32px", textAlign: "center" }}>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "#1D1B44" }}>No requests yet</p>
+            <p style={{ marginTop: 8, fontSize: 13, color: "#757080" }}>When people ask to join your projects, they show up here.</p>
           </div>
         ) : (
-          <div className="mt-5 flex flex-col gap-4 px-6">
-            {pending.length > 0 && <p className="text-[12px] font-bold uppercase tracking-wide text-muted">Pending · {pending.length}</p>}
-            {pending.map((a) => (
-              <ApplicantCard key={a.id} {...a} queueIds={pending.filter((p) => p.groupId === a.groupId).map((p) => p.applicantId)} />
+          <div style={{ marginTop: 22, padding: "0 22px", display: "flex", flexDirection: "column", gap: 15 }}>
+            {pending.map((a, i) => (
+              <ApplicantCard key={a.id} {...a} index={i} queueIds={pending.filter((p) => p.groupId === a.groupId).map((p) => p.applicantId)} />
             ))}
 
             {invited.length > 0 && (
               <>
-                <p className="mt-2 text-[12px] font-bold uppercase tracking-wide text-muted">Invited · {invited.length}</p>
-                {invited.map((a) => {
-                  const s = HISTORY_STYLE.invited;
-                  return (
-                    <Link key={a.id} href={`/u/${a.applicantId}`} className="flex items-center gap-3 rounded-2xl border border-line bg-white p-4">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: "#7c3aed" }}>{(a.name || "?").slice(0, 2).toUpperCase()}</span>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[14px] font-bold text-navy">{a.name}</p>
-                        <p className="truncate text-[12px] text-muted">{a.project}</p>
-                      </div>
-                      <span className="rounded-full px-3 py-1 text-[12px] font-bold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
-                    </Link>
-                  );
-                })}
+                <p style={SECTION}>Invited</p>
+                {invited.map((a, i) => <HistoryRow key={a.id} a={a} index={i} />)}
               </>
             )}
 
             {history.length > 0 && (
               <>
-                <p className="mt-2 text-[12px] font-bold uppercase tracking-wide text-muted">History</p>
-                {history.map((a) => {
-                  const s = HISTORY_STYLE[a.status] || HISTORY_STYLE.declined;
-                  return (
-                    <Link key={a.id} href={`/u/${a.applicantId}`} className="flex items-center gap-3 rounded-2xl border border-line bg-white p-4">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full text-[12px] font-bold text-white" style={{ background: "#7c3aed" }}>{(a.name || "?").slice(0, 2).toUpperCase()}</span>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[14px] font-bold text-navy">{a.name}</p>
-                        <p className="truncate text-[12px] text-muted">{a.project}</p>
-                      </div>
-                      <span className="rounded-full px-3 py-1 text-[12px] font-bold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
-                    </Link>
-                  );
-                })}
+                <p style={SECTION}>History</p>
+                {history.map((a, i) => <HistoryRow key={a.id} a={a} index={i} />)}
               </>
             )}
           </div>

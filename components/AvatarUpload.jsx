@@ -9,7 +9,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
 // Photo picker. Defaults to the rounded-square group/project shape; pass
 // round for a person (this app's convention: people are circles,
 // groups/projects are rounded-squares).
-export default function AvatarUpload({ url, onChange, size = 90, round = false }) {
+export default function AvatarUpload({ url, onChange, size = 90, round = false, caption = "Change photo" }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -49,7 +49,7 @@ export default function AvatarUpload({ url, onChange, size = 90, round = false }
           <input type="file" accept=".jpg,.jpeg,.png" className="hidden" onChange={onPick} disabled={uploading} />
         </label>
       </div>
-      <p className="mt-2 text-[12.5px] font-semibold text-purple-600">{uploading ? "Uploading…" : "Change photo"}</p>
+      <p className="mt-2 text-[12.5px] font-semibold text-purple-600">{uploading ? "Uploading…" : caption}</p>
       {error && <p className="mt-1 text-[11px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
     </div>
   );

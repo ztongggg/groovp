@@ -10,9 +10,16 @@ async function getData(convId) {
     const { data: parts } = await supabase.from("conversation_participants").select("user_id").eq("conversation_id", convId);
     const otherId = (parts || []).map((p) => p.user_id).find((id) => id !== user?.id);
     let title = "Chat";
+    let subtitle = "";
+    let avatars = [];
     if (otherId) {
-      const { data: prof } = await supabase.from("profiles").select("full_name, username").eq("id", otherId).single();
+      const { data: prof } = await supabase.from("profiles").select("full_name, username, avatar_url, year, major").eq("id", otherId).single();
       title = prof?.full_name || prof?.username || "Chat";
+      // The Figma frame shows a relationship line ("Applicant · <project>").
+      // There is no single relationship to derive here, so this shows who they
+      // are instead of inventing a status that might not be true.
+      subtitle = [prof?.year, prof?.major].filter(Boolean).join(" · ") || (prof?.username ? `@${prof.username}` : "");
+      avatars = [{ url: prof?.avatar_url || "" }];
     }
 
     const { data: msgs } = await supabase
@@ -32,13 +39,24 @@ async function getData(convId) {
       } catch {}
     }
 
-    return { title, meId: user?.id || null, messages: (msgs || []).map((m) => ({ id: m.id, body: m.body, sender_id: m.sender_id, created_at: m.created_at, name: "" })) };
+    return { title, subtitle, avatars, otherId: otherId || null, meId: user?.id || null, messages: (msgs || []).map((m) => ({ id: m.id, body: m.body, sender_id: m.sender_id, created_at: m.created_at, name: "" })) };
   } catch {
-    return { title: "Chat", meId: null, messages: [] };
+    return { title: "Chat", subtitle: "", avatars: [], otherId: null, meId: null, messages: [] };
   }
 }
 
 export default async function DMPage({ params }) {
-  const { title, meId, messages } = await getData(params.conversationId);
-  return <ChatView conversationId={params.conversationId} title={title} meId={meId} messages={messages} backHref="/teams" />;
+  const { title, subtitle, avatars, otherId, meId, messages } = await getData(params.conversationId);
+  return (
+    <ChatView
+      conversationId={params.conversationId}
+      title={title}
+      subtitle={subtitle}
+      infoHref={otherId ? `/u/${otherId}` : null}
+      avatars={avatars}
+      meId={meId}
+      messages={messages}
+      backHref="/teams"
+    />
+  );
 }
