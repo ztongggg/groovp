@@ -12,7 +12,12 @@ export async function signIn(_prevState, formData) {
   const supabase = createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) return { error: error.message };
+  if (error) {
+    // Supabase's own wording ("Invalid login credentials") doesn't match the
+    // Welcome Page export's copy — map the one case that matters to users.
+    if (error.status === 400) return { error: "Incorrect email or password. Try again." };
+    return { error: error.message };
+  }
 
   revalidatePath("/", "layout");
   redirect("/home");

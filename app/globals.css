@@ -19,6 +19,13 @@ body {
   font-family: "Inter", system-ui, sans-serif;
 }
 
+/* Welcome Page's two fields — the export specifies navy-at-50%-opacity
+   placeholders, not the browser default gray. */
+.login-field::placeholder {
+  color: rgba(30, 27, 75, 0.5);
+  font-weight: 400;
+}
+
 /* ---------------------------------------------------------------------
    Cross-cutting interaction polish. Every screen in this app is pixel-
    matched to a Figma export — colors, sizes, and spacing are locked and

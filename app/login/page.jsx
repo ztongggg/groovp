@@ -35,9 +35,9 @@ function Cloudy() {
 
 function EyeIcon({ open }) {
   return open ? (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" /><circle cx="12" cy="12" r="3" /></svg>
   ) : (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a21.7 21.7 0 0 1-2.61 3.87M14.12 14.12a3 3 0 1 1-4.24-4.24" /><path d="M1 1l22 22" /></svg>
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a21.7 21.7 0 0 1-2.61 3.87M14.12 14.12a3 3 0 1 1-4.24-4.24" /><path d="M1 1l22 22" /></svg>
   );
 }
 
@@ -65,14 +65,14 @@ export default function LoginPage() {
 
       {/* username/email */}
       <div className="absolute flex items-center" style={{ left: 32, top: 346, width: 337, height: 49, borderRadius: 16, background: "#f3f1f8", paddingLeft: 44 }}>
-        <svg className="absolute" style={{ left: 16, top: 15 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-        <input name="email" type="text" required placeholder="Username or email" className="w-full bg-transparent focus:outline-none" style={{ fontSize: 15, fontWeight: 600, color: "#1e1b4b" }} />
+        <svg className="absolute" style={{ left: 16, top: 15 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+        <input name="email" type="text" required placeholder="Username or email" className="login-field w-full bg-transparent focus:outline-none" style={{ fontSize: 15, fontWeight: 600, color: "#1e1b4b" }} />
       </div>
 
       {/* password */}
       <div className="absolute flex items-center" style={{ left: 32, top: 412, width: 337, height: 49, borderRadius: 16, background: "#f3f1f8", paddingLeft: 44, paddingRight: 44 }}>
-        <svg className="absolute" style={{ left: 16, top: 15 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
-        <input name="password" type={showPw ? "text" : "password"} required placeholder="Password" className="w-full bg-transparent focus:outline-none" style={{ fontSize: 15, fontWeight: 600, color: "#1e1b4b" }} />
+        <svg className="absolute" style={{ left: 16, top: 15 }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+        <input name="password" type={showPw ? "text" : "password"} required placeholder="Password" className="login-field w-full bg-transparent focus:outline-none" style={{ fontSize: 15, fontWeight: 600, color: "#1e1b4b" }} />
         <button type="button" onClick={() => setShowPw((v) => !v)} className="absolute flex items-center justify-center" style={{ right: 16, top: 16 }} aria-label={showPw ? "Hide password" : "Show password"}>
           <EyeIcon open={showPw} />
         </button>
