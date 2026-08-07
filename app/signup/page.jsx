@@ -43,7 +43,7 @@ function Field({ icon, optional, ...props }) {
   return (
     <div className="relative flex items-center" style={{ height: 52, borderRadius: 14, background: "#f3f1f8", paddingLeft: 48, paddingRight: 16 }}>
       <span className="absolute" style={{ left: 16 }}>{icon}</span>
-      <input {...props} className="w-full bg-transparent focus:outline-none" style={{ fontSize: 14, fontWeight: 400, color: "#1d1b44" }} />
+      <input {...props} className="field-input w-full bg-transparent focus:outline-none" style={{ fontSize: 14, fontWeight: 400, color: "#1d1b44" }} />
       {optional && <span className="absolute" style={{ right: 16, fontSize: 10, fontWeight: 800, letterSpacing: 0.4, color: "#c4b5fd" }}>optional</span>}
     </div>
   );
@@ -59,6 +59,7 @@ const I = {
   mail: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>,
   lock: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>,
   book: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5Z" /></svg>,
+  university: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10 12 4l9 6-9 6-9-6Z" /><path d="M6 12.5V18M18 12.5V18" /><path d="M4 18h16" /></svg>,
   link: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 17H7a5 5 0 0 1 0-10h2M15 7h2a5 5 0 0 1 0 10h-2M8 12h8" /></svg>,
   linkedin: <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45Z" /></svg>,
   github: <svg width="20" height="20" viewBox="0 0 24 24" fill="#1F2328"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.4-1.27.74-1.56-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.28 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z" /></svg>,
@@ -205,7 +206,13 @@ export default function SignupPage() {
         )}
         {step === 1 && (
           <div className="flex flex-col gap-3">
-            <Field icon={I.book} optional placeholder="University" value={d.university} onChange={(e) => set("university", e.target.value)} />
+            {/* The export also shows a 3rd free-text "Year" row above the real
+                Year-of-study chips — no data field for it anywhere in the spec
+                (only year_of_study, an enum, is defined), so it's a Figma
+                duplicate, not a second control. Not built: an input that
+                doesn't save anywhere is exactly the fake-control this project
+                explicitly avoids. */}
+            <Field icon={I.university} optional placeholder="University" value={d.university} onChange={(e) => set("university", e.target.value)} />
             <Field icon={I.book} optional placeholder="Major (e.g. Computer Science)" value={d.major} onChange={(e) => set("major", e.target.value)} />
             <div>
               <p className="text-[13px] font-semibold text-navy">Year of study</p>

@@ -34,6 +34,14 @@ body {
   font-weight: 400;
 }
 
+/* Signup's shared Field/SkillPicker-style inputs — the export shows
+   placeholder text in full navy #1D1B44, not the browser's default gray. */
+.field-input::placeholder {
+  color: #1d1b44;
+  opacity: 1;
+  font-weight: 400;
+}
+
 /* ---------------------------------------------------------------------
    Cross-cutting interaction polish. Every screen in this app is pixel-
    matched to a Figma export — colors, sizes, and spacing are locked and
