@@ -322,10 +322,15 @@ export function PastProjectCard({ entry, index = 0 }) {
         <div style={{ height: 100, background: BAND_COLOURS[index % BAND_COLOURS.length] }} />
       ) : null}
       <div style={{ padding: 16 }}>
+        {/* An entry that isn't linked to a real project has no name of its own
+            (past_projects has no name column), so the role becomes the title —
+            in which case don't repeat it on the subtitle line. */}
         <p style={{ fontSize: 14, fontWeight: 700, color: "#1D1B44" }}>{proj?.name || entry.role || "Untitled project"}</p>
-        <p style={{ fontSize: 11, fontWeight: 600, color: "#6126CC", marginTop: 4 }}>
-          {[entry.role, proj ? (ongoing ? "Ongoing" : "Completed") : null].filter(Boolean).join(" · ") || "Contributor"}
-        </p>
+        {(() => {
+          const parts = [proj?.name ? entry.role : null, proj ? (ongoing ? "Ongoing" : "Completed") : null].filter(Boolean);
+          if (!parts.length) return null;
+          return <p style={{ fontSize: 11, fontWeight: 600, color: "#6126CC", marginTop: 4 }}>{parts.join(" · ")}</p>;
+        })()}
         {entry.write_up && <p style={{ fontSize: 11, fontWeight: 400, color: "#757080", marginTop: 6 }}>{entry.write_up}</p>}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 10 }}>
           <span style={{ fontSize: 10.5, color: "#757080" }}>{dates || ""}</span>

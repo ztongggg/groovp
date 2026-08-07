@@ -74,7 +74,9 @@ export default async function PastProjectDetailPage({ params }) {
 
         <div style={{ padding: "0 24px" }}>
           <p style={{ marginTop: 22, fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>{pp.project?.name || pp.role || "Untitled project"}</p>
-          {pp.role && <p style={{ marginTop: 8, fontSize: 13, fontWeight: 600, color: "#6126CC" }}>{pp.role}</p>}
+          {/* Only when the entry is linked to a real project — otherwise the
+              role is already the title above. */}
+          {pp.role && pp.project?.name && <p style={{ marginTop: 8, fontSize: 13, fontWeight: 600, color: "#6126CC" }}>{pp.role}</p>}
 
           {dateRange && (
             <div style={{ marginTop: 30 }}>

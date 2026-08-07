@@ -33,7 +33,8 @@ async function getProfile() {
         return {
           id: r.id,
           name: proj?.name || r.role || "Untitled project",
-          subtitle: [r.role, proj ? (ongoing ? "Ongoing" : "Completed") : null].filter(Boolean).join(" · "),
+          // Unlinked entries use the role as their title, so don't repeat it below.
+          subtitle: [proj?.name ? r.role : null, proj ? (ongoing ? "Ongoing" : "Completed") : null].filter(Boolean).join(" · "),
         };
       });
     } catch {}
