@@ -39,7 +39,6 @@ export default function EditBasicsForm({ initial }) {
     username: initial.username || "",
     avatar_url: initial.avatar_url || "",
     bio: initial.bio || "",
-    university: initial.university || "",
     major: initial.major || "",
     year: initial.year || "",
     personality: initial.personality || "",
@@ -69,7 +68,13 @@ export default function EditBasicsForm({ initial }) {
       <input className={cls} placeholder="Full name" value={d.full_name} onChange={(e) => set("full_name", e.target.value)} />
       <input className={cls} placeholder="Username" value={d.username} onChange={(e) => set("username", e.target.value)} />
       <textarea className={cls} rows={3} placeholder="Short bio — what are you into?" value={d.bio} onChange={(e) => set("bio", e.target.value)} />
-      <input className={cls} placeholder="University" value={d.university} onChange={(e) => set("university", e.target.value)} />
+      {/* Read-only — derived from the verified signup email domain, never
+          user-editable. A free-text override here would defeat the whole
+          point of the Restricted (same-school) privacy tier. */}
+      <div className={cls} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span>{initial.university || "University not verified"}</span>
+        {initial.university && <span style={{ fontSize: 10, fontWeight: 800, color: "#7c3aed" }}>VERIFIED</span>}
+      </div>
       <input className={cls} placeholder="Major" value={d.major} onChange={(e) => set("major", e.target.value)} />
 
       <p className="mt-2 text-[14px] font-bold text-navy">Year of study</p>

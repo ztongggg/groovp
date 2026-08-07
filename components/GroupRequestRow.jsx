@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { acceptRequest, declineRequest } from "@/app/applicants/actions";
+import DeclineReasonSheet from "@/components/DeclineReasonSheet";
 
 const AVATARS = ["#A78BFA", "#FF8671", "#4AC7B2", "#FBBF24", "#F2A5BD"];
 
@@ -17,14 +18,23 @@ export default function GroupRequestRow({ request, groupId, index = 0 }) {
   const [busy, setBusy] = useState("");
   const [done, setDone] = useState("");
   const [error, setError] = useState("");
+  const [showDecline, setShowDecline] = useState(false);
 
-  async function act(kind) {
-    if (busy) return;
-    setBusy(kind); setError("");
-    const res = kind === "accept" ? await acceptRequest(request.id, groupId, request.userId) : await declineRequest(request.id);
+  async function onAccept() {
+    setBusy("accept"); setError("");
+    const res = await acceptRequest(request.id, groupId, request.userId);
     setBusy("");
     if (res?.error) { setError(res.error); return; }
-    setDone(kind === "accept" ? "Accepted" : "Declined");
+    setDone("Accepted");
+    router.refresh();
+  }
+  async function onDecline(reason) {
+    setBusy("decline"); setError("");
+    const res = await declineRequest(request.id, reason);
+    setBusy("");
+    setShowDecline(false);
+    if (res?.error) { setError(res.error); return; }
+    setDone("Declined");
     router.refresh();
   }
 
@@ -62,14 +72,15 @@ export default function GroupRequestRow({ request, groupId, index = 0 }) {
         <span style={{ fontSize: 10.5, color: "#757080", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{request.subtitle}</span>
       </Link>
 
-      <button onClick={() => act("decline")} disabled={!!busy} aria-label={`Decline ${request.name}`} style={{ width: 32, height: 32, borderRadius: 16, background: "#FAEBEB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <button onClick={() => setShowDecline(true)} disabled={!!busy} aria-label={`Decline ${request.name}`} style={{ width: 32, height: 32, borderRadius: 16, background: "#FAEBEB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF4625" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
       </button>
-      <button onClick={() => act("accept")} disabled={!!busy} style={{ width: 66, height: 32, borderRadius: 16, background: "#D4F2DE", fontSize: 11.5, fontWeight: 600, color: "#298C52", flexShrink: 0 }}>
+      <button onClick={onAccept} disabled={!!busy} style={{ width: 66, height: 32, borderRadius: 16, background: "#D4F2DE", fontSize: 11.5, fontWeight: 600, color: "#298C52", flexShrink: 0 }}>
         {busy === "accept" ? "…" : "Accept"}
       </button>
     </div>
       {error && <p style={{ fontSize: 11.5, fontWeight: 600, color: "#BF4247", paddingLeft: 8 }}>{error}</p>}
+      <DeclineReasonSheet open={showDecline} busy={busy === "decline"} onConfirm={onDecline} onCancel={() => setShowDecline(false)} />
     </div>
   );
 }

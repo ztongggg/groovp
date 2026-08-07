@@ -20,11 +20,11 @@ export async function joinByCode(rawCode) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "You must be signed in." };
 
-  const { data: project } = await supabase
-    .from("projects")
-    .select("id, name")
-    .eq("join_code", code)
-    .maybeSingle();
+  // Resolves via a SECURITY DEFINER RPC, not a direct select — an invite-only
+  // project can't be read by a non-member otherwise, and the whole point of
+  // a share code is that having it IS the access grant (schema_v13.sql).
+  const { data: rows } = await supabase.rpc("resolve_join_code", { p_code: code });
+  const project = rows?.[0];
   if (!project) return { error: "No project with that code." };
 
   const { error } = await supabase

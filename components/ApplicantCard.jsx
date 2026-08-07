@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { acceptRequest, declineRequest } from "@/app/applicants/actions";
 import { ApplicantFace, StrongMatchPill, CARD_STYLE, appliedLabel } from "@/components/ApplicantParts";
+import DeclineReasonSheet from "@/components/DeclineReasonSheet";
 
 const NAME = { fontSize: 13, fontWeight: 700, color: "#1D1B44" };
 const SUB = { fontSize: 10.5, color: "#757080" };
@@ -13,6 +14,7 @@ const META = { fontSize: 10, color: "#757080" };
 export default function ApplicantCard({ id, groupId, applicantId, name, username, subtitle, createdAt, avatarUrl, comment, isStrongMatch, queueIds = [], index = 0 }) {
   const [state, setState] = useState("idle"); // idle | working | accepted | declined | error
   const [msg, setMsg] = useState("");
+  const [showDecline, setShowDecline] = useState(false);
 
   async function onAccept() {
     setState("working");
@@ -20,9 +22,10 @@ export default function ApplicantCard({ id, groupId, applicantId, name, username
     if (r?.error) { setMsg(r.error); setState("error"); }
     else setState("accepted");
   }
-  async function onDecline() {
+  async function onDecline(reason) {
     setState("working");
-    const r = await declineRequest(id);
+    const r = await declineRequest(id, reason);
+    setShowDecline(false);
     if (r?.error) { setMsg(r.error); setState("error"); }
     else setState("declined");
   }
@@ -49,7 +52,7 @@ export default function ApplicantCard({ id, groupId, applicantId, name, username
           <span style={{ ...SUB, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subtitle || `@${username}`}</span>
           {createdAt && <span style={META}>{appliedLabel(createdAt)}</span>}
         </Link>
-        <button onClick={onDecline} disabled={state === "working"} aria-label={`Decline ${name}`} style={{ width: 32, height: 32, borderRadius: 16, background: "#FAEBEB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <button onClick={() => setShowDecline(true)} disabled={state === "working"} aria-label={`Decline ${name}`} style={{ width: 32, height: 32, borderRadius: 16, background: "#FAEBEB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF4625" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
         </button>
         <button onClick={onAccept} disabled={state === "working"} style={{ width: 66, height: 32, borderRadius: 16, background: "#D4F2DE", fontSize: 11.5, fontWeight: 600, color: "#298C52", flexShrink: 0 }}>
@@ -59,6 +62,8 @@ export default function ApplicantCard({ id, groupId, applicantId, name, username
 
       {comment && <p style={{ marginTop: 10, fontSize: 12, color: "#1E1E1E", lineHeight: "17px" }}>{comment}</p>}
       {state === "error" && <p style={{ marginTop: 8, fontSize: 12, color: "#bf4247" }}>{msg || "Something went wrong — please try again."}</p>}
+
+      <DeclineReasonSheet open={showDecline} busy={state === "working"} onConfirm={onDecline} onCancel={() => setShowDecline(false)} />
     </div>
   );
 }

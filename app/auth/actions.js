@@ -46,16 +46,19 @@ export async function signUp(_prevState, formData) {
 export async function signUpFull(data) {
   const supabase = createClient();
 
-  // No school-email requirement — any email works. If the domain happens to
-  // match a known university it's used as a nicety; otherwise the user's own
-  // typed "University" field from the signup form is what's saved. The
-  // "Restricted" (same-school) privacy tier just compares whatever string
-  // ends up here, so it degrades gracefully rather than gatekeeping signup.
+  // No school-email requirement — any email works, signup never blocks on
+  // this. But `university` is derived from the email domain ONLY, never
+  // free text: the "Restricted" privacy tier's RLS policy (schema_v13.sql)
+  // trusts this column to mean "actually verified same school" — a
+  // free-text fallback would let anyone type "SUTD" and pass that check
+  // with an unrelated email. Unmatched domains just get null, meaning they
+  // won't match any Restricted project — a real, honest degrade, not a
+  // spoofable one.
   const emailDomain = (data.email || "").split("@")[1]?.toLowerCase();
   const { data: uniRow } = emailDomain
     ? await supabase.from("university_domains").select("university").eq("domain", emailDomain).maybeSingle()
     : { data: null };
-  const university = uniRow?.university || data.university || null;
+  const university = uniRow?.university || null;
 
   const { data: auth, error } = await supabase.auth.signUp({
     email: data.email,

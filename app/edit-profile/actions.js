@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-const TEXT_FIELDS = ["full_name", "username", "avatar_url", "bio", "university", "major"];
+// university deliberately excluded — it's derived once at signup from the
+// verified email domain (schema_v13.sql's Restricted-tier RLS trusts this
+// column), never user-editable, or a free-text override would defeat it.
+const TEXT_FIELDS = ["full_name", "username", "avatar_url", "bio", "major"];
 const ENUM_FIELDS = ["year", "personality", "prefer_working", "best_work_time", "location"];
 const LINK_FIELDS = ["linkedin_url", "github_url", "portfolio_url"];
 

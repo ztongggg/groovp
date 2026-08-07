@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { acceptRequest, declineRequest } from "@/app/applicants/actions";
+import DeclineReasonSheet from "@/components/DeclineReasonSheet";
 
 // Bottom Accept/Decline bar for reviewing an applicant from their full profile
 // (/u/[id]?groupId=...), with prev/next paging through the same queue used by
@@ -14,6 +15,7 @@ export default function ApplicantReviewBar({ requestId, groupId, applicantId, pr
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(null); // null | "accepted" | "declined"
   const [error, setError] = useState("");
+  const [showDecline, setShowDecline] = useState(false);
 
   async function onAccept() {
     setBusy(true); setError("");
@@ -22,10 +24,11 @@ export default function ApplicantReviewBar({ requestId, groupId, applicantId, pr
     if (r?.error) { setError(r.error); return; }
     setDone("accepted"); router.refresh();
   }
-  async function onDecline() {
+  async function onDecline(reason) {
     setBusy(true); setError("");
-    const r = await declineRequest(requestId);
+    const r = await declineRequest(requestId, reason);
     setBusy(false);
+    setShowDecline(false);
     if (r?.error) { setError(r.error); return; }
     setDone("declined"); router.refresh();
   }
@@ -42,7 +45,7 @@ export default function ApplicantReviewBar({ requestId, groupId, applicantId, pr
           <p className="flex-1 text-center text-[14px] font-bold" style={{ color: done === "accepted" ? "#298c52" : "#bf4247" }}>{done === "accepted" ? "Accepted ✓" : "Declined"}</p>
         ) : (
           <div className="flex flex-1 items-center justify-center gap-2.5">
-            <button onClick={onDecline} disabled={busy} aria-label="Decline" className="flex h-10 w-10 items-center justify-center rounded-full" style={{ background: "#fae0e0" }}>
+            <button onClick={() => setShowDecline(true)} disabled={busy} aria-label="Decline" className="flex h-10 w-10 items-center justify-center rounded-full" style={{ background: "#fae0e0" }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#bf4247" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
             </button>
             <button onClick={onAccept} disabled={busy} className="flex-1 rounded-full py-2.5 text-[14px] font-bold" style={{ background: "#d4f2de", color: "#298c52" }}>{busy ? "…" : "Accept"}</button>
@@ -53,6 +56,8 @@ export default function ApplicantReviewBar({ requestId, groupId, applicantId, pr
           <Link href={nextHref} aria-label="Next applicant" className="flex h-10 w-10 items-center justify-center rounded-full" style={{ background: "#f3f1f8" }}>›</Link>
         ) : <span className="w-10" />}
       </div>
+
+      <DeclineReasonSheet open={showDecline} busy={busy} onConfirm={onDecline} onCancel={() => setShowDecline(false)} />
     </div>
   );
 }

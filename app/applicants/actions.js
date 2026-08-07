@@ -41,28 +41,32 @@ export async function acceptRequest(id, groupId, applicantId) {
   return { ok: true };
 }
 
-export async function declineRequest(id) {
+export async function declineRequest(id, reason) {
   const supabase = createClient();
   const { data: req } = await supabase.from("join_requests").select("user_id, group_id").eq("id", id).single();
 
+  const cleanReason = (reason || "").trim() || null;
   const { error } = await supabase
     .from("join_requests")
-    .update({ status: "declined", declined_at: new Date().toISOString() })
+    .update({ status: "declined", declined_at: new Date().toISOString(), decline_reason: cleanReason })
     .eq("id", id);
   if (error) return { error: error.message };
 
   // The applicant is told either way — the Notifications frame shows an
-  // "Application declined" row, and previously a decline was silent.
+  // "Application declined" row, and previously a decline was silent (and,
+  // separately, gave no reason at all — someone got rejected with zero
+  // feedback and a 3-day blind wait before reapplying).
   // Gated on the same "updates about my requests" preference as an accept.
   try {
     if (req?.user_id && (await shouldNotify(supabase, req.user_id, "notify_join_accepted"))) {
       const { data: g } = await supabase.from("groups").select("project_id, name").eq("id", req.group_id).single();
       const { data: proj } = g?.project_id ? await supabase.from("projects").select("name").eq("id", g.project_id).single() : { data: null };
+      const suffix = cleanReason ? ` — "${cleanReason}"` : "";
       await supabase.from("notifications").insert({
         user_id: req.user_id,
         type: "join_declined",
         related_id: req.group_id,
-        body: `Your request to join ${proj?.name || g?.name || "a group"} was declined`,
+        body: `Your request to join ${proj?.name || g?.name || "a group"} was declined${suffix}`,
       });
     }
   } catch {}
