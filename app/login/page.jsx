@@ -8,28 +8,12 @@ import { signIn } from "@/app/auth/actions";
 // Figma node 1065:2102 "Welcome Page" (+ 891:3491 error variant), file wA2wiOAqWkKr9JI319d5wT
 
 function Cloudy() {
+  // The owner exported the real mascot asset (Cloudy.png) alongside this
+  // screen's HTML — replaces the earlier hand-built composite of bump SVGs
+  // and shape divs approximating the same face.
   return (
-    <div className="absolute overflow-hidden" style={{ left: 59, top: 28, width: 284, height: 284 }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 157.73, top: 161.31, width: 70.053, height: 70.053 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 250.93, top: 161.31, width: 70.053, height: 70.053 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-b.svg" alt="" className="absolute" style={{ left: 250.93, top: 243.76, width: 70.053, height: 68.16 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-a.svg" alt="" className="absolute" style={{ left: 161.31, top: 250.93, width: 70.053, height: 70.053 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 139.8, top: 229.42, width: 41.653, height: 41.653 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-d.svg" alt="" className="absolute" style={{ left: 229.42, top: 139.8, width: 39.76, height: 41.653 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 322.62, top: 233.01, width: 41.653, height: 41.653 }} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/splash-cloudy-bump-c.svg" alt="" className="absolute" style={{ left: 240.18, top: 322.62, width: 41.653, height: 41.653 }} />
-      <div className="absolute rounded-full" style={{ background: "#0b2a5b", left: 215.08, top: 247.35, width: 16.312, height: 20.827 }} />
-      <div className="absolute rounded-full" style={{ background: "#0b2a5b", left: 298.91, top: 247.35, width: 16.312, height: 20.827 }} />
-      <div className="absolute rounded-full" style={{ background: "#1d4ed8", left: 261.68, top: 304.7, width: 9.467, height: 13.253 }} />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/welcome-cloudy.png" alt="" className="absolute" style={{ left: 59, top: 31, width: 284, height: 284 }} />
   );
 }
 
