@@ -8,6 +8,14 @@ body {
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Content used to start flush at the very top edge of the phone screen — the
+   fake status bar used to reserve this space, now that it's gone (removed
+   deliberately, see git history) every screen needs its own breathing room
+   back. Matches the old status bar's height so nothing else has to move. */
+.phone-content {
+  padding-top: 44px;
+}
+
 /* The Figma file sets Nunito on the project-feed surfaces (Home, Discover,
    Saved, Project Details, Tutorials) and Inter everywhere else. Applied at the
    screen wrapper; the bottom nav opts back out since it is Inter in the design. */

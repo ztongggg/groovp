@@ -6,7 +6,7 @@ import SkillPicker from "@/components/SkillPicker";
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
 function Chip({ active, onClick, children }) {
-  return <button type="button" onClick={onClick} className="rounded-[10px] px-4 py-2 text-[12px] font-semibold" style={{ background: active ? "#7c3aed" : "#f3f1f8", color: active ? "#fff" : "#1d1b44" }}>{children}</button>;
+  return <button type="button" onClick={onClick} className="rounded-[10px] px-4 py-2 text-[12px]" style={{ fontWeight: active ? 700 : 400, background: active ? "#F3EDFE" : "#F3F1F8", color: active ? "#7C3AED" : "#1D1B44", border: `1px solid ${active ? "#7C3AED" : "transparent"}` }}>{children}</button>;
 }
 
 const inputCls = "w-full rounded-[14px] bg-[#f3f1f8] px-4 py-2.5 text-[13px] text-navy focus:outline-none";

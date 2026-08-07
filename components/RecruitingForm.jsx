@@ -108,7 +108,7 @@ export default function RecruitingForm({ groupId, groupName, initial }) {
 
           <p style={{ ...LABEL, marginTop: 24 }}>SKILLS WANTED</p>
           <div style={{ marginTop: 10 }}>
-            <SkillPicker selected={d.skills_wanted} onChange={(v) => set("skills_wanted", v)} chipActiveStyle={{ background: "#F3EDFE", color: "#7C3AED", border: "1px solid #7C3AED" }} />
+            <SkillPicker selected={d.skills_wanted} onChange={(v) => set("skills_wanted", v)} />
           </div>
 
           <p style={{ ...LABEL, marginTop: 26 }}>INTERESTS WANTED</p>

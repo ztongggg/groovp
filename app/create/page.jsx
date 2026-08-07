@@ -132,7 +132,7 @@ export default function CreateProjectPage() {
       { l: 88, t: 205, w: 32, h: 11, r: 6, bg: "#ffb800", rot: -30 },
       { l: 282, t: 235, w: 32, h: 11, r: 6, bg: "#ffb800", rot: 30 },
       { l: 362, t: 265, w: 8, h: 8, r: 999, bg: "#7c3aed" },
-      { l: 60, t: 335, w: 8, h: 8, r: 999, bg: "#dcf674" },
+      { l: 60, t: 335, w: 8, h: 8, r: 999, bg: "#7c3aed" },
     ];
     return (
       <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
@@ -278,7 +278,7 @@ export default function CreateProjectPage() {
             <div>
               <p style={{ fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>Skills needed</p>
               <div style={{ marginTop: 10 }}>
-                <SkillPicker selected={d.skills} onChange={(v) => set("skills", v)} chipActiveStyle={{ background: "#7C3AED", color: "#fff", border: "1px solid transparent" }} />
+                <SkillPicker selected={d.skills} onChange={(v) => set("skills", v)} />
               </div>
               {skillErr && <p style={{ marginTop: 6, fontSize: 11, color: ERR }}>Please select at least one skill.</p>}
             </div>

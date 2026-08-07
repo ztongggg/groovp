@@ -33,7 +33,7 @@ export default function JoinGroupButton({ groupId, full }) {
         onClick={() => { setErrorMsg(""); setStatus("modal"); }}
         disabled={status === "loading" || settled || full}
         className="rounded-xl px-4 py-2 text-[13px] font-bold disabled:opacity-60"
-        style={{ background: settled ? "#dcf674" : "#7c3aed", color: settled ? "#5f7900" : "#fff" }}
+        style={{ background: "#7c3aed", color: "#fff" }}
       >
         {full ? "Full" : label}
       </button>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getSkillCatalog, addCustomSkill } from "@/app/skills/actions";
 import { DEFAULT_SKILLS } from "@/lib/skillCatalog";
 
-const DEFAULT_CHIP_ACTIVE = { background: "#7C3AED", color: "#fff", border: "1px solid transparent" };
+const DEFAULT_CHIP_ACTIVE = { background: "#F3EDFE", color: "#7C3AED", border: "1px solid #7C3AED" };
 const DEFAULT_CHIP_INACTIVE = { background: "#F3F1F8", color: "#1D1B44", border: "1px solid transparent" };
 
 /**

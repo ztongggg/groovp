@@ -22,13 +22,16 @@ export default function HomeProjectCard({
   id,
   title,
   desc,
+  tags,
   skills = [],
+  matchedTags = [],
   memberCount = 0,
   count,
   date,
   badge,
   coverImageUrl,
 }) {
+  const chips = tags || skills;
   return (
     <Link
       href={id ? `/project/${id}` : "#"}
@@ -68,17 +71,20 @@ export default function HomeProjectCard({
         {desc}
       </div>
 
-      {/* skills — first chip filled, rest tinted */}
+      {/* skills/interests — matched-against-viewer chips highlighted, rest neutral */}
       <div className="absolute flex gap-2 overflow-hidden" style={{ left: 13, top: 147, width: 256, height: 19 }}>
-        {skills.slice(0, 3).map((s, i) => (
-          <span
-            key={s}
-            className="inline-flex shrink-0 items-center"
-            style={{ height: 19, padding: "0 10px", borderRadius: 12.99, fontSize: 8.38, fontWeight: 800, lineHeight: "15.09px", background: i === 0 ? "#7c3aed" : "#f5f0ff", color: i === 0 ? "#fff" : "#7c3aed" }}
-          >
-            {s}
-          </span>
-        ))}
+        {chips.slice(0, 3).map((s) => {
+          const matched = matchedTags.includes(s);
+          return (
+            <span
+              key={s}
+              className="inline-flex shrink-0 items-center"
+              style={{ height: 19, padding: "0 10px", borderRadius: 12.99, fontSize: 8.38, fontWeight: 800, lineHeight: "15.09px", background: matched ? "#DEF5E5" : "#F3F1F8", color: "#1D1B44", border: `1px solid ${matched ? "#33B273" : "transparent"}` }}
+            >
+              {s}
+            </span>
+          );
+        })}
       </div>
 
       {/* member blobs */}

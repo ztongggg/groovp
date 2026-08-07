@@ -12,7 +12,7 @@ const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Sc
 
 const inputCls = "w-full rounded-[14px] bg-[#f3f1f8] px-4 py-3 text-[14px] text-navy focus:outline-none";
 function Chip({ active, onClick, children }) {
-  return <button type="button" onClick={onClick} className="rounded-[10px] px-4 text-[12px] font-semibold" style={{ height: 34, background: active ? "#7c3aed" : "#f3f1f8", color: active ? "#fff" : "#1d1b44" }}>{children}</button>;
+  return <button type="button" onClick={onClick} className="rounded-[10px] px-4 text-[12px]" style={{ height: 34, fontWeight: active ? 700 : 400, background: active ? "#F3EDFE" : "#F3F1F8", color: active ? "#7C3AED" : "#1D1B44", border: `1px solid ${active ? "#7C3AED" : "transparent"}` }}>{children}</button>;
 }
 
 export default function EditProjectForm({ project }) {

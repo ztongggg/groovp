@@ -45,9 +45,9 @@ export default function RequestButton({ groupId, subtitle }) {
         onClick={() => { setErrorMsg(""); setStatus("modal"); }}
         disabled={status === "loading" || settled}
         className="absolute flex items-center justify-center disabled:opacity-90"
-        style={{ left: 15, top: 294, width: 306, height: 42, borderRadius: 14, background: settled ? "#dcf674cc" : "#dcf674" }}
+        style={{ left: 15, top: 294, width: 306, height: 42, borderRadius: 14, background: settled ? "#7c3aedcc" : "#7c3aed" }}
       >
-        <span style={{ fontSize: 13, fontWeight: 800, color: "#5f7900" }}>{label}</span>
+        <span style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{label}</span>
       </button>
 
       {status === "modal" && (

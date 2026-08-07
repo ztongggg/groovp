@@ -82,7 +82,7 @@ export default function StartGroupForm({ projectId, projectName }) {
 
       <p style={{ marginTop: 24, fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>Skills needed</p>
       <div style={{ marginTop: 10 }}>
-        <SkillPicker selected={d.skills_wanted} onChange={(v) => set("skills_wanted", v)} chipActiveStyle={{ background: "#F3EDFE", color: "#7C3AED", border: "1px solid #7C3AED" }} />
+        <SkillPicker selected={d.skills_wanted} onChange={(v) => set("skills_wanted", v)} />
       </div>
 
       <p style={{ marginTop: 24, fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>Interests needed</p>

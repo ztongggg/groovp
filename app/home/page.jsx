@@ -1,6 +1,7 @@
 import AppShell from "@/components/AppShell";
 import HomeView from "@/components/HomeView";
 import { createClient } from "@/lib/supabase/server";
+import { STRONG_MATCH_THRESHOLD } from "@/lib/matching";
 
 function fmt(d) {
   if (!d) return "";
@@ -18,13 +19,15 @@ async function getData() {
     let name = "there";
     let unread = 0;
     let invites = 0;
+    let mine = new Set();
     if (user) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name")
+        .select("full_name, skills, interests")
         .eq("id", user.id)
         .single();
       name = profile?.full_name || (user.email || "there").split("@")[0];
+      mine = new Set([...(profile?.skills || []), ...(profile?.interests || [])].map((s) => (s || "").toLowerCase()));
       try {
         const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("read", false);
         unread = count || 0;
@@ -37,7 +40,7 @@ async function getData() {
 
     const { data: rows } = await supabase
       .from("projects")
-      .select("id,name,description,skills_needed,timeline_start,timeline_end,max_size,cover_image_url,created_at,status, groups(group_members(count))")
+      .select("id,name,description,skills_needed,interests,timeline_start,timeline_end,max_size,cover_image_url,created_at,status, groups(group_members(count))")
       .order("created_at", { ascending: false });
 
     const visible = (rows || []).filter((p) => p.status !== "Deleted");
@@ -65,11 +68,15 @@ async function getData() {
 
     const mapProject = (p) => {
       const members = p.groups?.[0]?.group_members?.[0]?.count ?? 0;
+      const tags = [...(p.skills_needed || []), ...(p.interests || [])];
+      const matchedTags = tags.filter((t) => mine.has((t || "").toLowerCase()));
       return {
         id: p.id,
         title: p.name,
         desc: p.description || "",
-        skills: p.skills_needed || [],
+        tags,
+        matchedTags,
+        badge: matchedTags.length >= STRONG_MATCH_THRESHOLD ? "✨ Strong Match" : undefined,
         memberCount: members,
         count: `${members}/${p.max_size || 0}`,
         date: `${fmt(p.timeline_start)} - ${fmt(p.timeline_end)}`,

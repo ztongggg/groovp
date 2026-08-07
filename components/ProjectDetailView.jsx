@@ -183,7 +183,14 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
               const full = members.length >= (maxSize || 99);
               const isLeader = meId && meId === g.leaderId;
               return (
-                <div key={g.id} className="rounded-2xl border border-line bg-white p-4 shadow-card">
+                <div
+                  key={g.id}
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => router.push(`/groups/${g.id}`)}
+                  onKeyDown={(e) => { if (e.key === "Enter") router.push(`/groups/${g.id}`); }}
+                  className="cursor-pointer rounded-2xl border border-line bg-white p-4 shadow-card"
+                >
                   <div className="flex items-center justify-between">
                     <p className="text-[16px] font-bold text-navy">{g.name}</p>
                     <span className="text-[13px] font-semibold text-muted">{members.length}/{maxSize} members</span>
@@ -192,22 +199,24 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
                     {g.recruiting ? (g.membersWanted > 0 ? `Open — looking for ${g.membersWanted} more` : "Open to requests") : "Not recruiting"}
                   </p>
                   <div className="mt-3 flex items-center justify-between">
-                    <div className="flex -space-x-2">
+                    <div className="flex -space-x-2" onClick={(e) => e.stopPropagation()}>
                       {members.slice(0, 5).map((m, i) => (
                         <Link key={m.user_id} href={`/u/${m.user_id}`} className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-[11px] font-bold text-white" style={{ background: AVATAR[i % AVATAR.length] }}>
                           {(m.name || "?").slice(0, 2).toUpperCase()}
                         </Link>
                       ))}
                     </div>
-                    {isLeader ? (
-                      <Link href={`/recruiting/${g.id}`} className="rounded-xl bg-[#f3f1f8] px-4 py-2 text-[13px] font-bold text-purple-600">Manage ›</Link>
-                    ) : !g.recruiting ? (
-                      <span className="rounded-xl bg-[#f3f1f8] px-4 py-2 text-[13px] font-bold text-muted">Closed</span>
-                    ) : !enrolled ? (
-                      <button onClick={enrol} disabled={pending} className="rounded-xl px-4 py-2 text-[13px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>Join project first</button>
-                    ) : (
-                      <JoinGroupButton groupId={g.id} full={full} />
-                    )}
+                    <div onClick={(e) => e.stopPropagation()}>
+                      {isLeader ? (
+                        <Link href={`/recruiting/${g.id}`} className="rounded-xl bg-[#f3f1f8] px-4 py-2 text-[13px] font-bold text-purple-600">Manage ›</Link>
+                      ) : !g.recruiting ? (
+                        <span className="rounded-xl bg-[#f3f1f8] px-4 py-2 text-[13px] font-bold text-muted">Closed</span>
+                      ) : !enrolled ? (
+                        <button onClick={enrol} disabled={pending} className="rounded-xl px-4 py-2 text-[13px] font-bold text-white disabled:opacity-50" style={{ background: "#7c3aed" }}>Join project first</button>
+                      ) : (
+                        <JoinGroupButton groupId={g.id} full={full} />
+                      )}
+                    </div>
                   </div>
                 </div>
               );

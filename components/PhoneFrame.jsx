@@ -14,7 +14,7 @@ export default function PhoneFrame({ children }) {
             402x874 phone screen instead of covering the whole browser
             viewport around the bezel on desktop. */}
         <div className="h-screen w-screen overflow-hidden bg-white sm:h-[874px] sm:w-[402px] sm:rounded-[34px]" style={{ transform: "translateZ(0)" }}>
-          <div className="h-full overflow-y-auto">{children}</div>
+          <div className="h-full overflow-y-auto phone-content">{children}</div>
         </div>
       </div>
     </div>

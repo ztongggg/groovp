@@ -107,7 +107,7 @@ export default function SignupPage() {
       { l: 88, t: 258, w: 34, h: 12, r: 6, bg: "#ffb800", rot: -30 },
       { l: 288, t: 288, w: 34, h: 12, r: 6, bg: "#ffb800", rot: 30 },
       { l: 370, t: 318, w: 8, h: 8, r: 999, bg: "#7c3aed" },
-      { l: 60, t: 398, w: 8, h: 8, r: 999, bg: "#dcf674" },
+      { l: 60, t: 398, w: 8, h: 8, r: 999, bg: "#7c3aed" },
       { l: 90, t: 465, w: 14, h: 6, r: 4, bg: "#f2a5bd", rot: -20 },
       { l: 335, t: 435, w: 12, h: 12, r: 999, bg: "#c4b5fd" },
       { l: 347, t: 470, w: 10, h: 6, r: 4, bg: "#7c3aed", rot: 20 },

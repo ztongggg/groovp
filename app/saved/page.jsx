@@ -45,7 +45,8 @@ export default async function SavedPage() {
                 key={p.id}
                 title={p.title}
                 desc={p.desc}
-                skills={p.skills}
+                tags={p.tags}
+                matchedTags={p.matchedTags}
                 memberCount={p.memberCount}
                 count={p.count}
                 date={p.date}
