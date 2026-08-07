@@ -1,7 +1,8 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
-import ApplicantCard, { ApplicantFace, StrongMatchPill, CARD_STYLE, appliedLabel } from "@/components/ApplicantCard";
+import ApplicantCard from "@/components/ApplicantCard";
+import { ApplicantFace, StrongMatchPill, CARD_STYLE, appliedLabel } from "@/components/ApplicantParts";
 import { createClient } from "@/lib/supabase/server";
 import { computeMatch } from "@/lib/matching";
 

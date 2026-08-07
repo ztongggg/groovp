@@ -23,6 +23,9 @@ export async function requestToJoin(groupId, note) {
     .single();
   if (!g) return { error: "Group not found." };
   if (g.recruiting === false) return { error: "This group isn't recruiting right now." };
+  // A leader requesting to join their own group left a self-request sitting in
+  // their own Join Requests list forever (seen in live data).
+  if (g.leader_id === user.id) return { ok: true, already: true };
 
   // Already a member? Nothing to do.
   const { data: mem } = await supabase
