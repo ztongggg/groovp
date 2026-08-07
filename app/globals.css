@@ -11,9 +11,9 @@ body {
 /* Content used to start flush at the very top edge of the phone screen — the
    fake status bar used to reserve this space, now that it's gone (removed
    deliberately, see git history) every screen needs its own breathing room
-   back. Matches the old status bar's height so nothing else has to move. */
+   back. */
 .phone-content {
-  padding-top: 44px;
+  padding-top: 20px;
 }
 
 /* The Figma file sets Nunito on the project-feed surfaces (Home, Discover,
