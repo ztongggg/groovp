@@ -1,6 +1,5 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import StatusBar from "@/components/StatusBar";
 import DiscoverList from "@/components/DiscoverList";
 import TutorialOverlay from "@/components/TutorialOverlay";
 import { createClient } from "@/lib/supabase/server";
@@ -22,7 +21,6 @@ export default async function Tutorial2Page() {
     <div className="relative">
       <AppShell>
         <div className="min-h-full bg-white pb-6">
-          <StatusBar />
           <div className="flex items-center justify-between px-6">
             <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1e1b4b" }}>Discover</h1>
             <div className="flex items-center gap-2">

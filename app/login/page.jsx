@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
-import StatusBar from "@/components/StatusBar";
 import { signIn } from "@/app/auth/actions";
 
 // Figma node 1065:2102 "Welcome Page" (+ 891:3491 error variant), file wA2wiOAqWkKr9JI319d5wT
@@ -57,7 +56,7 @@ export default function LoginPage() {
 
   return (
     <form action={formAction} className="relative w-[402px] bg-white" style={{ height: 874 }}>
-      <div className="absolute inset-x-0 top-0"><StatusBar /></div>
+      
 
       <div className="absolute" style={{ left: 71, top: 40, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.35), rgba(124,58,237,0))" }} />
       <Cloudy />

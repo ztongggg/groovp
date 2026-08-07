@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import StatusBar from "@/components/StatusBar";
 import HomeProjectCard from "@/components/HomeProjectCard";
 
 // Figma "swirl" mascot — eight cyan lobes with eyes and a mouth, drawn as plain
@@ -75,7 +74,6 @@ export default function HomeView({ name = "there", projects = [], popular = [], 
 
   return (
     <div className="font-nunito bg-white pb-3">
-      <StatusBar />
 
       <div className="flex justify-center px-[30px]">
         <div className="mt-2">

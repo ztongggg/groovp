@@ -16,13 +16,14 @@ export default function GroupRequestRow({ request, groupId, index = 0 }) {
   const router = useRouter();
   const [busy, setBusy] = useState("");
   const [done, setDone] = useState("");
+  const [error, setError] = useState("");
 
   async function act(kind) {
     if (busy) return;
-    setBusy(kind);
+    setBusy(kind); setError("");
     const res = kind === "accept" ? await acceptRequest(request.id, groupId, request.userId) : await declineRequest(request.id);
     setBusy("");
-    if (res?.error) return;
+    if (res?.error) { setError(res.error); return; }
     setDone(kind === "accept" ? "Accepted" : "Declined");
     router.refresh();
   }
@@ -36,6 +37,7 @@ export default function GroupRequestRow({ request, groupId, index = 0 }) {
   }
 
   return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
     <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #F3F1F8", boxShadow: "0px 2px 10px rgba(25,20,51,0.05)", padding: 8, display: "flex", alignItems: "center", gap: 10 }}>
       <Link href={`/u/${request.userId}?groupId=${groupId}`} style={{ flexShrink: 0 }}>
         {request.avatarUrl ? (
@@ -66,6 +68,8 @@ export default function GroupRequestRow({ request, groupId, index = 0 }) {
       <button onClick={() => act("accept")} disabled={!!busy} style={{ width: 66, height: 32, borderRadius: 16, background: "#D4F2DE", fontSize: 11.5, fontWeight: 600, color: "#298C52", flexShrink: 0 }}>
         {busy === "accept" ? "…" : "Accept"}
       </button>
+    </div>
+      {error && <p style={{ fontSize: 11.5, fontWeight: 600, color: "#BF4247", paddingLeft: 8 }}>{error}</p>}
     </div>
   );
 }

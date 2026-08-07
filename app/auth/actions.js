@@ -41,14 +41,16 @@ export async function signUp(_prevState, formData) {
 export async function signUpFull(data) {
   const supabase = createClient();
 
-  // University is derived from the email domain, not user-entered — the
-  // allowlist is also what makes the "Restricted" (same-school) privacy
-  // tier meaningful. Reject unrecognized domains before creating the account.
+  // No school-email requirement — any email works. If the domain happens to
+  // match a known university it's used as a nicety; otherwise the user's own
+  // typed "University" field from the signup form is what's saved. The
+  // "Restricted" (same-school) privacy tier just compares whatever string
+  // ends up here, so it degrades gracefully rather than gatekeeping signup.
   const emailDomain = (data.email || "").split("@")[1]?.toLowerCase();
   const { data: uniRow } = emailDomain
     ? await supabase.from("university_domains").select("university").eq("domain", emailDomain).maybeSingle()
     : { data: null };
-  if (!uniRow) return { error: "Please sign up with your university email address." };
+  const university = uniRow?.university || data.university || null;
 
   const { data: auth, error } = await supabase.auth.signUp({
     email: data.email,
@@ -68,7 +70,7 @@ export async function signUpFull(data) {
       .update({
         full_name: data.full_name,
         username: data.username,
-        university: uniRow.university,
+        university: university,
         major: data.major || null,
         year: data.year || null,
         personality: data.personality || null,

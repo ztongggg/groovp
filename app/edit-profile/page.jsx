@@ -1,5 +1,4 @@
 import AppShell from "@/components/AppShell";
-import StatusBar from "@/components/StatusBar";
 import EditProfileForm from "@/components/EditProfileForm";
 import { createClient } from "@/lib/supabase/server";
 
@@ -53,7 +52,6 @@ export default async function EditProfilePage({ searchParams }) {
   return (
     <AppShell>
       <div className="min-h-full bg-white pb-6">
-        <StatusBar />
         <EditProfileForm initial={profile} initialStep={step} pastProjects={pastProjects} />
       </div>
     </AppShell>

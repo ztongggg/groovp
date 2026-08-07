@@ -8,11 +8,12 @@ export default function JoinGroupButton({ groupId, full }) {
   const [status, setStatus] = useState("idle"); // idle | modal | loading | confirmed | done | reapplied | joined | error
   const [note, setNote] = useState("");
   const [wasReapply, setWasReapply] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   async function send() {
     setStatus("loading");
     const res = await requestToJoin(groupId, note);
-    if (res?.error) { setStatus("error"); return; }
+    if (res?.error) { setErrorMsg(res.error); setStatus("modal"); return; }
     if (res?.joined) { setStatus("joined"); return; }
     setWasReapply(!!res?.reapplied);
     setStatus("confirmed");
@@ -24,13 +25,12 @@ export default function JoinGroupButton({ groupId, full }) {
       : status === "joined" ? "Joined ✓"
       : status === "reapplied" ? "Re-requested ✓"
       : status === "done" ? "Requested ✓"
-      : status === "error" ? "Try again"
       : "Request to join";
 
   return (
     <>
       <button
-        onClick={() => (status === "error" ? send() : setStatus("modal"))}
+        onClick={() => { setErrorMsg(""); setStatus("modal"); }}
         disabled={status === "loading" || settled || full}
         className="rounded-xl px-4 py-2 text-[13px] font-bold disabled:opacity-60"
         style={{ background: settled ? "#dcf674" : "#7c3aed", color: settled ? "#5f7900" : "#fff" }}
@@ -44,7 +44,8 @@ export default function JoinGroupButton({ groupId, full }) {
             <p className="mb-1 text-[16px] font-bold text-navy">Request to join</p>
             <p className="mb-3 text-[13px] text-muted">Add a short note — it helps the leader decide (optional).</p>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder="e.g. I've worked with React before and I'm free most evenings" className="w-full rounded-xl border border-line px-3 py-2.5 text-[14px] text-navy focus:outline-none" />
-            <button onClick={send} className="mt-3 w-full rounded-xl py-3 text-[14px] font-bold text-white" style={{ background: "#7c3aed" }}>Send request</button>
+            {errorMsg && <p className="mt-2 text-[13px] font-semibold" style={{ color: "#bf4247" }}>{errorMsg}</p>}
+            <button onClick={send} disabled={status === "loading"} className="mt-3 w-full rounded-xl py-3 text-[14px] font-bold text-white disabled:opacity-60" style={{ background: "#7c3aed" }}>{status === "loading" ? "Sending…" : "Send request"}</button>
             <button onClick={() => setStatus("idle")} className="mt-2 w-full py-2 text-[14px] font-semibold text-muted">Cancel</button>
           </div>
         </div>

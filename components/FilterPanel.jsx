@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import SkillPicker from "@/components/SkillPicker";
 
-const SKILLS = ["Python", "React", "TypeScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "AI/ML", "FastAPI", "Design", "Research"];
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
 function Chip({ active, onClick, children }) {
@@ -13,20 +13,10 @@ const inputCls = "w-full rounded-[14px] bg-[#f3f1f8] px-4 py-2.5 text-[13px] tex
 
 const EMPTY = { skills: [], interests: [], teamMin: 2, teamMax: 5, timelineStart: "", timelineEnd: "" };
 
-function SearchBox({ value, onChange }) {
-  return (
-    <div className="mb-3 flex items-center gap-2.5 rounded-full" style={{ height: 50, background: "#f3f1f8", padding: "0 18px" }}>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d1b44" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
-      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="Find more of your skills" className="flex-1 bg-transparent focus:outline-none" style={{ fontSize: 13, color: "#1d1b44" }} />
-    </div>
-  );
-}
-
 // Filter Panel (Figma node 616:1961) — skills/interests/team-size/timeline only,
 // deliberately NO personality filter (spec: "filtering is for projects... not personality").
 export default function FilterPanel({ open, onClose, value, onApply }) {
   const [d, setD] = useState(value || EMPTY);
-  const [skillQuery, setSkillQuery] = useState("");
 
   if (!open) return null;
 
@@ -43,8 +33,9 @@ export default function FilterPanel({ open, onClose, value, onApply }) {
 
         <div className="flex-1 overflow-y-auto px-6 py-4">
           <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Skills needed</p>
-          <SearchBox value={skillQuery} onChange={setSkillQuery} />
-          <div className="mb-5 flex flex-wrap gap-2">{SKILLS.filter((s) => s.toLowerCase().includes(skillQuery.trim().toLowerCase())).map((s) => <Chip key={s} active={d.skills.includes(s)} onClick={() => toggle("skills", s)}>{s}</Chip>)}</div>
+          <div className="mb-5">
+            <SkillPicker selected={d.skills} onChange={(v) => setD((s) => ({ ...s, skills: v }))} />
+          </div>
 
           <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-muted">Interests needed</p>
           <div className="mb-5 flex flex-wrap gap-2">{INTERESTS.map((s) => <Chip key={s} active={d.interests.includes(s)} onClick={() => toggle("interests", s)}>{s}</Chip>)}</div>

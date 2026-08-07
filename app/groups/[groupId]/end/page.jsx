@@ -1,5 +1,4 @@
 import AppShell from "@/components/AppShell";
-import StatusBar from "@/components/StatusBar";
 import EndProjectFlow from "@/components/EndProjectFlow";
 import { createClient } from "@/lib/supabase/server";
 
@@ -42,7 +41,6 @@ export default async function EndProjectPage({ params }) {
   return (
     <AppShell>
       <div className="min-h-full bg-white pb-8">
-        <StatusBar />
         <EndProjectFlow groupId={data.group.id} groupName={data.group.name} groupStatus={data.group.status} projectId={data.group.project_id} members={data.members} />
       </div>
     </AppShell>

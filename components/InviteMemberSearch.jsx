@@ -12,6 +12,7 @@ export default function InviteMemberSearch({ groupId }) {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [invited, setInvited] = useState({}); // userId -> true, optimistic
+  const [errors, setErrors] = useState({}); // userId -> message
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -28,8 +29,12 @@ export default function InviteMemberSearch({ groupId }) {
 
   async function onInvite(userId) {
     setInvited((s) => ({ ...s, [userId]: true }));
+    setErrors((s) => ({ ...s, [userId]: "" }));
     const r = await inviteUserId(groupId, userId);
-    if (r?.error) setInvited((s) => ({ ...s, [userId]: false }));
+    if (r?.error) {
+      setInvited((s) => ({ ...s, [userId]: false }));
+      setErrors((s) => ({ ...s, [userId]: r.error }));
+    }
   }
 
   return (
@@ -48,7 +53,8 @@ export default function InviteMemberSearch({ groupId }) {
           const already = invited[c.id] || c.requestStatus === "invited" || c.requestStatus === "pending" || c.requestStatus === "accepted";
           const label = invited[c.id] ? "Invited" : STATUS_LABEL[c.requestStatus] || null;
           return (
-            <div key={c.id} style={{ height: 66, background: "#fff", borderRadius: 16, border: "1px solid #F3F1F8", display: "flex", alignItems: "center", gap: 10, padding: "0 10px" }}>
+            <div key={c.id} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ height: 66, background: "#fff", borderRadius: 16, border: "1px solid #F3F1F8", display: "flex", alignItems: "center", gap: 10, padding: "0 10px" }}>
               {c.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={c.avatar_url} alt="" style={{ width: 46, height: 46, borderRadius: 9999, objectFit: "cover", flexShrink: 0 }} />
@@ -71,6 +77,8 @@ export default function InviteMemberSearch({ groupId }) {
               >
                 {label || "Invite"}
               </button>
+            </div>
+            {errors[c.id] && <p style={{ paddingLeft: 10, fontSize: 11.5, fontWeight: 600, color: "#BF4247" }}>{errors[c.id]}</p>}
             </div>
           );
         })}

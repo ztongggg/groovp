@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createGroupInProject } from "@/app/project/[id]/actions";
 import AvatarUpload from "@/components/AvatarUpload";
+import SkillPicker from "@/components/SkillPicker";
 
-const SKILLS = ["Python", "Figma", "AI/ML", "React", "TypeScript", "Node.js", "SQL", "UI/UX", "Java", "FastAPI", "Design", "Research"];
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
 function TagChip({ active, onClick, children }) {
@@ -38,7 +38,6 @@ function Stepper({ label, value, onBump }) {
 export default function StartGroupForm({ projectId, projectName }) {
   const router = useRouter();
   const [d, setD] = useState({ name: "", photo_url: "", min_members: 2, max_members: 5, skills_wanted: [], interests_wanted: [], recruiting: true });
-  const [skillQuery, setSkillQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -56,7 +55,6 @@ export default function StartGroupForm({ projectId, projectName }) {
     router.push(`/recruiting/${res.groupId}`);
   }
 
-  const visibleSkills = SKILLS.filter((x) => x.toLowerCase().includes(skillQuery.trim().toLowerCase()));
 
   return (
     <div style={{ padding: "0 24px 32px" }}>
@@ -82,14 +80,9 @@ export default function StartGroupForm({ projectId, projectName }) {
         <Stepper label="Max" value={d.max_members} onBump={bumpMax} />
       </div>
 
-      <div style={{ marginTop: 24, height: 50, borderRadius: 25, background: "#F3F1F8", display: "flex", alignItems: "center", gap: 10, padding: "0 18px" }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#757080" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
-        <input value={skillQuery} onChange={(e) => setSkillQuery(e.target.value)} placeholder="Find more of your skills" className="flex-1 bg-transparent focus:outline-none" style={{ fontSize: 13, color: "#1D1B44" }} />
-      </div>
-
       <p style={{ marginTop: 24, fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>Skills needed</p>
-      <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {visibleSkills.map((x) => <TagChip key={x} active={d.skills_wanted.includes(x)} onClick={() => toggle("skills_wanted", x)}>{x}</TagChip>)}
+      <div style={{ marginTop: 10 }}>
+        <SkillPicker selected={d.skills_wanted} onChange={(v) => set("skills_wanted", v)} chipActiveStyle={{ background: "#F3EDFE", color: "#7C3AED", border: "1px solid #7C3AED" }} />
       </div>
 
       <p style={{ marginTop: 24, fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>Interests needed</p>

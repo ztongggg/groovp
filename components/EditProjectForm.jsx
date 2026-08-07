@@ -6,8 +6,8 @@ import { updateProject, deleteProject } from "@/app/project/[id]/edit/actions";
 import ResourceFileUpload from "@/components/ResourceFileUpload";
 import AvatarUpload from "@/components/AvatarUpload";
 import CoverImageUpload from "@/components/CoverImageUpload";
+import SkillPicker from "@/components/SkillPicker";
 
-const SKILLS = ["Python", "React", "TypeScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "AI/ML", "FastAPI", "Design", "Research"];
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
 const inputCls = "w-full rounded-[14px] bg-[#f3f1f8] px-4 py-3 text-[14px] text-navy focus:outline-none";
@@ -105,7 +105,7 @@ export default function EditProjectForm({ project }) {
 
       <div>
         <p className="mb-2 text-[13px] font-bold text-navy">Skills needed</p>
-        <div className="flex flex-wrap gap-2">{SKILLS.map((x) => <Chip key={x} active={d.skills.includes(x)} onClick={() => toggle("skills", x)}>{x}</Chip>)}</div>
+        <SkillPicker selected={d.skills} onChange={(v) => set("skills", v)} />
       </div>
       <div>
         <p className="mb-2 text-[13px] font-bold text-navy">Related interests</p>

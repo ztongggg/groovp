@@ -1,12 +1,11 @@
 import Link from "next/link";
-import StatusBar from "@/components/StatusBar";
 
 // Onboarding — Splash (Figma node 570:15147). Brand intro, tap anywhere to continue.
 // Whole-screen tap target matches the Figma frame, which has no separate CTA button.
 export default function SplashPage() {
   return (
     <Link href="/login" className="relative block w-[402px] bg-white" style={{ height: 874 }}>
-      <div className="absolute inset-x-0 top-0"><StatusBar /></div>
+      
 
       <p className="absolute" style={{ left: 32, top: 90, fontSize: 40, fontWeight: 800, color: "#1e1b4b" }}>Groovp</p>
       <div className="absolute" style={{ left: 32, top: 150, width: 300, fontSize: 15, color: "#59546b", lineHeight: "22px" }}>

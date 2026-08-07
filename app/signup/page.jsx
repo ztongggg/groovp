@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signUpFull } from "@/app/auth/actions";
+import SkillPicker from "@/components/SkillPicker";
 
-const SKILL_OPTIONS = ["Python", "React", "TypeScript", "JavaScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "C++", "TensorFlow", "AWS", "Docker", "Research", "Product", "Design", "Business"];
 const INTEREST_OPTIONS = [
   { name: "Sustainability", icon: "/interest-sustainability.svg" },
   { name: "EdTech", icon: "/interest-edtech.svg" },
@@ -71,15 +71,12 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [], linkedin_url: "", github_url: "", portfolio_url: "", pending_projects: [] });
   const [showLinks, setShowLinks] = useState(false);
-  const [skillQuery, setSkillQuery] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [addingProject, setAddingProject] = useState(false);
   const [newProject, setNewProject] = useState({ role: "", write_up: "" });
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
-  const hasSkill = (n) => d.skills.some((s) => s.name === n);
-  const toggleSkill = (n) => setD((s) => ({ ...s, skills: s.skills.some((x) => x.name === n) ? s.skills.filter((x) => x.name !== n) : [...s.skills, { name: n, level: "Basic" }] }));
   const setSkillLevel = (n, level) => setD((s) => ({ ...s, skills: s.skills.map((x) => (x.name === n ? { ...x, level } : x)) }));
   const canNext = () => {
     if (step === 0) return d.full_name && d.username && d.email && d.password.length >= 6;
@@ -249,13 +246,10 @@ export default function SignupPage() {
         )}
         {step === 3 && (
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2.5 rounded-full" style={{ height: 50, background: "#f3f1f8", padding: "0 18px" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d1b44" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
-              <input value={skillQuery} onChange={(e) => setSkillQuery(e.target.value)} placeholder="Find more of your skills" className="flex-1 bg-transparent focus:outline-none" style={{ fontSize: 13, color: "#1d1b44" }} />
-            </div>
-            <div className="flex flex-wrap gap-2.5">
-              {SKILL_OPTIONS.filter((x) => x.toLowerCase().includes(skillQuery.trim().toLowerCase())).map((x) => <Chip key={x} active={hasSkill(x)} onClick={() => toggleSkill(x)}>{x}</Chip>)}
-            </div>
+            <SkillPicker
+              selected={d.skills.map((s) => s.name)}
+              onChange={(names) => setD((s) => ({ ...s, skills: names.map((n) => s.skills.find((x) => x.name === n) || { name: n, level: "Basic" }) }))}
+            />
             {d.skills.length > 0 && (
               <div className="flex flex-col gap-2">
                 <div>

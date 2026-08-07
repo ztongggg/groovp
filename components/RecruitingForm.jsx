@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveRecruiting } from "@/app/recruiting/[groupId]/actions";
+import SkillPicker from "@/components/SkillPicker";
 
-const SKILLS = ["Python", "AI/ML", "FastAPI", "PyTorch", "React", "TypeScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "Design"];
 // These three rows are what actually fills personality_wanted. The Figma frame
 // also shows a separate "PERSONALITY WANTED" chip block holding the same
 // values — two pickers writing one array would fight each other, so only the
@@ -52,15 +52,17 @@ export default function RecruitingForm({ groupId, groupName, initial }) {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));
 
   async function save() {
-    setSaving(true); setSaved(false);
+    setSaving(true); setSaved(false); setError("");
     const res = await saveRecruiting(groupId, d);
     setSaving(false);
-    if (!res?.error) { setSaved(true); router.refresh(); }
+    if (res?.error) { setError(res.error); return; }
+    setSaved(true); router.refresh();
   }
 
   return (
@@ -105,8 +107,8 @@ export default function RecruitingForm({ groupId, groupName, initial }) {
           <p style={{ marginTop: 34, fontSize: 14, fontWeight: 700, color: "#1D1B44" }}>Who are you looking for?</p>
 
           <p style={{ ...LABEL, marginTop: 24 }}>SKILLS WANTED</p>
-          <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {SKILLS.map((s) => <Chip key={s} active={d.skills_wanted.includes(s)} onClick={() => toggle("skills_wanted", s)}>{s}</Chip>)}
+          <div style={{ marginTop: 10 }}>
+            <SkillPicker selected={d.skills_wanted} onChange={(v) => set("skills_wanted", v)} chipActiveStyle={{ background: "#F3EDFE", color: "#7C3AED", border: "1px solid #7C3AED" }} />
           </div>
 
           <p style={{ ...LABEL, marginTop: 26 }}>INTERESTS WANTED</p>
@@ -155,10 +157,12 @@ export default function RecruitingForm({ groupId, groupName, initial }) {
         </>
       )}
 
+      {error && <p style={{ marginTop: 16, fontSize: 13, fontWeight: 600, color: "#BF4247" }}>{error}</p>}
+
       <button
         onClick={save}
         disabled={saving}
-        style={{ marginTop: 40, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7C3AED,#6126CC)", boxShadow: "0px 6px 18px rgba(124,58,237,0.22)", fontSize: 16, fontWeight: 600, color: "#fff", opacity: saving ? 0.5 : 1 }}
+        style={{ marginTop: error ? 12 : 40, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7C3AED,#6126CC)", boxShadow: "0px 6px 18px rgba(124,58,237,0.22)", fontSize: 16, fontWeight: 600, color: "#fff", opacity: saving ? 0.5 : 1 }}
       >
         {saving ? "Saving…" : saved ? "Saved ✓" : "Save Settings"}
       </button>

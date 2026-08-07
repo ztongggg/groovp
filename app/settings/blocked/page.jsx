@@ -1,6 +1,5 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import StatusBar from "@/components/StatusBar";
 import BlockedUserRow from "@/components/BlockedUserRow";
 import { createClient } from "@/lib/supabase/server";
 
@@ -31,7 +30,6 @@ export default async function BlockedUsersPage() {
   return (
     <AppShell>
       <div className="min-h-full pb-8" style={{ background: "#f9f8fb" }}>
-        <StatusBar />
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
           <Link href="/settings" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Blocked Users</h1>

@@ -43,6 +43,7 @@ export default function ChatView({
   const router = useRouter();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   async function send(e) {
     e?.preventDefault();
@@ -50,10 +51,12 @@ export default function ChatView({
     if (!body || sending) return;
     setSending(true);
     setText("");
+    setError("");
     const res = conversationId ? await sendDM(conversationId, body) : await sendMessage(groupId, body);
     setSending(false);
     if (res?.error) {
       setText(body);
+      setError(res.error);
       return;
     }
     router.refresh();
@@ -126,6 +129,8 @@ export default function ChatView({
           })
         )}
       </div>
+
+      {error && <p style={{ padding: "0 22px", fontSize: 11.5, fontWeight: 600, color: "#BF4247" }}>{error}</p>}
 
       {/* Composer */}
       <form onSubmit={send} style={{ height: 90, background: "#fff", boxShadow: "0px -2px 12px rgba(25,20,51,0.06)", display: "flex", alignItems: "center", gap: 8, padding: "0 22px" }}>

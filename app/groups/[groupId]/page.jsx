@@ -1,6 +1,5 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import StatusBar from "@/components/StatusBar";
 import { createClient } from "@/lib/supabase/server";
 import LeaveGroupButton from "@/components/LeaveGroupButton";
 import JoinGroupButton from "@/components/JoinGroupButton";
@@ -142,7 +141,6 @@ export default async function GroupInfoPage({ params }) {
   return (
     <AppShell>
       <div className="min-h-full bg-white pb-10">
-        <StatusBar />
 
         <div style={{ position: "relative", height: 42 }}>
           <Link

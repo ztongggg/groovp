@@ -1,6 +1,5 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import StatusBar from "@/components/StatusBar";
 import ConnectLinkedIn from "@/components/ConnectLinkedIn";
 import ConnectGitHub from "@/components/ConnectGitHub";
 import { signOut } from "@/app/auth/actions";
@@ -61,7 +60,6 @@ export default async function SettingsPage() {
   return (
     <AppShell>
       <div className="min-h-full bg-bgapp pb-8">
-        <StatusBar />
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
           <Link href="/profile" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: "#1D1B44" }}>Settings</h1>

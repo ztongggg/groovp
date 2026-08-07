@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { createProject } from "@/app/create/actions";
 import ResourceFileUpload from "@/components/ResourceFileUpload";
 import AvatarUpload from "@/components/AvatarUpload";
+import SkillPicker from "@/components/SkillPicker";
 
-const SKILLS = ["Python", "Figma", "AI/ML", "React", "TypeScript", "Node.js", "SQL", "UI/UX", "Java", "FastAPI", "Design", "Research"];
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
 const STEPS = [
@@ -82,7 +82,6 @@ export default function CreateProjectPage() {
   const [error, setError] = useState("");
   const [done, setDone] = useState(null); // {projectId, name, joinCode}
   const [copied, setCopied] = useState(false);
-  const [skillQuery, setSkillQuery] = useState("");
   // Type starts unset: the frame has an error state for "make a selection".
   const [d, setD] = useState({ type: "", name: "", description: "", photo_url: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, number_of_groups: 1, skills: [], interests: [], project_link: "", resource_files: [], privacy: "public", joining_method: "approval" });
   const [touched, setTouched] = useState(false);
@@ -179,7 +178,6 @@ export default function CreateProjectPage() {
 
   const s = STEPS[step];
   const low = step <= 1; // steps 0 and 1 sit lower in the frames
-  const visibleSkills = SKILLS.filter((x) => x.toLowerCase().includes(skillQuery.trim().toLowerCase()));
 
   return (
     <div className="relative w-[402px] bg-white" style={{ minHeight: 874 }}>
@@ -279,15 +277,10 @@ export default function CreateProjectPage() {
 
             <div>
               <p style={{ fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>Skills needed</p>
-              <div style={{ marginTop: 10, height: 50, borderRadius: 25, background: skillErr ? ERR_BG : "#F3F1F8", border: skillErr ? `1.5px solid ${ERR}` : "1.5px solid transparent", display: "flex", alignItems: "center", gap: 10, padding: "0 18px" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#757080" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
-                <input value={skillQuery} onChange={(e) => setSkillQuery(e.target.value)} placeholder="Find more of your skills" className="flex-1 bg-transparent focus:outline-none" style={{ fontSize: 13, color: "#1D1B44" }} />
+              <div style={{ marginTop: 10 }}>
+                <SkillPicker selected={d.skills} onChange={(v) => set("skills", v)} chipActiveStyle={{ background: "#7C3AED", color: "#fff", border: "1px solid transparent" }} />
               </div>
               {skillErr && <p style={{ marginTop: 6, fontSize: 11, color: ERR }}>Please select at least one skill.</p>}
-              <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {visibleSkills.map((x) => <TagChip key={x} active={d.skills.includes(x)} onClick={() => toggle("skills", x)}>{x}</TagChip>)}
-                {visibleSkills.length === 0 && <p style={{ fontSize: 12, color: "#757080" }}>No skills match &quot;{skillQuery}&quot;.</p>}
-              </div>
             </div>
 
             <div>

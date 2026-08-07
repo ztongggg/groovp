@@ -1,6 +1,5 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import StatusBar from "@/components/StatusBar";
 import RateTeammatesList from "@/components/RateTeammatesList";
 import { createClient } from "@/lib/supabase/server";
 
@@ -50,7 +49,6 @@ export default async function RateTeammatesPage({ params }) {
   return (
     <AppShell>
       <div className="min-h-full pb-8" style={{ background: "#F9F8FB" }}>
-        <StatusBar />
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
           <Link href="/teams" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Rate your teammates</h1>

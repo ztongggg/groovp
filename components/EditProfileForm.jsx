@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateProfile } from "@/app/edit-profile/actions";
 import AvatarUpload from "@/components/AvatarUpload";
+import SkillPicker from "@/components/SkillPicker";
 
 const YEARS = ["Y1", "Y2", "Y3", "Y4", "Other"];
-const SKILL_OPTIONS = ["Python", "React", "TypeScript", "JavaScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "C++", "TensorFlow", "AWS", "Docker", "Research", "Product", "Design", "Business"];
 const INTEREST_OPTIONS = [
   { name: "Sustainability", icon: "/interest-sustainability.svg" },
   { name: "EdTech", icon: "/interest-edtech.svg" },
@@ -49,6 +49,7 @@ export default function EditProfileForm({ initial, initialStep = 0, pastProjects
     username: initial.username || "",
     avatar_url: initial.avatar_url || "",
     bio: initial.bio || "",
+    university: initial.university || "",
     major: initial.major || "",
     year: initial.year || "",
     personality: initial.personality || "",
@@ -65,8 +66,6 @@ export default function EditProfileForm({ initial, initialStep = 0, pastProjects
   const [error, setError] = useState("");
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
 
-  const hasSkill = (n) => d.skills.some((x) => x.name === n);
-  const toggleSkill = (n) => setD((s) => ({ ...s, skills: hasSkill(n) ? s.skills.filter((x) => x.name !== n) : [...s.skills, { name: n, level: "Basic" }] }));
   const setSkillLevel = (n, level) => setD((s) => ({ ...s, skills: s.skills.map((x) => (x.name === n ? { ...x, level } : x)) }));
   const toggleInterest = (n) => setD((s) => ({ ...s, interests: s.interests.includes(n) ? s.interests.filter((x) => x !== n) : [...s.interests, n] }));
 
@@ -98,10 +97,7 @@ export default function EditProfileForm({ initial, initialStep = 0, pastProjects
           <input className={cls} placeholder="Full name" value={d.full_name} onChange={(e) => set("full_name", e.target.value)} />
           <input className={cls} placeholder="Username" value={d.username} onChange={(e) => set("username", e.target.value)} />
           <textarea className={cls} rows={3} placeholder="Short bio — what are you into?" value={d.bio} onChange={(e) => set("bio", e.target.value)} />
-          <div className={`${cls} flex items-center justify-between`}>
-            <span>{initial.university || "University"}</span>
-            <span className="text-[11px] font-bold uppercase tracking-wide text-muted">Verified</span>
-          </div>
+          <input className={cls} placeholder="University" value={d.university} onChange={(e) => set("university", e.target.value)} />
           <input className={cls} placeholder="Major" value={d.major} onChange={(e) => set("major", e.target.value)} />
 
           <p className="mt-2 text-[14px] font-bold text-navy">Year of study</p>
@@ -127,11 +123,10 @@ export default function EditProfileForm({ initial, initialStep = 0, pastProjects
 
       {step === 1 && (
         <>
-          <div className={`${cls} flex items-center gap-2.5`}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></svg>
-            <span className="text-[14px] text-muted">Find more of your skills</span>
-          </div>
-          <div className="flex flex-wrap gap-2">{SKILL_OPTIONS.map((x) => <Chip key={x} active={hasSkill(x)} onClick={() => toggleSkill(x)}>{x}</Chip>)}</div>
+          <SkillPicker
+            selected={d.skills.map((s) => s.name)}
+            onChange={(names) => setD((s) => ({ ...s, skills: names.map((n) => s.skills.find((x) => x.name === n) || { name: n, level: "Basic" }) }))}
+          />
           {d.skills.length > 0 && (
             <div className="mt-3 flex flex-col gap-2">
               <p className="text-[15px] font-bold text-navy">Set your skill level</p>

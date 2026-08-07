@@ -5,12 +5,15 @@ import { respondToInvite } from "@/app/invites/actions";
 
 export default function InviteCard({ invite }) {
   const [done, setDone] = useState(null); // null | 'accepted' | 'declined'
+  const [error, setError] = useState("");
   const [pending, start] = useTransition();
 
   function respond(accept) {
+    setError("");
     start(async () => {
       const res = await respondToInvite(invite.id, accept);
-      if (!res?.error) setDone(accept ? "accepted" : "declined");
+      if (res?.error) { setError(res.error); return; }
+      setDone(accept ? "accepted" : "declined");
     });
   }
 
@@ -46,6 +49,7 @@ export default function InviteCard({ invite }) {
           </button>
         </div>
       )}
+      {error && <p className="mt-2 text-[12.5px] font-semibold" style={{ color: "#bf4247" }}>{error}</p>}
     </div>
   );
 }
