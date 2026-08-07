@@ -91,13 +91,8 @@ export default function ChatView({
       <div className="flex flex-1 flex-col overflow-y-auto" style={{ padding: "28px 24px", gap: 18 }}>
         {messages.length === 0 ? (
           <div style={{ marginTop: 60, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-            <div style={{ position: "relative", width: 300, height: 300 }}>
-              <div style={{ position: "absolute", background: "#FFB800", left: 110.7, top: 147.5, width: 118, height: 88.5 }} />
-              <div style={{ position: "absolute", background: "#FFB800", left: 52.9, top: 79.9, width: 104.5, height: 104.5, borderRadius: 9999 }} />
-              <div style={{ position: "absolute", background: "#111827", left: 132.8, top: 191.8, width: 11.1, height: 20.9, borderRadius: 9999 }} />
-              <div style={{ position: "absolute", background: "#111827", left: 170.9, top: 191.8, width: 11.1, height: 20.9, borderRadius: 9999 }} />
-              <div style={{ position: "absolute", background: "#C2410C", left: 167.4, top: 219.2, width: 10, height: 21.9, borderRadius: 9999, transform: "rotate(90deg)" }} />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/empty-messages-shapey.png" alt="" style={{ width: 300, height: 300 }} />
             <p style={{ marginTop: 16, fontSize: 19, fontWeight: 800, color: "#1D1B44" }}>Say hello!</p>
             <p style={{ marginTop: 10, fontSize: 12.5, color: "#757080" }}>This is the start of your conversation.</p>
           </div>

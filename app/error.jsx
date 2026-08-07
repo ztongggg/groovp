@@ -2,17 +2,12 @@
 
 // Global error boundary (Next.js App Router convention — catches render/data
 // errors anywhere under this segment). Figma node 895:2005 "Error – Something
-// Went Wrong", reuses the same star mascot asset as the Splash screen.
+// Went Wrong" — its own real Starry export, not shared with Splash's.
 export default function Error({ reset }) {
   return (
     <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
-      <div className="absolute" style={{ left: 60, top: 216, width: 281, height: 281 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/splash-starry-star.svg" alt="" className="absolute" style={{ left: 7.5, top: 7.5, width: 266, height: 266 }} />
-        <div className="absolute rounded-full" style={{ background: "#111827", left: 101.25, top: 123.75, width: 20.625, height: 20.625 }} />
-        <div className="absolute rounded-full" style={{ background: "#111827", left: 157.5, top: 123.75, width: 20.625, height: 20.625 }} />
-        <div className="absolute rounded-full" style={{ background: "#be185d", left: 135, top: 148.13, width: 13.125, height: 11.25 }} />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/error-starry.png" alt="" className="absolute" style={{ left: 60, top: 208, width: 282, height: 282 }} />
 
       <p className="absolute w-full text-center" style={{ top: 472, fontSize: 19, fontWeight: 800, color: "#1d1b44" }}>Something went wrong</p>
       <div className="absolute w-full text-center" style={{ top: 504, fontSize: 12.5, color: "#757080", lineHeight: "normal" }}>

@@ -134,11 +134,15 @@ export default function SignupPage() {
   if (intro) {
     return (
       <div className="relative w-[402px] overflow-hidden bg-white" style={{ height: 874 }}>
-        <div className="absolute" style={{ left: 296, top: 112, width: 87, height: 87, borderRadius: 11, background: "#f2a5bd" }} />
-        <div className="absolute rounded-full" style={{ left: 20, top: 469, width: 62, height: 62, background: "#4ac7b2" }} />
-        {/* real Figma illustration (node 570:15162), exact position */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/signup-cloud.png" alt="" className="pointer-events-none absolute" style={{ left: -48, top: 88, width: 500, height: 500 }} />
+        <img src="/signup-rectangle.png" alt="" className="pointer-events-none absolute" style={{ left: 288, top: 108, width: 82, height: 82 }} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/signup-ellipse.png" alt="" className="pointer-events-none absolute" style={{ left: 34, top: 469, width: 62, height: 62 }} />
+        {/* Real exported mascot — this screen's mascot is Starry (pink star),
+            not Cloudy. An earlier pass had the wrong mascot entirely; caught
+            once the owner supplied the real per-asset exports to compare against. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/signup-starry.png" alt="" className="pointer-events-none absolute" style={{ left: 51, top: 190, width: 300, height: 300 }} />
         <div className="absolute" style={{ left: 32, top: 600, width: 340, fontSize: 28, fontWeight: 800, color: "#1e1b4b", lineHeight: "34px" }}>Just 4 questions before you start!</div>
         <div className="absolute" style={{ left: 32, top: 700, width: 340, fontSize: 14, fontWeight: 400, color: "#6b6678", lineHeight: "17px" }}>Tell us a bit about yourself so we can match you with teammates who fit — from skills to working style.</div>
         <button onClick={() => setIntro(false)} className="absolute flex items-center justify-center" style={{ left: 32, top: 800, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
