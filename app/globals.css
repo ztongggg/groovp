@@ -18,3 +18,66 @@ body {
 .font-nunito nav {
   font-family: "Inter", system-ui, sans-serif;
 }
+
+/* ---------------------------------------------------------------------
+   Cross-cutting interaction polish. Every screen in this app is pixel-
+   matched to a Figma export — colors, sizes, and spacing are locked and
+   deliberately NOT touched here. What was missing on top of that: motion,
+   focus, and press feedback, applied once, globally, instead of 89 times.
+   ------------------------------------------------------------------- */
+
+a,
+button,
+input,
+textarea,
+select,
+[role="button"] {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease,
+    opacity 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+/* Custom press feedback (opacity dip) replaces the browser's default tap
+   flash, which we just disabled above via -webkit-tap-highlight-color. */
+button:not(:disabled):active,
+a:active,
+[role="button"]:active {
+  opacity: 0.7;
+}
+
+/* Deliberate focus ring in the brand color — the app has no custom focus
+   styling anywhere, so keyboard/switch-control navigation currently falls
+   back to whatever the browser does by default (inconsistent, sometimes
+   invisible against a colored button). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+}
+
+::selection {
+  background: #ece8fc;
+  color: #1d1b44;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
