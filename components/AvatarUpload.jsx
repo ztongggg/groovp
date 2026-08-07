@@ -9,7 +9,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
 // Photo picker. Defaults to the rounded-square group/project shape; pass
 // round for a person (this app's convention: people are circles,
 // groups/projects are rounded-squares).
-export default function AvatarUpload({ url, onChange, size = 90, round = false, caption = "Change photo" }) {
+export default function AvatarUpload({ url, onChange, size = 90, round = false, outline = false, caption = "Change photo" }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -41,6 +41,12 @@ export default function AvatarUpload({ url, onChange, size = 90, round = false, 
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt="" className="h-full w-full object-cover" style={{ borderRadius: radius }} />
+        ) : outline ? (
+          // Empty-state treatment used when creating something that has no
+          // photo yet: lavender well with a purple upload glyph.
+          <div className="flex h-full w-full items-center justify-center" style={{ borderRadius: 20, background: "#F5F0FF", border: "2px solid #7C3AED" }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" /><path d="M12 3v12M8 7l4-4 4 4" /></svg>
+          </div>
         ) : (
           <div className="flex h-full w-full items-center justify-center" style={{ borderRadius: radius, background: round ? "#FBBF24" : "#4ac7b2" }} />
         )}

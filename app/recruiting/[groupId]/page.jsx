@@ -27,11 +27,10 @@ export default async function RecruitingPage({ params }) {
     <AppShell>
       <div className="min-h-full bg-white pb-6">
         <StatusBar />
-        <div className="mb-4 flex items-center gap-3 px-6">
-          <Link href={g ? `/project/${g.project_id}` : "/teams"} className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d1b44" }}>Recruiting settings</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
+          <Link href={g ? `/groups/${g.id}` : "/teams"} aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Recruiting settings</h1>
         </div>
-        {g && <p className="mb-4 px-6 text-[13px] text-muted">Control whether people can request to join {g.name}.</p>}
 
         {!g ? (
           <p className="mt-24 px-8 text-center text-muted">Group not found.</p>
@@ -39,7 +38,7 @@ export default async function RecruitingPage({ params }) {
           <p className="mt-24 px-8 text-center text-muted">Only the group leader can manage recruiting.</p>
         ) : (
           <>
-            <RecruitingForm groupId={g.id} initial={g} />
+            <RecruitingForm groupId={g.id} groupName={g.name} initial={g} />
             <div className="px-6">
               <InviteByUsername groupId={g.id} />
             </div>
