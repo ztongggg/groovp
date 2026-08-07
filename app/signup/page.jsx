@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signUpFull } from "@/app/auth/actions";
 import SkillPicker from "@/components/SkillPicker";
+import { createClient } from "@/lib/supabase/client";
 
 const INTEREST_OPTIONS = [
   { name: "Sustainability", icon: "/interest-sustainability.svg" },
@@ -73,7 +74,7 @@ export default function SignupPage() {
   const [done, setDone] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "SUTD", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [], linkedin_url: "", github_url: "", portfolio_url: "", pending_projects: [] });
+  const [d, setD] = useState({ full_name: "", username: "", email: "", password: "", university: "", major: "", year: "", gender: "", personality: "", prefer_working: "", best_work_time: "", location: "", skills: [], interests: [], linkedin_url: "", github_url: "", portfolio_url: "", pending_projects: [] });
   const [showLinks, setShowLinks] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [addingProject, setAddingProject] = useState(false);
@@ -95,6 +96,22 @@ export default function SignupPage() {
     setSaving(false);
     if (res?.error) { setError(res.error); return; }
     setDone(true);
+  }
+  // linkIdentity needs an authenticated session, which doesn't exist until
+  // signUpFull runs — so "Verify" here creates the account first (same as
+  // Finish would), then immediately hands off to the provider. Lands back
+  // on /tutorial/1 via /auth/callback, same destination Complete's "Let's
+  // go" already uses — this path just skips the congrats screen in between.
+  async function verifyAndLink(provider) {
+    setSaving(true); setError("");
+    const res = await signUpFull(d);
+    if (res?.error) { setSaving(false); setError(res.error); return; }
+    const supabase = createClient();
+    const { error } = await supabase.auth.linkIdentity({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/tutorial/1` },
+    });
+    if (error) { setSaving(false); setError(error.message); }
   }
   const next = () => (step < STEPS.length - 1 ? setStep(step + 1) : finish());
   const back = () => (step > 0 ? setStep(step - 1) : setIntro(true));
@@ -212,7 +229,7 @@ export default function SignupPage() {
                 duplicate, not a second control. Not built: an input that
                 doesn't save anywhere is exactly the fake-control this project
                 explicitly avoids. */}
-            <Field icon={I.university} optional placeholder="University" value={d.university} onChange={(e) => set("university", e.target.value)} />
+            <Field icon={I.university} optional placeholder="University (eg SUTD, NUS, NTU)" value={d.university} onChange={(e) => set("university", e.target.value)} />
             <Field icon={I.book} optional placeholder="Major (e.g. Computer Science)" value={d.major} onChange={(e) => set("major", e.target.value)} />
             <div>
               <p className="text-[13px] font-semibold text-navy">Year of study</p>
@@ -333,7 +350,15 @@ export default function SignupPage() {
                   <Field icon={I.linkedin} placeholder="LinkedIn URL" value={d.linkedin_url} onChange={(e) => set("linkedin_url", e.target.value)} />
                   <Field icon={I.github} placeholder="GitHub URL" value={d.github_url} onChange={(e) => set("github_url", e.target.value)} />
                   <Field icon={I.globe} placeholder="Portfolio website URL" value={d.portfolio_url} onChange={(e) => set("portfolio_url", e.target.value)} />
-                  <p className="text-[11.5px] text-muted">You can verify these with LinkedIn and GitHub right after you sign up — verified badges help teammates trust your links.</p>
+                  <p className="mt-1 text-[11.5px] text-muted">Verify now — this creates your account and hands off to the provider.</p>
+                  <button type="button" onClick={() => verifyAndLink("linkedin_oidc")} disabled={saving} className="flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-[14px] font-bold text-white disabled:opacity-60" style={{ background: "#0a66c2" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z" /></svg>
+                    Verify with LinkedIn
+                  </button>
+                  <button type="button" onClick={() => verifyAndLink("github")} disabled={saving} className="flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-[14px] font-bold text-white disabled:opacity-60" style={{ background: "#1f2328" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.4-1.27.74-1.56-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.28 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z" /></svg>
+                    Verify with GitHub
+                  </button>
                 </div>
               ) : (
                 <button type="button" onClick={() => setShowLinks(true)} className="w-full rounded-2xl border-[1.5px] py-3 text-[13px] font-semibold" style={{ borderColor: "#7c3aed", color: "#7c3aed" }}>+ Add Link</button>

@@ -27,17 +27,13 @@ body {
   font-family: "Inter", system-ui, sans-serif;
 }
 
-/* Welcome Page's two fields — the export specifies navy-at-50%-opacity
-   placeholders, not the browser default gray. */
-.login-field::placeholder {
-  color: rgba(30, 27, 75, 0.5);
-  font-weight: 400;
-}
-
-/* Signup's shared Field/SkillPicker-style inputs — the export shows
-   placeholder text in full navy #1D1B44, not the browser's default gray. */
-.field-input::placeholder {
-  color: #1d1b44;
+/* Standardized placeholder color, every text input/textarea in the app —
+   grey before typing, full color once a value's entered (owner feedback:
+   was inconsistent, navy-on-some-fields read as already-filled-in). Matches
+   the app's existing muted-text token so it reads as "empty", not "wrong". */
+input::placeholder,
+textarea::placeholder {
+  color: #757080;
   opacity: 1;
   font-weight: 400;
 }
