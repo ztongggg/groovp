@@ -54,6 +54,7 @@ export async function createGroupInProject(projectId, data) {
       max_members: maxMembers,
       skills_wanted: data?.skills_wanted || [],
       interests_wanted: data?.interests_wanted || [],
+      recruiting: data?.recruiting !== false,
     })
     .select()
     .single();

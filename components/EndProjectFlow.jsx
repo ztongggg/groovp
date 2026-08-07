@@ -27,14 +27,14 @@ function PhotoPicker({ photos, onChange }) {
   }
 
   return (
-    <div className="flex gap-2">
+    <div style={{ display: "flex", gap: 12 }}>
       {[0, 1, 2].map((i) => (
-        <label key={i} className="flex flex-1 items-center justify-center rounded-2xl border-[1.5px] border-dashed" style={{ height: 72, borderColor: "#c9c5d3" }}>
+        <label key={i} style={{ width: 104, height: 90, borderRadius: 14, background: "#F3F1F8", border: "1px solid #CCC2F0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {photos[i] ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photos[i]} alt="" className="h-full w-full rounded-2xl object-cover" />
+            <img src={photos[i]} alt="" style={{ width: "100%", height: "100%", borderRadius: 14, objectFit: "cover" }} />
           ) : (
-            <span style={{ fontSize: 20, color: "#7c3aed" }}>{uploading ? "…" : "+"}</span>
+            <span style={{ fontSize: 24, fontWeight: 400, color: "#7C3AED" }}>{uploading ? "…" : "+"}</span>
           )}
           <input type="file" accept="image/jpeg,image/png" className="hidden" onChange={(e) => onPick(e, i)} disabled={uploading} />
         </label>
@@ -119,25 +119,55 @@ export default function EndProjectFlow({ groupId, groupName, groupStatus, projec
       );
     }
     return (
-      <div className="mt-6 flex flex-col gap-3 px-6 text-left">
-        <div className="text-center">
-          <p className="text-[20px] font-extrabold text-navy">Add this to your profile?</p>
-          <p className="mt-1 text-[13px] text-muted">Show off what you built{groupName ? ` on "${groupName}"` : ""} — write a short summary and add a few photos.</p>
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
+          <button onClick={() => setStep("rate")} aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</button>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Add this to your profile?</h1>
         </div>
-        <div className="mt-2 flex flex-col gap-2">
-          {groupName && <div className="rounded-xl px-3 py-2.5 text-[14px] font-semibold text-navy" style={{ background: "#f3f1f8" }}>{groupName}</div>}
-          <p className="mt-1 text-[13px] font-bold text-muted">Your role</p>
-          <input placeholder="e.g. Frontend Lead" value={role} onChange={(e) => setRole(e.target.value)} className="rounded-xl px-3 py-2.5 text-[14px] focus:outline-none" style={{ background: "#f3f1f8" }} />
-          <p className="mt-1 text-[13px] font-bold text-muted">Write-up</p>
-          <textarea placeholder="What did you build? What are you proud of? (visible on your public profile)" value={writeUp} onChange={(e) => setWriteUp(e.target.value)} rows={3} className="rounded-xl px-3 py-2.5 text-[14px] focus:outline-none" style={{ background: "#f3f1f8" }} />
-          <p className="mt-1 text-[13px] font-bold text-muted">Photos (optional)</p>
+      <div style={{ padding: "0 24px 32px" }}>
+        <p style={{ marginTop: 12, fontSize: 12.5, color: "#757080", lineHeight: "18px" }}>
+          Show off what you built{groupName ? ` on “${groupName}”` : ""} — write a short summary and add a few photos.
+        </p>
+
+        {groupName && (
+          <div style={{ marginTop: 21, height: 52, background: "#F3F1F8", borderRadius: 14, display: "flex", alignItems: "center", padding: "0 16px" }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#1D1B44" }}>{groupName}</span>
+          </div>
+        )}
+
+        <p style={{ marginTop: 15, fontSize: 12, fontWeight: 600, color: "#757080" }}>Your role</p>
+        <input
+          placeholder="e.g. Frontend Lead"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          style={{ marginTop: 6, width: "100%", height: 50, borderRadius: 14, background: "#F3F1F8", padding: "0 16px", fontSize: 13.5, color: "#1D1B44", outline: "none" }}
+        />
+
+        <p style={{ marginTop: 15, fontSize: 12, fontWeight: 600, color: "#757080" }}>Write-up</p>
+        <textarea
+          placeholder="What did you build? What are you proud of? (visible on your public profile)"
+          value={writeUp}
+          onChange={(e) => setWriteUp(e.target.value)}
+          rows={4}
+          style={{ marginTop: 6, width: "100%", height: 140, borderRadius: 14, background: "#F3F1F8", border: "1px solid #F3F1F8", padding: 16, fontSize: 12.5, color: "#1D1B44", outline: "none", resize: "none" }}
+        />
+
+        <p style={{ marginTop: 15, fontSize: 12, fontWeight: 600, color: "#757080" }}>Photos (optional)</p>
+        <div style={{ marginTop: 6 }}>
           <PhotoPicker photos={photos} onChange={setPhotos} />
         </div>
-        {error && <p className="text-[13px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}
-        <button onClick={onAddProject} disabled={saving} className="mt-2 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white disabled:opacity-50">
+
+        {error && <p style={{ marginTop: 12, fontSize: 13, fontWeight: 500, color: "#bf4247" }}>{error}</p>}
+
+        <button
+          onClick={onAddProject}
+          disabled={saving}
+          style={{ marginTop: 24, width: "100%", height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7C3AED,#6126CC)", boxShadow: "0px 6px 18px rgba(124,58,237,0.22)", fontSize: 16, fontWeight: 600, color: "#fff", opacity: saving ? 0.5 : 1 }}
+        >
           {saving ? "Adding…" : "Add to Profile"}
         </button>
-        <button onClick={() => router.push("/profile")} className="w-full rounded-2xl py-3 text-[14px] font-semibold text-muted" style={{ background: "#f3f1f8" }}>Skip for now</button>
+        <button onClick={() => router.push("/profile")} style={{ marginTop: 10, width: "100%", height: 44, borderRadius: 22, background: "#F3F1F8", fontSize: 12.5, fontWeight: 600, color: "#1D1B44" }}>Skip for now</button>
+      </div>
       </div>
     );
   }
