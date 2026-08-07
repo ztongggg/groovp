@@ -16,10 +16,10 @@ async function getBlocked() {
     if (!blocks || blocks.length === 0) return [];
 
     const ids = blocks.map((b) => b.blocked_id);
-    const { data: profiles } = await supabase.from("profiles").select("id, full_name, username").in("id", ids);
+    const { data: profiles } = await supabase.from("profiles").select("id, full_name, username, avatar_url").in("id", ids);
     const byId = Object.fromEntries((profiles || []).map((p) => [p.id, p]));
 
-    return ids.map((id) => ({ id, name: byId[id]?.full_name || byId[id]?.username || "Someone" }));
+    return ids.map((id) => ({ id, name: byId[id]?.full_name || byId[id]?.username || "Someone", avatarUrl: byId[id]?.avatar_url || "" }));
   } catch {
     return [];
   }
@@ -32,17 +32,17 @@ export default async function BlockedUsersPage() {
     <AppShell>
       <div className="min-h-full pb-8" style={{ background: "#f9f8fb" }}>
         <StatusBar />
-        <div className="flex items-center gap-3 px-6">
-          <Link href="/settings" className="flex items-center justify-center rounded-full" style={{ width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}><span style={{ fontSize: 20, fontWeight: 700, color: "#1d1b44" }}>‹</span></Link>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d1b44" }}>Blocked Users</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
+          <Link href="/settings" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Blocked Users</h1>
         </div>
-        <p className="mt-2 px-6 text-[12.5px] text-muted">You won&apos;t see content from blocked users, and they can&apos;t contact you.</p>
+        <p style={{ marginTop: 14, padding: "0 24px", fontSize: 12, color: "#757080", lineHeight: "18px" }}>You won&apos;t see content from blocked users, and they can&apos;t contact you.</p>
 
-        <div className="mt-5 flex flex-col gap-3 px-6">
+        <div style={{ marginTop: 18, padding: "0 24px", display: "flex", flexDirection: "column", gap: 10 }}>
           {blocked.length === 0 ? (
-            <p className="mt-6 text-center text-[14px] text-muted">You haven&apos;t blocked anyone.</p>
+            <p style={{ marginTop: 24, textAlign: "center", fontSize: 13, color: "#757080" }}>You haven&apos;t blocked anyone.</p>
           ) : (
-            blocked.map((b) => <BlockedUserRow key={b.id} userId={b.id} name={b.name} />)
+            blocked.map((b, i) => <BlockedUserRow key={b.id} userId={b.id} name={b.name} avatarUrl={b.avatarUrl} index={i} />)
           )}
         </div>
       </div>

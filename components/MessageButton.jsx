@@ -18,8 +18,13 @@ export default function MessageButton({ userId }) {
   }
 
   return (
-    <div>
-      <button onClick={onClick} disabled={busy} className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 px-5 py-2.5 text-[14px] font-bold text-white disabled:opacity-60">
+    <div style={{ textAlign: "right" }}>
+      <button
+        onClick={onClick}
+        disabled={busy}
+        style={{ height: 36, minWidth: 110, padding: "0 14px", borderRadius: 18, background: "#7C3AED", color: "#fff", fontSize: 11.5, fontWeight: 600, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5, opacity: busy ? 0.6 : 1 }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12a8 8 0 0 1-11.5 7.2L4 20l.8-4.5A8 8 0 1 1 20 12Z" /></svg>
         {busy ? "…" : "Message"}
       </button>
       {error && <p className="mt-1.5 text-[12px] font-medium" style={{ color: "#bf4247" }}>{error}</p>}

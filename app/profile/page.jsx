@@ -38,7 +38,7 @@ async function getProfile() {
 
     let pastProjects = [];
     try {
-      const { data: pp } = await supabase.from("past_projects").select("id, role, write_up, created_at, project_id").eq("user_id", user.id).order("created_at", { ascending: false });
+      const { data: pp } = await supabase.from("past_projects").select("id, role, write_up, photos, created_at, project_id").eq("user_id", user.id).order("created_at", { ascending: false });
       const projIds = (pp || []).map((r) => r.project_id).filter(Boolean);
       let projById = {};
       if (projIds.length) {
@@ -55,6 +55,7 @@ async function getProfile() {
       name: p?.full_name || emailName,
       username: p?.username || emailName,
       subtitle: subtitleParts.join(" · "),
+      avatarUrl: p?.avatar_url || "",
       ratingLabel: avg || "New",
       ratingCount: count,
       personality: {

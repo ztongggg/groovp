@@ -17,6 +17,8 @@ export async function updateProfile(data) {
     .update({
       full_name: data.full_name?.trim() || null,
       username: data.username?.trim() || null,
+      avatar_url: data.avatar_url?.trim() || null,
+      bio: data.bio?.trim() || null,
       // university intentionally NOT here — it's derived from the verified signup
       // email domain (see app/auth/actions.js signUpFull), not user-editable, or the
       // "Restricted (same school)" privacy tier would mean nothing.

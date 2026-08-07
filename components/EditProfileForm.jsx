@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateProfile } from "@/app/edit-profile/actions";
+import AvatarUpload from "@/components/AvatarUpload";
 
 const YEARS = ["Y1", "Y2", "Y3", "Y4", "Y5"];
 const SKILL_OPTIONS = ["Python", "React", "TypeScript", "JavaScript", "Node.js", "SQL", "Figma", "UI/UX", "Java", "C++", "TensorFlow", "AWS", "Docker", "Research", "Product", "Design", "Business"];
@@ -27,16 +28,27 @@ const LOCATIONS = ["North", "South", "East", "West", "On Campus", "Central"];
 const STEPS = ["Edit Profile", "Edit Skills", "Edit Interests", "Projects & Links"];
 
 const cls = "rounded-2xl bg-[#f3f1f8] px-4 py-3.5 text-[15px] text-navy focus:outline-none w-full";
+const PROJECT_TINTS = ["#4AC7B2", "#B1B4ED", "#C4B5FD", "#F2A5BD"];
+// Behance and the generic "+ Add another link" row in the Figma frame have no
+// backing column, so they are deliberately not rendered — an inert field here
+// would look saved and never be.
+const LINK_FIELDS = [
+  { key: "linkedin_url", label: "LinkedIn", glyph: "in", bg: "#086BAD", placeholder: "linkedin.com/in/username" },
+  { key: "github_url", label: "GitHub", glyph: "GH", bg: "#141414", placeholder: "github.com/username" },
+  { key: "portfolio_url", label: "Portfolio Website", glyph: "🌐", bg: "#7C3AED", placeholder: "yourname.dev" },
+];
 function Chip({ active, onClick, children }) {
   return <button type="button" onClick={onClick} className="rounded-full px-4 py-2 text-[13px] font-semibold" style={{ background: active ? "#fff" : "#f3f1f8", color: active ? "#7c3aed" : "#1d1b44", border: active ? "1px solid #7c3aed" : "1px solid transparent" }}>{children}</button>;
 }
 
-export default function EditProfileForm({ initial }) {
+export default function EditProfileForm({ initial, initialStep = 0, pastProjects = [] }) {
   const router = useRouter();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(initialStep);
   const [d, setD] = useState({
     full_name: initial.full_name || "",
     username: initial.username || "",
+    avatar_url: initial.avatar_url || "",
+    bio: initial.bio || "",
     major: initial.major || "",
     year: initial.year || "",
     personality: initial.personality || "",
@@ -80,8 +92,12 @@ export default function EditProfileForm({ initial }) {
 
       {step === 0 && (
         <>
+          <div className="my-2 flex justify-center">
+            <AvatarUpload url={d.avatar_url} onChange={(u) => set("avatar_url", u)} size={96} round />
+          </div>
           <input className={cls} placeholder="Full name" value={d.full_name} onChange={(e) => set("full_name", e.target.value)} />
           <input className={cls} placeholder="Username" value={d.username} onChange={(e) => set("username", e.target.value)} />
+          <textarea className={cls} rows={3} placeholder="Short bio — what are you into?" value={d.bio} onChange={(e) => set("bio", e.target.value)} />
           <div className={`${cls} flex items-center justify-between`}>
             <span>{initial.university || "University"}</span>
             <span className="text-[11px] font-bold uppercase tracking-wide text-muted">Verified</span>
@@ -154,31 +170,39 @@ export default function EditProfileForm({ initial }) {
 
       {step === 3 && (
         <>
-          <p className="mt-1 text-[13px] font-bold uppercase tracking-wide text-muted">Projects</p>
-          <Link href="/past-projects/add" className="w-full rounded-2xl border-[1.5px] py-3.5 text-center text-[14px] font-bold" style={{ borderColor: "#7c3aed", color: "#7c3aed" }}>+ Add Project</Link>
+          <p style={{ marginTop: 4, fontSize: 13, fontWeight: 700, color: "#757080" }}>Projects</p>
+          {pastProjects.map((pp, i) => (
+            <Link key={pp.id} href={`/past-projects/${pp.id}`} style={{ height: 72, background: "#fff", borderRadius: 16, border: "1px solid #F3F1F8", boxShadow: "0px 2px 10px rgba(25,20,51,0.05)", display: "flex", alignItems: "center", gap: 10, padding: 10 }}>
+              <span style={{ position: "relative", width: 52, height: 52, borderRadius: 12, background: PROJECT_TINTS[i % PROJECT_TINTS.length], flexShrink: 0, display: "block" }}>
+                <span style={{ position: "absolute", left: 16.5, top: 23.5, width: 5, height: 5, borderRadius: 9999, background: "#fff" }} />
+                <span style={{ position: "absolute", left: 30.5, top: 23.5, width: 5, height: 5, borderRadius: 9999, background: "#fff" }} />
+                <span style={{ position: "absolute", left: 22.3, top: 31.5, width: 7.5, height: 2.5, borderRadius: 1.3, background: "#fff" }} />
+              </span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: "block", fontSize: 13.5, fontWeight: 700, color: "#1D1B44", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pp.name}</span>
+                <span style={{ display: "block", fontSize: 11, color: "#757080", marginTop: 4 }}>{pp.subtitle}</span>
+              </span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#6126CC", flexShrink: 0 }}>View ›</span>
+            </Link>
+          ))}
+          <Link href="/past-projects/add" style={{ height: 48, borderRadius: 14, background: "#fff", border: "1.5px solid #7C3AED", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: "#7C3AED" }}>+ Add Project</Link>
 
-          <p className="mt-4 text-[13px] font-bold uppercase tracking-wide text-muted">Links</p>
-          <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5" style={{ boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" }}>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white" style={{ background: "#0a66c2" }}>in</span>
-            <div className="min-w-0 flex-1">
-              <p className="text-[12px] font-bold text-navy">LinkedIn</p>
-              <input className="w-full bg-transparent text-[13px] text-purple-600 focus:outline-none" placeholder="linkedin.com/in/username" value={d.linkedin_url} onChange={(e) => set("linkedin_url", e.target.value)} />
+          <p style={{ marginTop: 16, fontSize: 13, fontWeight: 700, color: "#757080" }}>Links</p>
+          {LINK_FIELDS.map((f) => (
+            <div key={f.key} style={{ height: 64, background: "#fff", borderRadius: 16, border: "1px solid #F3F1F8", display: "flex", alignItems: "center", gap: 12, padding: "0 14px" }}>
+              <span style={{ width: 36, height: 36, borderRadius: 10, background: f.bg, color: "#fff", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{f.glyph}</span>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: "#757080" }}>{f.label}</p>
+                <input
+                  className="w-full bg-transparent focus:outline-none"
+                  style={{ fontSize: 13, color: "#1D1B44" }}
+                  placeholder={f.placeholder}
+                  value={d[f.key]}
+                  onChange={(e) => set(f.key, e.target.value)}
+                />
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5" style={{ boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" }}>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white" style={{ background: "#1f2328" }}>GH</span>
-            <div className="min-w-0 flex-1">
-              <p className="text-[12px] font-bold text-navy">GitHub</p>
-              <input className="w-full bg-transparent text-[13px] text-purple-600 focus:outline-none" placeholder="github.com/username" value={d.github_url} onChange={(e) => set("github_url", e.target.value)} />
-            </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-2xl bg-white p-3.5" style={{ boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" }}>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white" style={{ background: "#7c3aed" }}>🌐</span>
-            <div className="min-w-0 flex-1">
-              <p className="text-[12px] font-bold text-navy">Portfolio Website</p>
-              <input className="w-full bg-transparent text-[13px] text-purple-600 focus:outline-none" placeholder="yourname.dev" value={d.portfolio_url} onChange={(e) => set("portfolio_url", e.target.value)} />
-            </div>
-          </div>
+          ))}
         </>
       )}
 

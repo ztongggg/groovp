@@ -3,27 +3,30 @@ import AppShell from "@/components/AppShell";
 import StatusBar from "@/components/StatusBar";
 import { createClient } from "@/lib/supabase/server";
 
+// Compact stamps — "2h", "1d", "2w" — matching the Figma frame.
 function relTime(iso) {
   if (!iso) return "";
   const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return "now";
+  if (mins < 60) return `${mins}m`;
   const h = Math.floor(mins / 60);
-  if (h < 24) return `${h}h ago`;
+  if (h < 24) return `${h}h`;
   const dd = Math.floor(h / 24);
-  return `${dd}d ago`;
+  if (dd < 7) return `${dd}d`;
+  return `${Math.floor(dd / 7)}w`;
 }
 
-const ICON = {
-  join_accepted: { bg: "#d4f2de", stroke: "#298c52", d: "M5 12l5 5L20 6" },
-  new_join_requests: { bg: "#ece8fc", stroke: "#7c3aed", d: "M8 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3 20c0-3 2.5-5 5-5s5 2 5 5" },
-  new_message: { bg: "#dcebff", stroke: "#0a66c2", d: "M20 12a8 8 0 0 1-11.5 7.2L4 20l.8-4.5A8 8 0 1 1 20 12Z" },
-  rate_reminder: { bg: "#fce5b8", stroke: "#99730d", d: "m12 3 2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7L12 3Z" },
-  invite: { bg: "#ece8fc", stroke: "#7c3aed", d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6" },
+const KIND = {
+  join_accepted: { bg: "#D9F2E0", stroke: "#298c52", sub: "Your request was accepted", d: "M5 13l4 4L19 7" },
+  join_declined: { bg: "#FCDEDE", stroke: "#bf4247", sub: "Your request was not accepted", d: "M18 6 6 18M6 6l12 12" },
+  new_join_requests: { bg: "#C4B5FD", stroke: "#3a1e83", sub: "Needs your review", d: "M8 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3 20c0-3 2.5-5 5-5s5 2 5 5" },
+  new_message: { bg: "#ECE8FC", stroke: "#7c3aed", sub: "Tap to open the chat", d: "M20 12a8 8 0 0 1-11.5 7.2L4 20l.8-4.5A8 8 0 1 1 20 12Z" },
+  rate_reminder: { bg: "#FCE5B8", stroke: "#99730d", sub: "Leave a rating for your teammates", d: "m12 3 2.6 5.6 6 .7-4.4 4.1 1.2 6-5.4-3-5.4 3 1.2-6L3.4 9.3l6-.7L12 3Z" },
+  invite: { bg: "#ECE8FC", stroke: "#7c3aed", sub: "You've been invited to join", d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6" },
 };
 
 // Notifications that deep-link somewhere when tapped.
-const STATIC_HREF = { invite: "/invites", new_join_requests: "/applicants", join_accepted: "/teams" };
+const STATIC_HREF = { invite: "/invites", new_join_requests: "/applicants", join_accepted: "/teams", join_declined: "/teams" };
 
 async function getNotifs() {
   try {
@@ -76,35 +79,36 @@ export default async function NotificationsPage() {
         </div>
 
         {notifs.length === 0 ? (
-          <div className="mt-16 flex flex-col items-center px-8 text-center">
+          <div style={{ marginTop: 90, display: "flex", flexDirection: "column", alignItems: "center", padding: "0 32px", textAlign: "center" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/empty-notif.png" alt="" className="mb-4 h-36 w-36" />
-            <p className="text-[16px] font-semibold text-navy">You're all caught up</p>
-            <p className="mt-1 text-[14px] text-muted">New activity on your projects shows up here.</p>
+            <img src="/empty-notif.png" alt="" style={{ width: 220, height: 220, objectFit: "contain" }} />
+            <p style={{ marginTop: 24, fontSize: 19, fontWeight: 800, color: "#1D1B44" }}>You&apos;re all caught up!</p>
+            <p style={{ marginTop: 10, fontSize: 12.5, color: "#757080", lineHeight: "18px" }}>No new updates right now.<br />We&apos;ll let you know when something happens.</p>
           </div>
         ) : (
-          <div className="mt-5 flex flex-col gap-2 px-5">
+          <div style={{ marginTop: 18, padding: "0 24px", display: "flex", flexDirection: "column", gap: 8 }}>
             {notifs.map((n) => {
-              const ic = ICON[n.type] || ICON.new_message;
-              const href = n.href;
+              const k = KIND[n.type] || KIND.new_message;
               const inner = (
                 <>
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: ic.bg }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={ic.stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={ic.d} /></svg>
+                  <span style={{ width: 40, height: 40, borderRadius: 9999, background: k.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={k.stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={k.d} /></svg>
                   </span>
-                  <p className="flex-1 text-[14px] text-navy">{n.body}</p>
-                  <span className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="text-[12px] text-muted">{relTime(n.created_at)}</span>
-                    {!n.read && <span className="rounded-full" style={{ width: 6, height: 6, background: "#7c3aed" }} />}
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#1D1B44", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.body}</span>
+                    <span style={{ display: "block", fontSize: 11.5, color: "#757080", marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{k.sub}</span>
+                  </span>
+                  <span style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                    <span style={{ fontSize: 10.5, color: "#757080" }}>{relTime(n.created_at)}</span>
+                    {!n.read && <span style={{ width: 6, height: 6, borderRadius: 9999, background: "#7C3AED" }} />}
                   </span>
                 </>
               );
-              const cls = "flex items-center gap-3 p-4";
-              const bg = { background: "#fff", border: "1px solid #f3f1f8", borderRadius: 16, boxShadow: "0px 2px 8px rgba(26,20,51,0.06)" };
-              return href ? (
-                <Link key={n.id} href={href} className={cls} style={bg}>{inner}</Link>
+              const rowStyle = { height: 68, background: "#fff", border: "1px solid #F3F1F8", borderRadius: 16, boxShadow: "0px 2px 8px rgba(26,20,51,0.06)", display: "flex", alignItems: "center", gap: 12, padding: "0 12px" };
+              return n.href ? (
+                <Link key={n.id} href={n.href} style={rowStyle}>{inner}</Link>
               ) : (
-                <div key={n.id} className={cls} style={bg}>{inner}</div>
+                <div key={n.id} style={rowStyle}>{inner}</div>
               );
             })}
           </div>

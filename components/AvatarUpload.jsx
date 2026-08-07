@@ -6,9 +6,10 @@ import { createClient } from "@/lib/supabase/client";
 const ALLOWED = ["image/jpeg", "image/png"];
 const MAX_BYTES = 5 * 1024 * 1024;
 
-// Rounded-square group/project photo picker (per this app's avatar-shape convention —
-// people are circles, groups/projects are rounded-squares).
-export default function AvatarUpload({ url, onChange, size = 90 }) {
+// Photo picker. Defaults to the rounded-square group/project shape; pass
+// round for a person (this app's convention: people are circles,
+// groups/projects are rounded-squares).
+export default function AvatarUpload({ url, onChange, size = 90, round = false }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,14 +33,16 @@ export default function AvatarUpload({ url, onChange, size = 90 }) {
     onChange(data.publicUrl);
   }
 
+  const radius = round ? 9999 : size * 0.32;
+
   return (
     <div className="flex flex-col items-center">
       <div className="relative" style={{ width: size, height: size }}>
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="" className="h-full w-full object-cover" style={{ borderRadius: size * 0.32 }} />
+          <img src={url} alt="" className="h-full w-full object-cover" style={{ borderRadius: radius }} />
         ) : (
-          <div className="flex h-full w-full items-center justify-center" style={{ borderRadius: size * 0.32, background: "#4ac7b2" }} />
+          <div className="flex h-full w-full items-center justify-center" style={{ borderRadius: radius, background: round ? "#FBBF24" : "#4ac7b2" }} />
         )}
         <label className="absolute flex cursor-pointer items-center justify-center rounded-full border-2 border-white" style={{ right: -4, bottom: -4, width: 32, height: 32, background: "#7c3aed" }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z" /><circle cx="12" cy="13" r="4" /></svg>
