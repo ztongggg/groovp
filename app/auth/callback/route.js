@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") || "/settings";
+  const next = searchParams.get("next") || "/profile";
   const errorDesc = searchParams.get("error_description");
 
   if (errorDesc) {
@@ -21,6 +21,7 @@ export async function GET(request) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+          const { data: existing } = await supabase.from("profiles").select("github_url").eq("id", user.id).maybeSingle();
           const ids = user.identities || [];
           const li = ids.find((i) => i.provider === "linkedin_oidc");
           const gh = ids.find((i) => i.provider === "github");
@@ -31,7 +32,13 @@ export async function GET(request) {
           }
           if (gh) {
             patch.github_verified = true;
-            patch.github_username = gh.identity_data?.user_name || gh.identity_data?.preferred_username || null;
+            const username = gh.identity_data?.user_name || gh.identity_data?.preferred_username || null;
+            patch.github_username = username;
+            // Verifying proves the account is real — if the user never typed a
+            // GitHub URL, don't leave the profile with a verified badge and
+            // nothing to show for it. LinkedIn's OIDC identity has no public
+            // vanity URL to derive the same way.
+            if (username && !existing?.github_url) patch.github_url = `https://github.com/${username}`;
           }
           if (Object.keys(patch).length) {
             await supabase.from("profiles").update(patch).eq("id", user.id);

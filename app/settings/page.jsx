@@ -1,7 +1,5 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import ConnectLinkedIn from "@/components/ConnectLinkedIn";
-import ConnectGitHub from "@/components/ConnectGitHub";
 import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -45,17 +43,16 @@ async function getAccount() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { name: "Student", handle: "student", isAdmin: false, linkedin: false };
-    const { data: p } = await supabase.from("profiles").select("full_name, username, is_admin, linkedin_verified, github_verified").eq("id", user.id).single();
-    const emailName = (user.email || "student").split("@")[0];
-    return { name: p?.full_name || emailName, handle: p?.username || emailName, isAdmin: !!p?.is_admin, linkedin: !!p?.linkedin_verified, github: !!p?.github_verified };
+    if (!user) return { isAdmin: false };
+    const { data: p } = await supabase.from("profiles").select("is_admin").eq("id", user.id).single();
+    return { isAdmin: !!p?.is_admin };
   } catch {
-    return { name: "Student", handle: "student", isAdmin: false, linkedin: false, github: false };
+    return { isAdmin: false };
   }
 }
 
 export default async function SettingsPage() {
-  const { isAdmin, linkedin, github } = await getAccount();
+  const { isAdmin } = await getAccount();
 
   return (
     <AppShell>
@@ -70,11 +67,6 @@ export default async function SettingsPage() {
             <Row href="/edit-profile" icon={<PersonIcon />} label="Edit Profile" />
             <Row href="/settings/password" icon={<KeyIcon />} label="Change Password" />
           </Section>
-
-          <div className="mt-3 flex flex-col gap-3">
-            <ConnectLinkedIn verified={linkedin} />
-            <ConnectGitHub verified={github} />
-          </div>
 
           <Section label="PREFERENCES">
             <Row href="/settings/notifications" icon={<BellIcon />} label="Notification Preferences" />

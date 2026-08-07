@@ -13,7 +13,7 @@ export default function ConnectLinkedIn({ verified }) {
     const supabase = createClient();
     const { error } = await supabase.auth.linkIdentity({
       provider: "linkedin_oidc",
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/settings` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/profile` },
     });
     // On success the browser redirects to LinkedIn; we only reach here on error.
     if (error) {

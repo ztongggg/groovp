@@ -15,6 +15,8 @@ import {
   PastProjectCard,
   BANNER_MINE,
 } from "@/components/ProfileParts";
+import ConnectLinkedIn from "@/components/ConnectLinkedIn";
+import ConnectGitHub from "@/components/ConnectGitHub";
 
 const GearIcon = () => (
   <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#1D1B44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -94,6 +96,16 @@ export default function ProfileView({
               linkedinVerified={linkedinVerified}
               githubVerified={githubVerified}
             />
+
+            {/* Verification lives here, not in Settings — it's proof attached
+                to what teammates actually see on this page. */}
+            {(!linkedinVerified || !githubVerified) && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {!linkedinVerified && <ConnectLinkedIn verified={false} />}
+                {!githubVerified && <ConnectGitHub verified={false} />}
+              </div>
+            )}
+
             <SkillsCard skills={skills} editHref="/edit-profile?step=1" />
             <InterestsCard interests={interests} editHref="/edit-profile?step=2" />
           </div>

@@ -15,7 +15,7 @@ export default function ConnectGitHub({ verified }) {
     const supabase = createClient();
     const { error } = await supabase.auth.linkIdentity({
       provider: "github",
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/settings` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/profile` },
     });
     if (error) {
       setErr(error.message);

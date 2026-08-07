@@ -8,8 +8,12 @@ export default function PhoneFrame({ children }) {
       <div className="relative bg-black sm:rounded-[46px] sm:p-3 sm:shadow-2xl">
         {/* notch */}
         <div className="absolute left-1/2 top-3 z-20 hidden h-7 w-40 -translate-x-1/2 rounded-b-3xl bg-black sm:block" />
-        {/* screen */}
-        <div className="h-screen w-screen overflow-hidden bg-white sm:h-[874px] sm:w-[402px] sm:rounded-[34px]">
+        {/* screen — `transform` here isn't decorative: it makes this div a
+            containing block for `position: fixed` descendants (CSS spec), so
+            every bottom sheet/modal/composer bar in the app clips to the
+            402x874 phone screen instead of covering the whole browser
+            viewport around the bezel on desktop. */}
+        <div className="h-screen w-screen overflow-hidden bg-white sm:h-[874px] sm:w-[402px] sm:rounded-[34px]" style={{ transform: "translateZ(0)" }}>
           <div className="h-full overflow-y-auto">{children}</div>
         </div>
       </div>
