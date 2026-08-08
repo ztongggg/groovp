@@ -1,30 +1,33 @@
 "use client";
 
-// EXPERIMENT: on-screen task timer for the web experiment. Renders nothing
-// unless the participant has an active experiment session (cookie-gated
-// server-side inside getExperimentStatus — real users never see this).
-// See lib/experiment.js for the removal checklist.
+// EXPERIMENT: on-screen task guidance for the web experiment. No visible
+// clock (time is still recorded in the DB — just not shown, so it doesn't
+// pressure the participant). Renders nothing unless the participant has an
+// active session (cookie-gated server-side inside getExperimentStatus —
+// real users never see this). See lib/experiment.js for the removal
+// checklist.
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getExperimentStatus } from "@/lib/experiment";
 
-const LABELS = {
-  1: "Task 1 · Create your profile",
-  2: "Task 2 · Find a team & request to join",
-  3: "Task 3 · Create your project & group",
-  4: "Task 4 · Review an applicant",
+const TASK_INSTRUCTIONS = {
+  1: "Create your Groovp profile. Fill in your details, skills and interests to finish signing up.",
+  2: "Browse Discover, find a project you like, pick a team that fits you, and request to join.",
+  3: "Create your own project, then set up your group.",
+  4: "Open your Requests and review the applicants waiting — accept one to finish.",
 };
 
-function fmt(totalSeconds) {
-  const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
-  return `${m}:${String(s).padStart(2, "0")}`;
-}
+// Shown briefly between tasks (e.g. mid-tutorial, or right after a request
+// is sent) — points at what to do to reach the next task.
+const NEXT_STEP_INSTRUCTIONS = {
+  1: "Profile created! Next: go through the quick tour, then head to Discover to find a team.",
+  2: "Request sent! Next: create your own project and set up a group.",
+  3: "Project created! Next: open your Requests and review who's applied.",
+};
 
 export default function ExperimentTimerOverlay() {
   const [status, setStatus] = useState(null);
-  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     let cancelled = false;
@@ -40,11 +43,6 @@ export default function ExperimentTimerOverlay() {
     };
   }, []);
 
-  useEffect(() => {
-    const iv = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(iv);
-  }, []);
-
   if (!status?.active) return null;
 
   if (status.completed) {
@@ -58,33 +56,31 @@ export default function ExperimentTimerOverlay() {
     );
   }
 
-  if (!status.taskNumber) return null; // between tasks (e.g. during the tutorial) — nothing timed right now
+  const text = status.taskNumber
+    ? TASK_INSTRUCTIONS[status.taskNumber]
+    : NEXT_STEP_INSTRUCTIONS[status.lastEndedTask];
 
-  const elapsed = Math.max(0, Math.round((now - new Date(status.startedAt).getTime()) / 1000));
+  if (!text) return null;
 
   return (
     <div style={WRAP}>
-      <span style={{ fontWeight: 700 }}>{LABELS[status.taskNumber]}</span>
-      <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 800 }}>{fmt(elapsed)}</span>
+      {status.taskNumber && <span style={{ fontWeight: 800, display: "block", marginBottom: 4 }}>Task {status.taskNumber}</span>}
+      <span>{text}</span>
     </div>
   );
 }
 
 const WRAP = {
   position: "fixed",
-  top: 10,
-  left: "50%",
-  transform: "translateX(-50%)",
+  top: 40,
+  left: 40,
+  right: 40,
   zIndex: 9999,
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-  padding: "8px 14px",
-  borderRadius: 999,
+  padding: "14px 16px",
+  borderRadius: 16,
   background: "#1D1B44",
   color: "#fff",
-  fontSize: 11.5,
+  fontSize: 13,
+  lineHeight: 1.4,
   boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
-  maxWidth: 370,
-  whiteSpace: "nowrap",
 };

@@ -16,6 +16,12 @@ body {
   padding-top: 20px;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* The Figma file sets Nunito on the project-feed surfaces (Home, Discover,
    Saved, Project Details, Tutorials) and Inter everywhere else. Applied at the
    screen wrapper; the bottom nav opts back out since it is Inter in the design. */
