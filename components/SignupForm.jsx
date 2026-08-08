@@ -68,9 +68,11 @@ const I = {
   globe: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z" /></svg>,
 };
 
-// EXPERIMENT: isNeutral (Condition B) drops the 3 personality/work-style
-// questions from step 2 entirely — location stays, it's not a work-style
-// trait. Real users and Condition A always get isNeutral=false. See
+// EXPERIMENT: isNeutral (Condition B) drops step 2 entirely — the 3
+// personality/work-style questions AND location (owner decided location
+// should also be hidden for Neutral, not just work-style traits). next()/
+// back() jump straight from step 1 to step 3 so Condition B never sees an
+// empty screen. Real users and Condition A always get isNeutral=false. See
 // lib/experiment.js for the removal checklist.
 export default function SignupForm({ isNeutral = false }) {
   const router = useRouter();
@@ -91,7 +93,7 @@ export default function SignupForm({ isNeutral = false }) {
   const canNext = () => {
     if (step === 0) return d.full_name && d.username && d.email && d.password.length >= 6;
     if (step === 1) return d.year && d.gender;
-    if (step === 2) return isNeutral ? !!d.location : (PERSONALITY.every((p) => d[p.key]) && d.location);
+    if (step === 2) return PERSONALITY.every((p) => d[p.key]) && d.location; // never visited by Condition B, see next()/back()
     if (step === 3) return d.skills.length > 0;
     return true;
   };
@@ -120,8 +122,16 @@ export default function SignupForm({ isNeutral = false }) {
     });
     if (error) { setSaving(false); setError(error.message); }
   }
-  const next = () => (step < STEPS.length - 1 ? setStep(step + 1) : finish());
-  const back = () => (step > 0 ? setStep(step - 1) : setIntro(true));
+  // EXPERIMENT: Condition B skips step 2 (personality + location) entirely —
+  // jump 1↔3 directly so it's never mounted, not just visually hidden.
+  const next = () => {
+    if (step >= STEPS.length - 1) return finish();
+    setStep(isNeutral && step === 1 ? 3 : step + 1);
+  };
+  const back = () => {
+    if (step <= 0) return setIntro(true);
+    setStep(isNeutral && step === 3 ? 1 : step - 1);
+  };
 
   /* ---------- COMPLETE ---------- */
   if (done) {
@@ -180,18 +190,14 @@ export default function SignupForm({ isNeutral = false }) {
 
   /* ---------- STEPS ---------- */
   const s = STEPS[step];
-  // EXPERIMENT: step 2's copy assumes the personality questions are on
-  // screen — swap it when they're hidden for Condition B.
-  const stepTitle = step === 2 && isNeutral ? "Where do you stay?" : s.title;
-  const stepSub = step === 2 && isNeutral ? "Just so teammates roughly know where you're based." : s.sub;
   return (
     <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
       {/* back + title */}
       <button onClick={back} className="absolute flex items-center justify-center rounded-full" style={{ left: 24, top: 48, width: 40, height: 40, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)" }}>
         <span style={{ fontSize: 20, fontWeight: 700, color: "#1e1b4b" }}>‹</span>
       </button>
-      <div className="absolute" style={{ left: 75, top: 52, fontSize: 24, fontWeight: 800, color: "#1e1b4b" }}>{stepTitle}</div>
-      <div className="absolute" style={{ left: 25, top: 93, width: 350, fontSize: 13, fontWeight: 400, color: "#6b6678", lineHeight: "16px" }}>{stepSub}</div>
+      <div className="absolute" style={{ left: 75, top: 52, fontSize: 24, fontWeight: 800, color: "#1e1b4b" }}>{s.title}</div>
+      <div className="absolute" style={{ left: 25, top: 93, width: 350, fontSize: 13, fontWeight: 400, color: "#6b6678", lineHeight: "16px" }}>{s.sub}</div>
 
       {/* progress */}
       {STEPS.map((_, i) => {
@@ -262,9 +268,9 @@ export default function SignupForm({ isNeutral = false }) {
         )}
         {step === 2 && (
           <div className="flex flex-col gap-6">
-            {/* EXPERIMENT: Condition B (Neutral) drops these 3 questions —
-                location below is unaffected, it's not a work-style trait. */}
-            {!isNeutral && PERSONALITY.map((p) => (
+            {/* EXPERIMENT: never mounted for Condition B — next()/back() jump
+                straight from step 1 to step 3, skipping this whole step. */}
+            {PERSONALITY.map((p) => (
               <div key={p.key}>
                 <p className="mb-2.5 text-[13.5px] font-semibold text-navy">{p.q}</p>
                 <div className="flex gap-2.5">
