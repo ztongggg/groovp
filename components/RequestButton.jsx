@@ -1,20 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { requestToJoin } from "@/app/discover/actions";
+import RequestSentConfirmation from "@/components/RequestSentConfirmation";
 
 // Join Request Modal (Figma node 868:3100) + Request Sent Confirmation (1192:869).
-function Blobby() {
-  return (
-    <div className="relative" style={{ width: 200, height: 200 }}>
-      <div className="absolute" style={{ background: "#ff4625", inset: "25.33% 30.67% 25.33% 31.33%", borderTopLeftRadius: 37.333, borderTopRightRadius: 37.333, borderBottomLeftRadius: 6.667, borderBottomRightRadius: 6.667 }} />
-      <div className="absolute" style={{ background: "#6d1b2a", inset: "49.33% 45.33% 45.33% 46.67%", borderTopLeftRadius: 6.667, borderTopRightRadius: 6.667, borderBottomLeftRadius: 37.333, borderBottomRightRadius: 37.333 }} />
-      <div className="absolute rounded-full" style={{ background: "#071a3d", left: 101.33, top: 117.33, width: 9.333, height: 9.333 }} />
-      <div className="absolute rounded-full" style={{ background: "#071a3d", left: 154.67, top: 117.33, width: 9.333, height: 9.333 }} />
-    </div>
-  );
-}
 
 export default function RequestButton({ groupId, subtitle }) {
   const [status, setStatus] = useState("idle"); // idle | modal | loading | confirmed | done | reapplied | joined
@@ -65,15 +55,7 @@ export default function RequestButton({ groupId, subtitle }) {
       )}
 
       {status === "confirmed" && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-          <div className="mx-auto flex w-[402px] flex-col items-center rounded-t-3xl bg-white p-6 pb-8 text-center">
-            <Blobby />
-            <p className="mt-2 text-[20px] font-extrabold text-navy">Request sent!</p>
-            <p className="mt-1 text-[13.5px] text-muted">{subtitle ? `${subtitle}'s leader will review your request.` : "The leader will review your request."} We&apos;ll notify you when they respond.</p>
-            <button onClick={() => setStatus(wasReapply ? "reapplied" : "done")} className="mt-5 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white">Keep Browsing</button>
-            <Link href="/teams" className="mt-2 w-full rounded-2xl py-3.5 text-center text-[15px] font-bold text-navy" style={{ background: "#f3f1f8" }}>View Request Status</Link>
-          </div>
-        </div>
+        <RequestSentConfirmation subtitle={subtitle} onKeepBrowsing={() => setStatus(wasReapply ? "reapplied" : "done")} />
       )}
     </>
   );

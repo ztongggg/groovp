@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signUpFull } from "@/app/auth/actions";
 import SkillPicker from "@/components/SkillPicker";
+import Blobby from "@/components/Blobby";
+import Confetti, { CONFETTI_HIGH } from "@/components/Confetti";
 import { createClient } from "@/lib/supabase/client";
 import { completeExperimentTask1 } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
@@ -135,30 +137,13 @@ export default function SignupForm({ isNeutral = false }) {
 
   /* ---------- COMPLETE ---------- */
   if (done) {
-    const confetti = [
-      { l: 48, t: 178, w: 24, h: 24, r: 999, bg: "#f2a5bd" },
-      { l: 200, t: 158, w: 8, h: 8, r: 999, bg: "#f2a5bd" },
-      { l: 348, t: 202, w: 22, h: 22, r: 6, bg: "#7c3aed", rot: 20 },
-      { l: 88, t: 258, w: 34, h: 12, r: 6, bg: "#ffb800", rot: -30 },
-      { l: 288, t: 288, w: 34, h: 12, r: 6, bg: "#ffb800", rot: 30 },
-      { l: 370, t: 318, w: 8, h: 8, r: 999, bg: "#7c3aed" },
-      { l: 60, t: 398, w: 8, h: 8, r: 999, bg: "#7c3aed" },
-      { l: 90, t: 465, w: 14, h: 6, r: 4, bg: "#f2a5bd", rot: -20 },
-      { l: 335, t: 435, w: 12, h: 12, r: 999, bg: "#c4b5fd" },
-      { l: 347, t: 470, w: 10, h: 6, r: 4, bg: "#7c3aed", rot: 20 },
-    ];
     return (
       <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
-        {confetti.map((c, i) => <span key={i} className="absolute" style={{ left: c.l, top: c.t, width: c.w, height: c.h, borderRadius: c.r, background: c.bg, transform: c.rot ? `rotate(${c.rot}deg)` : undefined }} />)}
-        <div className="absolute" style={{ left: 151, top: 265, width: 100, height: 100 }}>
-          <div className="absolute" style={{ background: "#ff4625", inset: "0% 15% 0% 16%", borderTopLeftRadius: 37, borderTopRightRadius: 37, borderBottomLeftRadius: 6, borderBottomRightRadius: 6 }} />
-          <div className="absolute rounded-full" style={{ background: "#071a3d", left: 30, top: 42, width: 9, height: 9 }} />
-          <div className="absolute rounded-full" style={{ background: "#071a3d", left: 62, top: 42, width: 9, height: 9 }} />
-          <div className="absolute" style={{ background: "#6d1b2a", left: 44, top: 58, width: 12, height: 6, borderRadius: "0 0 6px 6px" }} />
-        </div>
-        <p className="absolute w-full text-center" style={{ top: 566, fontSize: 26, fontWeight: 800, color: "#1d1b44" }}>You&apos;re all set!</p>
-        <p className="absolute w-full text-center" style={{ top: 604, fontSize: 14, color: "#757080", padding: "0 32px" }}>Your profile is ready. Let&apos;s find your perfect team on Groovp.</p>
-        <button onClick={() => { router.push("/tutorial/1"); router.refresh(); }} className="absolute flex items-center justify-center gap-2" style={{ left: 32, top: 761, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
+        <Confetti pieces={CONFETTI_HIGH} />
+        <div className="absolute" style={{ left: 42, top: 189, width: 300, height: 300 }}><Blobby size={300} /></div>
+        <p className="absolute w-full text-center" style={{ top: 560, fontSize: 28, fontWeight: 800, color: "#1e1b4b" }}>You&apos;re all set!</p>
+        <p className="absolute w-full text-center" style={{ top: 604, fontSize: 14, color: "#6b6678", padding: "0 32px" }}>Your profile is ready. Let&apos;s find your perfect team on Groovp.</p>
+        <button onClick={() => { router.push("/tutorial/1"); router.refresh(); }} className="absolute flex items-center justify-center gap-2" style={{ left: 32, top: 756, width: 338, height: 56, borderRadius: 28, background: "linear-gradient(90deg,#7c3aed,#6126cc)" }}>
           <span style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>Go to Home →</span>
         </button>
       </div>

@@ -7,6 +7,8 @@ import { createProject } from "@/app/create/actions";
 import ResourceFileUpload from "@/components/ResourceFileUpload";
 import AvatarUpload from "@/components/AvatarUpload";
 import SkillPicker from "@/components/SkillPicker";
+import Blobby from "@/components/Blobby";
+import Confetti, { CONFETTI_LOW } from "@/components/Confetti";
 import { markTaskStart } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
@@ -125,34 +127,26 @@ export default function CreateProjectPage() {
   };
   const back = () => { setTouched(false); return step > 0 ? setStep(step - 1) : router.push("/discover"); };
 
-  /* congrats */
+  /* congrats — same screen for Academic and Personal, per Figma (both
+     export folders are pixel-identical bar a few px of export noise) */
   if (done) {
     const inviteLink = `${typeof window !== "undefined" ? window.location.origin : ""}/join?code=${done.joinCode}`;
-    const confetti = [
-      { l: 48, t: 120, w: 22, h: 22, r: 999, bg: "#f2a5bd" },
-      { l: 200, t: 100, w: 8, h: 8, r: 999, bg: "#f2a5bd" },
-      { l: 340, t: 148, w: 22, h: 22, r: 6, bg: "#7c3aed", rot: 20 },
-      { l: 88, t: 205, w: 32, h: 11, r: 6, bg: "#ffb800", rot: -30 },
-      { l: 282, t: 235, w: 32, h: 11, r: 6, bg: "#ffb800", rot: 30 },
-      { l: 362, t: 265, w: 8, h: 8, r: 999, bg: "#7c3aed" },
-      { l: 60, t: 335, w: 8, h: 8, r: 999, bg: "#7c3aed" },
-    ];
     return (
-      <div className="relative w-[402px] bg-white" style={{ height: 874 }}>
-        {confetti.map((c, i) => <span key={i} className="absolute" style={{ left: c.l, top: c.t, width: c.w, height: c.h, borderRadius: c.r, background: c.bg, transform: c.rot ? `rotate(${c.rot}deg)` : undefined }} />)}
-        <div className="absolute" style={{ left: 151, top: 210, width: 100, height: 100 }}>
-          <div className="absolute" style={{ background: "#ff4625", inset: "0% 15% 0% 16%", borderTopLeftRadius: 37, borderTopRightRadius: 37, borderBottomLeftRadius: 6, borderBottomRightRadius: 6 }} />
-          <div className="absolute rounded-full" style={{ background: "#071a3d", left: 30, top: 42, width: 9, height: 9 }} />
-          <div className="absolute rounded-full" style={{ background: "#071a3d", left: 62, top: 42, width: 9, height: 9 }} />
-          <div className="absolute" style={{ background: "#6d1b2a", left: 44, top: 58, width: 12, height: 6, borderRadius: "0 0 6px 6px" }} />
-        </div>
-        <p className="absolute w-full text-center" style={{ top: 328, fontSize: 26, fontWeight: 800, color: "#1d1b44" }}>Congrats!</p>
-        <p className="absolute w-full text-center" style={{ top: 366, fontSize: 15, fontWeight: 700, color: "#1d1b44" }}>You created &quot;{done.name}&quot;</p>
-        <p className="absolute w-full text-center" style={{ top: 392, fontSize: 13, color: "#757080", padding: "0 32px" }}>Copy the code below and share it so people can find and request to join.</p>
+      <div className="relative w-[402px]" style={{ height: 874, background: "#f9f8fb" }}>
+        <Confetti pieces={CONFETTI_LOW} />
+        <div className="absolute" style={{ left: 42, top: 188, width: 300, height: 300 }}><Blobby size={300} /></div>
+        <p className="absolute w-full text-center" style={{ top: 463, fontSize: 26, fontWeight: 800, color: "#1d1b44" }}>Congrats!</p>
+        <p className="absolute w-full text-center" style={{ top: 499, fontSize: 15, fontWeight: 700, color: "#1d1b44" }}>You created &quot;{done.name}&quot;</p>
+        {/* Export's copy says "link" and shows a vanity-URL string
+            (groovp.com/p/neurallink) — no slug field exists to back that,
+            same unbuilt-vanity-URL concept already deliberately skipped for
+            this screen (see HANDOFF). Kept the real join-code chip + its
+            matching "code" copy instead of introducing a fake-looking link. */}
+        <p className="absolute w-full text-center" style={{ top: 525, fontSize: 12.5, color: "#757080", padding: "0 32px" }}>Copy the code below and share it so people can find and request to join.</p>
 
         {done.joinCode && (
           <>
-            <div className="absolute flex items-center justify-between" style={{ left: 32, top: 452, width: 338, height: 52, borderRadius: 16, background: "#f3f1f8" }}>
+            <div className="absolute flex items-center justify-between" style={{ left: 31, top: 581, width: 338, height: 56, borderRadius: 16, background: "#f3f1f8" }}>
               <span className="pl-4 text-[16px] font-extrabold tracking-wider text-navy">{done.joinCode}</span>
               <button
                 onClick={() => { navigator.clipboard?.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 1600); }}
@@ -165,7 +159,7 @@ export default function CreateProjectPage() {
             <button
               onClick={() => { if (navigator.share) navigator.share({ title: done.name, url: inviteLink }); else { navigator.clipboard?.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 1600); } }}
               className="absolute flex items-center justify-center"
-              style={{ left: 32, top: 520, width: 338, height: 48, borderRadius: 16, background: "#f3f1f8" }}
+              style={{ left: 31, top: 657, width: 338, height: 54, borderRadius: 27, background: "#f3f1f8" }}
             >
               <span style={{ fontSize: 14, fontWeight: 600, color: "#1d1b44" }}>Share to…</span>
             </button>

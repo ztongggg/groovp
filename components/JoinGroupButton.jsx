@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { requestToJoin } from "@/app/discover/actions";
+import RequestSentConfirmation from "@/components/RequestSentConfirmation";
 
 export default function JoinGroupButton({ groupId, full }) {
   const [status, setStatus] = useState("idle"); // idle | modal | loading | confirmed | done | reapplied | joined | error
@@ -52,17 +52,7 @@ export default function JoinGroupButton({ groupId, full }) {
       )}
 
       {status === "confirmed" && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
-          <div className="mx-auto flex w-[402px] flex-col items-center rounded-t-3xl bg-white p-6 pb-8 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#d4f2de" }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#298c52" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-            </div>
-            <p className="mt-4 text-[18px] font-extrabold text-navy">Request sent!</p>
-            <p className="mt-1 text-[13.5px] text-muted">The leader will review it — check Teams → Requested for updates.</p>
-            <button onClick={() => setStatus(wasReapply ? "reapplied" : "done")} className="mt-5 w-full rounded-2xl bg-gradient-to-r from-purple-600 to-purple-700 py-3.5 text-[15px] font-bold text-white">Keep Browsing</button>
-            <Link href="/teams" className="mt-2 w-full rounded-2xl py-3.5 text-center text-[15px] font-bold text-navy" style={{ background: "#f3f1f8" }}>View Request Status</Link>
-          </div>
-        </div>
+        <RequestSentConfirmation onKeepBrowsing={() => setStatus(wasReapply ? "reapplied" : "done")} />
       )}
     </>
   );
