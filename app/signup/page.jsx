@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { signUpFull } from "@/app/auth/actions";
 import SkillPicker from "@/components/SkillPicker";
 import { createClient } from "@/lib/supabase/client";
+import { completeExperimentTask1 } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 const INTEREST_OPTIONS = [
   { name: "Sustainability", icon: "/interest-sustainability.svg" },
@@ -95,6 +96,7 @@ export default function SignupPage() {
     const res = await signUpFull(d);
     setSaving(false);
     if (res?.error) { setError(res.error); return; }
+    completeExperimentTask1(); // EXPERIMENT: no-op for real users
     setDone(true);
   }
   // linkIdentity needs an authenticated session, which doesn't exist until
@@ -106,6 +108,7 @@ export default function SignupPage() {
     setSaving(true); setError("");
     const res = await signUpFull(d);
     if (res?.error) { setSaving(false); setError(res.error); return; }
+    completeExperimentTask1(); // EXPERIMENT: no-op for real users
     const supabase = createClient();
     const { error } = await supabase.auth.linkIdentity({
       provider,

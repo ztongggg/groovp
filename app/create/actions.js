@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { markTaskEnd } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 // A short, human-shareable code: GRV-XXXXX (no ambiguous 0/O/1/I chars).
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -76,5 +77,6 @@ export async function createProject(data) {
 
   revalidatePath("/discover");
   revalidatePath("/home");
+  await markTaskEnd(3); // EXPERIMENT: no-op for real users — project + its Group A both exist now
   return { ok: true, projectId: project.id, name: project.name, joinCode: project.join_code };
 }

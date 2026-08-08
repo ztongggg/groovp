@@ -5,6 +5,7 @@ import { ApplicantFace, StrongMatchPill, CARD_STYLE, appliedLabel } from "@/comp
 import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 import { computeMatch } from "@/lib/matching";
+import { markTaskStart } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 async function getApplicants() {
   try {
@@ -86,6 +87,7 @@ function HistoryRow({ a, index }) {
 export default async function ApplicantsPage() {
   const all = await getApplicants();
   const pending = all.filter((a) => a.status === "pending");
+  if (pending.length > 0) await markTaskStart(4); // EXPERIMENT: no-op for real users
   const invited = all.filter((a) => a.status === "invited");
   const history = all.filter((a) => a.status === "accepted" || a.status === "declined");
 

@@ -1,5 +1,6 @@
 import "./globals.css";
 import PhoneFrame from "@/components/PhoneFrame";
+import ExperimentTimerOverlay from "@/components/ExperimentTimerOverlay"; // EXPERIMENT: see lib/experiment.js
 
 export const metadata = {
   metadataBase: new URL("https://groovp.vercel.app"),
@@ -32,7 +33,10 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <PhoneFrame>{children}</PhoneFrame>
+        <PhoneFrame>
+          {children}
+          <ExperimentTimerOverlay />
+        </PhoneFrame>
       </body>
     </html>
   );

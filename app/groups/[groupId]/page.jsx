@@ -6,6 +6,7 @@ import JoinGroupButton from "@/components/JoinGroupButton";
 import GroupRequestRow from "@/components/GroupRequestRow";
 import BackButton from "@/components/BackButton";
 import { computeMatch, STRONG_MATCH_THRESHOLD } from "@/lib/matching";
+import { markTaskStart } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 async function getData(groupId) {
   try {
@@ -135,6 +136,7 @@ export default async function GroupInfoPage({ params }) {
   }
 
   const { group, project, isLeader, isMember, match, requests, meId, members } = data;
+  if (isLeader && requests.length > 0) await markTaskStart(4); // EXPERIMENT: no-op for real users
   const recruiting = group.recruiting !== false && group.status !== "Ended";
   const insider = isLeader || isMember;
   const projectMeta = [project?.course_code, [shortDate(project?.timeline_start), shortDate(project?.timeline_end) || "Present"].filter(Boolean).join(" - ")].filter(Boolean).join(" · ");

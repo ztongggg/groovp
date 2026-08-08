@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import { signIn } from "@/app/auth/actions";
+import { startExperimentSession } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
+import { EXPERIMENT_ENABLED } from "@/lib/experimentFlags";
 
 // Figma node 1065:2102 "Welcome Page" (+ 891:3491 error variant), file wA2wiOAqWkKr9JI319d5wT
 
@@ -73,6 +75,21 @@ export default function LoginPage() {
       {/* sign up — two stacked lines per Figma, not inline */}
       <p className="absolute w-full text-center" style={{ top: 652, fontSize: 12.5, fontWeight: 400, color: "#757080" }}>Don&apos;t have an account?</p>
       <Link href="/signup" className="absolute w-full text-center" style={{ top: 674, fontSize: 13, fontWeight: 600, color: "#7c3aed" }}>Sign up</Link>
+
+      {/* EXPERIMENT: entry point, env-gated — see lib/experiment.js. Plain
+          button (not a nested <form>, the page itself is already one) that
+          invokes the server action directly. */}
+      {EXPERIMENT_ENABLED && (
+        <div className="absolute w-full text-center" style={{ top: 800 }}>
+          <button
+            type="button"
+            onClick={() => startExperimentSession()}
+            style={{ fontSize: 12.5, fontWeight: 700, color: "#fff", background: "#1D1B44", borderRadius: 999, padding: "10px 20px" }}
+          >
+            Start Web Experiment
+          </button>
+        </div>
+      )}
     </form>
   );
 }

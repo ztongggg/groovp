@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createProject } from "@/app/create/actions";
 import ResourceFileUpload from "@/components/ResourceFileUpload";
 import AvatarUpload from "@/components/AvatarUpload";
 import SkillPicker from "@/components/SkillPicker";
+import { markTaskStart } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 const INTERESTS = ["Sustainability", "EdTech", "Web Dev", "Healthcare", "Data Science", "Social Impact", "Robotics", "AI & ML", "Design"];
 
@@ -85,6 +86,8 @@ export default function CreateProjectPage() {
   // Type starts unset: the frame has an error state for "make a selection".
   const [d, setD] = useState({ type: "", name: "", description: "", photo_url: "", timeline_start: "", timeline_end: "", min_size: 2, max_size: 5, number_of_groups: 1, skills: [], interests: [], project_link: "", resource_files: [], privacy: "public", joining_method: "approval" });
   const [touched, setTouched] = useState(false);
+
+  useEffect(() => { markTaskStart(3); }, []); // EXPERIMENT: no-op for real users
 
   const set = (k, v) => setD((s) => ({ ...s, [k]: v }));
   const toggle = (k, v) => setD((s) => ({ ...s, [k]: s[k].includes(v) ? s[k].filter((x) => x !== v) : [...s[k], v] }));

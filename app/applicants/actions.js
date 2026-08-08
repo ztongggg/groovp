@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { groupHasRoom } from "@/lib/capacity";
 import { shouldNotify } from "@/lib/notify";
+import { markTaskEnd } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 // Leader accepts an applicant: mark request accepted + add them as a member.
 export async function acceptRequest(id, groupId, applicantId) {
@@ -38,6 +39,7 @@ export async function acceptRequest(id, groupId, applicantId) {
   } catch {}
 
   revalidatePath("/applicants");
+  await markTaskEnd(4); // EXPERIMENT: no-op for real users
   return { ok: true };
 }
 

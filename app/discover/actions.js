@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { groupHasRoom } from "@/lib/capacity";
 import { shouldNotify } from "@/lib/notify";
+import { markTaskEnd } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 // Request to join a group. Idempotent-ish: a duplicate request is treated as
 // "already requested" rather than an error (unique constraint on group+user).
@@ -57,6 +58,7 @@ export async function requestToJoin(groupId, note) {
     if (existing) await supabase.from("join_requests").update({ status: "accepted" }).eq("id", existing.id);
     else await supabase.from("join_requests").insert({ group_id: groupId, user_id: user.id, status: "accepted" }).then(() => {}, () => {});
     await notifyJoined(supabase, g, user.id);
+    await markTaskEnd(2); // EXPERIMENT: no-op for real users
     return { ok: true, joined: true };
   }
 
@@ -95,6 +97,7 @@ export async function requestToJoin(groupId, note) {
   }
 
   await notifyLeader(supabase, groupId, user.id);
+  await markTaskEnd(2); // EXPERIMENT: no-op for real users
   return { ok: true };
 }
 
