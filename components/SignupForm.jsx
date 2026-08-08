@@ -306,11 +306,15 @@ export default function SignupForm({ isNeutral = false }) {
           </div>
         )}
         {step === 4 && (
-          <div className="grid grid-cols-3 gap-x-2 gap-y-6">
+          // Exact px grid, not Tailwind's gap-x-2/gap-y-6 approximation — the
+          // fresh export's real geometry is a 72px-column, 38px-column-gap,
+          // 14px-row-gap grid inset 11px from this wrapper's left edge; the
+          // old arbitrary gap classes (8px/24px) visibly mis-spaced it.
+          <div style={{ display: "grid", gridTemplateColumns: "72px 72px 72px", columnGap: 38, rowGap: 11, paddingLeft: 11 }}>
             {INTEREST_OPTIONS.map(({ name, icon }) => {
               const active = d.interests.includes(name);
               return (
-                <button key={name} type="button" onClick={() => toggle("interests", name)} className="flex flex-col items-center gap-2">
+                <button key={name} type="button" onClick={() => toggle("interests", name)} className="flex flex-col items-center gap-2" style={{ width: 104, justifySelf: "center" }}>
                   <span className="flex items-center justify-center rounded-full" style={{ width: 72, height: 72, background: active ? "#ECE8FC" : "#f3f1f8" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={icon} alt="" width={28} height={28} />
