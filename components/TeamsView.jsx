@@ -156,19 +156,20 @@ export default function TeamsView({ requests = [], teams = [], wrapUps = [] }) {
       <div className="absolute flex flex-col" style={{ left: 24, top: searchOpen ? 140 : 150, gap: tab === "requested" ? 16 : ROW_GAP }}>
         {total === 0 ? (
           tab === "requested" ? (
-            <div style={{ fontSize: 13, color: "#757080" }}>No requests yet. Request to join a project from Discover.</div>
+            <div className="flex w-[354px] flex-col items-center text-center" style={{ marginTop: 96 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/empty-requests-shapey.png" alt="" width={266} height={266} />
+              <p style={{ marginTop: 16, fontSize: 19, fontWeight: 800, color: "#1d1b44" }}>No Request yet</p>
+              <p style={{ marginTop: 10, fontSize: 12.5, color: "#757080", lineHeight: "18px" }}>Request to join a project from Discover.</p>
+              <Link href="/discover" style={{ marginTop: 34, width: 240, height: 50, borderRadius: 25, background: "#7c3aed", boxShadow: "0px 8px 20px -4px rgba(25.50,20.40,51,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 600, color: "#fff" }}>Browse Discover</Link>
+            </div>
           ) : (
-            <div className="flex w-[354px] flex-col items-center text-center" style={{ marginTop: 60 }}>
-              <div className="relative" style={{ width: 300, height: 300 }}>
-                <div className="absolute" style={{ background: "#2ED573", left: 40.6, top: 148.2, width: 167.7, height: 68.8 }} />
-                <div className="absolute" style={{ background: "#2ED573", left: 118.2, top: 45.9, width: 105.9, height: 171.2 }} />
-                <div className="absolute rounded-full" style={{ background: "#0B2A5B", left: 135.9, top: 98.8, width: 15.9, height: 15.9 }} />
-                <div className="absolute rounded-full" style={{ background: "#0B2A5B", left: 190.6, top: 98.8, width: 15.9, height: 15.9 }} />
-                <div className="absolute rounded-full" style={{ background: "#115E59", left: 157.1, top: 123.5, width: 30, height: 7.1 }} />
-              </div>
+            <div className="flex w-[354px] flex-col items-center text-center" style={{ marginTop: 89 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/empty-teams-mascot.png" alt="" width={300} height={300} />
               <p style={{ marginTop: 16, fontSize: 19, fontWeight: 800, color: "#1d1b44" }}>You&apos;re not on a team yet</p>
               <p style={{ marginTop: 10, fontSize: 12.5, color: "#757080", lineHeight: "18px" }}>Browse Discover to find a project,<br />or start your own and invite people to join.</p>
-              <Link href="/discover" style={{ marginTop: 34, width: 240, height: 50, borderRadius: 25, background: "linear-gradient(90deg, #7C3AED 0%, #6D28D9 100%)", boxShadow: "0px 6px 18px rgba(124,58,237,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 600, color: "#fff" }}>Browse Discover</Link>
+              <Link href="/discover" style={{ marginTop: 34, width: 240, height: 50, borderRadius: 25, background: "#7c3aed", boxShadow: "0px 8px 20px -4px rgba(25.50,20.40,51,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 600, color: "#fff" }}>Browse Discover</Link>
             </div>
           )
         ) : list.length === 0 ? (
