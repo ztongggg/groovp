@@ -5,8 +5,9 @@ import MessageButton from "@/components/MessageButton";
 import ApplicantReviewBar from "@/components/ApplicantReviewBar";
 import { createClient } from "@/lib/supabase/server";
 import { computeMatch } from "@/lib/matching";
+import { getExperimentCondition } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
-async function getData(id, groupId) {
+async function getData(id, groupId, includePersonality) {
   const empty = { me: null, p: null, ratings: [], blocked: false, match: null, pendingRequestId: null, pastProjects: [], skillList: [] };
   try {
     const supabase = createClient();
@@ -39,7 +40,7 @@ async function getData(id, groupId) {
     if (groupId) {
       try {
         const { data: g } = await supabase.from("groups").select("skills_wanted, interests_wanted, personality_wanted, leader_id").eq("id", groupId).single();
-        if (g) match = computeMatch(p || {}, g);
+        if (g) match = computeMatch(p || {}, g, { includePersonality });
         if (g && user && g.leader_id === user.id) {
           const { data: jr } = await supabase.from("join_requests").select("id").eq("group_id", groupId).eq("user_id", id).eq("status", "pending").maybeSingle();
           pendingRequestId = jr?.id || null;
@@ -67,7 +68,9 @@ async function getData(id, groupId) {
 }
 
 export default async function UserProfilePage({ params, searchParams }) {
-  const { me, p, ratings, blocked, match, pendingRequestId, pastProjects, skillList } = await getData(params.id, searchParams?.groupId);
+  const condition = await getExperimentCondition(); // EXPERIMENT: see lib/experiment.js
+  const isNeutral = condition === "neutral";
+  const { me, p, ratings, blocked, match, pendingRequestId, pastProjects, skillList } = await getData(params.id, searchParams?.groupId, !isNeutral);
   const groupId = searchParams?.groupId;
   const queue = searchParams?.queue ? searchParams.queue.split(",").filter(Boolean) : [];
   const queueIndex = queue.indexOf(params.id);
@@ -100,6 +103,7 @@ export default async function UserProfilePage({ params, searchParams }) {
         match={match}
         blocked={blocked}
         backHref={groupId ? "/applicants" : "/discover"}
+        hidePersonality={isNeutral}
         paging={
           showPaging
             ? {

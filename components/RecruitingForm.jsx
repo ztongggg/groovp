@@ -39,7 +39,9 @@ function Chip({ active, onClick, children }) {
   );
 }
 
-export default function RecruitingForm({ groupId, groupName, initial }) {
+// EXPERIMENT: isNeutral (Condition B) hides the "Working Style Wanted" block
+// and strips personality_wanted on save — see lib/experiment.js.
+export default function RecruitingForm({ groupId, groupName, initial, isNeutral = false }) {
   const router = useRouter();
   const [d, setD] = useState({
     recruiting: initial.recruiting ?? true,
@@ -59,7 +61,7 @@ export default function RecruitingForm({ groupId, groupName, initial }) {
 
   async function save() {
     setSaving(true); setSaved(false); setError("");
-    const res = await saveRecruiting(groupId, d);
+    const res = await saveRecruiting(groupId, isNeutral ? { ...d, personality_wanted: [] } : d);
     setSaving(false);
     if (res?.error) { setError(res.error); return; }
     setSaved(true); router.refresh();
@@ -116,17 +118,21 @@ export default function RecruitingForm({ groupId, groupName, initial }) {
             {INTERESTS.map((s) => <Chip key={s} active={d.interests_wanted.includes(s)} onClick={() => toggle("interests_wanted", s)}>{s}</Chip>)}
           </div>
 
-          <p style={{ ...LABEL, marginTop: 26 }}>WORKING STYLE WANTED</p>
-          <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 14 }}>
-            {WORKING_STYLE.map((w) => (
-              <div key={w.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                <span style={{ width: 110, fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>{w.label}</span>
-                <div style={{ display: "flex", gap: 10 }}>
-                  {w.options.map((o) => <Chip key={o} active={d.personality_wanted.includes(o)} onClick={() => toggle("personality_wanted", o)}>{o}</Chip>)}
-                </div>
+          {!isNeutral && (
+            <>
+              <p style={{ ...LABEL, marginTop: 26 }}>WORKING STYLE WANTED</p>
+              <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 14 }}>
+                {WORKING_STYLE.map((w) => (
+                  <div key={w.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                    <span style={{ width: 110, fontSize: 13, fontWeight: 600, color: "#1D1B44" }}>{w.label}</span>
+                    <div style={{ display: "flex", gap: 10 }}>
+                      {w.options.map((o) => <Chip key={o} active={d.personality_wanted.includes(o)} onClick={() => toggle("personality_wanted", o)}>{o}</Chip>)}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
 
           <p style={{ marginTop: 34, fontSize: 13, color: "#1D1B44" }}>
             <span style={{ fontWeight: 600 }}>What are you looking for? </span>

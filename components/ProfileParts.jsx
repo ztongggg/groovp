@@ -175,8 +175,17 @@ function StatCard({ tint, icon, label, value, matched }) {
   );
 }
 
-export function AboutStatGrid({ personality = {}, matchedPersonality = [] }) {
+// EXPERIMENT: hidePersonality is true for a Condition B (Neutral) viewer —
+// see lib/experiment.js. Location stays; it isn't a work-style trait.
+export function AboutStatGrid({ personality = {}, matchedPersonality = [], hidePersonality = false }) {
   const hit = (v) => !!v && matchedPersonality.some((m) => String(m).toLowerCase() === String(v).toLowerCase());
+  if (hidePersonality) {
+    return (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", rowGap: 8 }}>
+        <StatCard tint={STAT_TINTS.location} icon={<PinIcon />} label="LOCATION" value={personality.location} matched={hit(personality.location)} />
+      </div>
+    );
+  }
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 4, rowGap: 8 }}>
       <StatCard tint={STAT_TINTS.personality} icon={<PersonIcon />} label="PERSONALITY" value={personality.personality} matched={hit(personality.personality)} />

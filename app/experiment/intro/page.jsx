@@ -1,12 +1,17 @@
 "use client";
 
 // EXPERIMENT: consent/orientation screen, reached from the "Start Web
-// Experiment" link on /login. The timer doesn't start until "Begin" is
-// clicked here — see lib/experiment.js for the removal checklist.
+// Experiment A/B" links on /login (?c=A or ?c=B — never shown to the
+// participant, just carried through to startExperimentSession). The timer
+// doesn't start until "Begin" is clicked here — see lib/experiment.js for
+// the removal checklist.
 
+import { useSearchParams } from "next/navigation";
 import { startExperimentSession } from "@/lib/experiment";
 
 export default function ExperimentIntroPage() {
+  const searchParams = useSearchParams();
+  const arm = searchParams.get("c") === "B" ? "B" : "A";
   return (
     <div className="relative w-[402px] bg-white" style={{ minHeight: 874, padding: "72px 32px 40px" }}>
       <p style={{ fontSize: 24, fontWeight: 800, color: "#1D1B44" }}>Before you start</p>
@@ -24,7 +29,7 @@ export default function ExperimentIntroPage() {
       </p>
       <button
         type="button"
-        onClick={() => startExperimentSession()}
+        onClick={() => startExperimentSession(arm)}
         style={{ marginTop: 32, width: "100%", height: 54, borderRadius: 20, background: "#7C3AED", color: "#fff", fontSize: 15, fontWeight: 700 }}
       >
         Begin

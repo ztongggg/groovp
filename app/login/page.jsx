@@ -76,14 +76,22 @@ export default function LoginPage() {
       <Link href="/signup" className="absolute w-full text-center" style={{ top: 674, fontSize: 13, fontWeight: 600, color: "#7c3aed" }}>Sign up</Link>
 
       {/* EXPERIMENT: entry point, env-gated — see lib/experiment.js. Links to
-          the consent/intro screen rather than starting the timer directly. */}
+          the consent/intro screen rather than starting the timer directly.
+          Two plain "A"/"B" buttons — whoever clicks picks the condition
+          (A=Personalised, B=Neutral), the participant never sees which. */}
       {EXPERIMENT_ENABLED && (
-        <div className="absolute w-full text-center" style={{ top: 800 }}>
+        <div className="absolute flex w-full flex-col items-center gap-8" style={{ top: 765 }}>
           <Link
-            href="/experiment/intro"
+            href="/experiment/intro?c=A"
             style={{ display: "inline-block", fontSize: 12.5, fontWeight: 700, color: "#fff", background: "#1D1B44", borderRadius: 999, padding: "10px 20px" }}
           >
-            Start Web Experiment
+            Start Web Experiment A
+          </Link>
+          <Link
+            href="/experiment/intro?c=B"
+            style={{ display: "inline-block", fontSize: 12.5, fontWeight: 700, color: "#fff", background: "#1D1B44", borderRadius: 999, padding: "10px 20px" }}
+          >
+            Start Web Experiment B
           </Link>
         </div>
       )}

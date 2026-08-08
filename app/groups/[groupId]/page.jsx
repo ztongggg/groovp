@@ -6,9 +6,9 @@ import JoinGroupButton from "@/components/JoinGroupButton";
 import GroupRequestRow from "@/components/GroupRequestRow";
 import BackButton from "@/components/BackButton";
 import { computeMatch, STRONG_MATCH_THRESHOLD } from "@/lib/matching";
-import { markTaskStart } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
+import { markTaskStart, getExperimentCondition } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
-async function getData(groupId) {
+async function getData(groupId, includePersonality) {
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -40,7 +40,7 @@ async function getData(groupId) {
         const byId = Object.fromEntries((profs || []).map((p) => [p.id, p]));
         requests = (jrs || []).map((r) => {
           const p = byId[r.user_id] || {};
-          const m = computeMatch(p, g);
+          const m = computeMatch(p, g, { includePersonality });
           return {
             id: r.id,
             userId: r.user_id,
@@ -58,7 +58,7 @@ async function getData(groupId) {
     let match = null;
     if (user && !isMember && !isLeader) {
       const { data: viewer } = await supabase.from("profiles").select("skills, interests, personality, prefer_working, best_work_time").eq("id", user.id).maybeSingle();
-      if (viewer) match = computeMatch(viewer, g);
+      if (viewer) match = computeMatch(viewer, g, { includePersonality });
     }
 
     return {
@@ -125,7 +125,9 @@ function shortDate(iso) {
 // Every member sees this; Edit Group and Recruiting Settings are leader-only
 // actions reached from here, not the entry point itself.
 export default async function GroupInfoPage({ params }) {
-  const data = await getData(params.groupId);
+  const condition = await getExperimentCondition(); // EXPERIMENT: see lib/experiment.js
+  const isNeutral = condition === "neutral";
+  const data = await getData(params.groupId, !isNeutral);
 
   if (!data) {
     return (
@@ -243,7 +245,9 @@ export default async function GroupInfoPage({ params }) {
                 {recruiting && (
                   <>
                     <WantedChips label="SKILLS WANTED" items={group.skills_wanted} matched={match?.matchedSkills || []} labelColour={insider ? "#6126CC" : "#757080"} />
-                    <WantedChips label="PERSONALITY WANTED" items={group.personality_wanted} matched={match?.matchedPersonality || []} labelColour={insider ? "#6126CC" : "#757080"} />
+                    {/* EXPERIMENT: hidden entirely for a Neutral (B) viewer, even
+                        on a seeded group they don't own — see lib/experiment.js */}
+                    {!isNeutral && <WantedChips label="PERSONALITY WANTED" items={group.personality_wanted} matched={match?.matchedPersonality || []} labelColour={insider ? "#6126CC" : "#757080"} />}
                     <WantedChips label="INTERESTS WANTED" items={group.interests_wanted} matched={match?.matchedInterests || []} labelColour={insider ? "#6126CC" : "#757080"} />
                   </>
                 )}

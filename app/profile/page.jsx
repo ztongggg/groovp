@@ -2,6 +2,7 @@ import AppShell from "@/components/AppShell";
 import ProfileView from "@/components/ProfileView";
 import { createClient } from "@/lib/supabase/server";
 import { profileCompleteness } from "@/lib/completeness";
+import { getExperimentCondition } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 async function getProfile() {
   const fallback = {
@@ -81,9 +82,10 @@ async function getProfile() {
 
 export default async function ProfilePage() {
   const data = await getProfile();
+  const condition = await getExperimentCondition(); // EXPERIMENT: see lib/experiment.js
   return (
     <AppShell>
-      <ProfileView {...data} />
+      <ProfileView {...data} hidePersonality={condition === "neutral"} />
     </AppShell>
   );
 }

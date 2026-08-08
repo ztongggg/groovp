@@ -43,6 +43,7 @@ export default function ProfileView({
   githubUrl = "",
   portfolioUrl = "",
   completeness = null,
+  hidePersonality = false, // EXPERIMENT: see lib/experiment.js
 }) {
   const [tab, setTab] = useState("about");
 
@@ -88,7 +89,7 @@ export default function ProfileView({
 
         {tab === "about" ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <AboutStatGrid personality={personality} />
+            <AboutStatGrid personality={personality} hidePersonality={hidePersonality} />
             <ProfileLinks
               linkedinUrl={linkedinUrl}
               githubUrl={githubUrl}

@@ -3,6 +3,7 @@ import RecruitingForm from "@/components/RecruitingForm";
 import InviteByUsername from "@/components/InviteByUsername";
 import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
+import { getExperimentCondition } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
 async function getGroup(groupId) {
   try {
@@ -21,6 +22,7 @@ async function getGroup(groupId) {
 
 export default async function RecruitingPage({ params }) {
   const { g, me } = await getGroup(params.groupId);
+  const condition = await getExperimentCondition(); // EXPERIMENT: see lib/experiment.js
 
   return (
     <AppShell>
@@ -36,7 +38,7 @@ export default async function RecruitingPage({ params }) {
           <p className="mt-24 px-8 text-center text-muted">Only the group leader can manage recruiting.</p>
         ) : (
           <>
-            <RecruitingForm groupId={g.id} groupName={g.name} initial={g} />
+            <RecruitingForm groupId={g.id} groupName={g.name} initial={g} isNeutral={condition === "neutral"} />
             <div className="px-6">
               <InviteByUsername groupId={g.id} />
             </div>

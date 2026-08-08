@@ -5,9 +5,9 @@ import { ApplicantFace, StrongMatchPill, CARD_STYLE, appliedLabel } from "@/comp
 import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 import { computeMatch } from "@/lib/matching";
-import { markTaskStart } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
+import { markTaskStart, getExperimentCondition } from "@/lib/experiment"; // EXPERIMENT: see lib/experiment.js
 
-async function getApplicants() {
+async function getApplicants(includePersonality) {
   try {
     const supabase = createClient();
     const {
@@ -33,7 +33,7 @@ async function getApplicants() {
 
     return (reqs || []).map((r) => {
       const group = byId[r.group_id];
-      const match = computeMatch(r.profiles || {}, group || {});
+      const match = computeMatch(r.profiles || {}, group || {}, { includePersonality });
       return {
         id: r.id,
         groupId: r.group_id,
@@ -85,7 +85,8 @@ function HistoryRow({ a, index }) {
 }
 
 export default async function ApplicantsPage() {
-  const all = await getApplicants();
+  const condition = await getExperimentCondition(); // EXPERIMENT: see lib/experiment.js
+  const all = await getApplicants(condition !== "neutral");
   const pending = all.filter((a) => a.status === "pending");
   if (pending.length > 0) await markTaskStart(4); // EXPERIMENT: no-op for real users
   const invited = all.filter((a) => a.status === "invited");

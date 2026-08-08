@@ -34,6 +34,7 @@ export default function UserProfileView({
   moderationMenu = null,
   messageButton = null,
   reviewBar = null,
+  hidePersonality = false, // EXPERIMENT: see lib/experiment.js
 }) {
   const [tab, setTab] = useState("about");
   const name = profile.full_name || profile.username || "Student";
@@ -91,6 +92,7 @@ export default function UserProfileView({
                 location: profile.location,
               }}
               matchedPersonality={match?.matchedPersonality || []}
+              hidePersonality={hidePersonality}
             />
             <ProfileLinks
               linkedinUrl={profile.linkedin_url || ""}
