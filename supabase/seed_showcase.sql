@@ -570,10 +570,456 @@ insert into public.project_favorites (user_id, project_id) values
 ('a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000008'),
 ('a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000004');
 
+-- ============================================================
+-- EXPANSION (doubling pass) — 15 more profiles (a...0016-0030),
+-- 10 more projects (b...0011-0020), 20 more groups (c...0021-0040).
+-- Deliberately NOT clones of the first batch: 10 new SUTD profiles add
+-- a 3rd+4th person to every existing pillar (still EPD/ESD/CSD/DAI/ASD,
+-- 4 each now), 5 new NUS profiles use 5 DIFFERENT majors than the
+-- first batch (Statistics, Electrical Engineering, Economics,
+-- Environmental Studies, Chemical Engineering — first batch was
+-- Business Analytics/CS/IS/DSA/Industrial Design). New projects cover
+-- domains the first 10 didn't touch at all: fintech, transport
+-- prediction, wellness, game-dev tooling, hardware marketplace, IoT,
+-- accessibility mapping, personal-finance-adjacent utility, career
+-- prep — every one has its own real skills/interests/personality
+-- profile, not a reshuffled copy of an existing project.
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 2b) 15 more auth accounts. Same password: test1234.
+-- ------------------------------------------------------------
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
+  created_at, updated_at, confirmation_token, email_change,
+  email_change_token_new, recovery_token
+) values
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000016','authenticated','authenticated','rachel.tan@sutd.edu.sg',    crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Rachel Tan","username":"rachel_tan"}',           now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000017','authenticated','authenticated','faris.rahman@sutd.edu.sg',  crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Faris Rahman","username":"faris_rahman"}',       now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000018','authenticated','authenticated','michelle.goh@sutd.edu.sg',  crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Michelle Goh","username":"michelle_goh"}',       now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000019','authenticated','authenticated','daniel.lee@sutd.edu.sg',    crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Daniel Lee","username":"daniel_lee"}',           now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000020','authenticated','authenticated','amirah.zulkifli@sutd.edu.sg',crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Amirah Zulkifli","username":"amirah_zulkifli"}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000021','authenticated','authenticated','sean.ng@sutd.edu.sg',       crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Sean Ng","username":"sean_ng"}',                 now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000022','authenticated','authenticated','huiling.tay@sutd.edu.sg',   crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Hui Ling Tay","username":"huiling_tay"}',        now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000023','authenticated','authenticated','zhixuan.koh@sutd.edu.sg',   crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Zhi Xuan Koh","username":"zhixuan_koh"}',        now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000024','authenticated','authenticated','aisyah.bakar@sutd.edu.sg',  crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Nur Aisyah Bakar","username":"aisyah_bakar"}',   now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000025','authenticated','authenticated','ryan.teo@sutd.edu.sg',      crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ryan Teo","username":"ryan_teo"}',               now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000026','authenticated','authenticated','xinyi.chua@u.nus.edu',      crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Xin Yi Chua","username":"xinyi_chua"}',          now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000027','authenticated','authenticated','arjun.menon@u.nus.edu',     crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Arjun Menon","username":"arjun_menon"}',         now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000028','authenticated','authenticated','bryan.koh@u.nus.edu',       crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Bryan Koh","username":"bryan_koh"}',             now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000029','authenticated','authenticated','farah.adnan@u.nus.edu',     crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Farah Adnan","username":"farah_adnan"}',         now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000030','authenticated','authenticated','kevin.sim@u.nus.edu',       crypt('test1234', gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Kevin Sim","username":"kevin_sim"}',             now(), now(), '', '', '', '');
+
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), u.id, u.id::text,
+       jsonb_build_object('sub', u.id::text, 'email', u.email),
+       'email', now(), now(), now()
+from auth.users u
+where u.id::text like 'a0000000-%' and right(u.id::text, 3)::int between 16 and 30;
+
+-- ------------------------------------------------------------
+-- 3b) Profiles — 2 more per SUTD pillar (now 4 each), 5 new NUS majors
+--     (Statistics, EE, Economics, Environmental Studies, ChemE —
+--     distinct from the first batch's NUS majors).
+-- ------------------------------------------------------------
+update public.profiles set
+  university='SUTD', major='EPD', year='Y2', gender='Woman',
+  personality='Extrovert', prefer_working='Face-to-face', best_work_time='In the day time', location='West',
+  skills=array['Product','Research','Figma'], interests=array['Robotics','Sustainability','Design'],
+  avatar_url='https://randomuser.me/api/portraits/women/24.jpg',
+  bio='EPD Y2, robotics club regular. If a motor''s making a weird noise I probably already know why.'
+where id='a0000000-0000-0000-0000-000000000016';
+
+update public.profiles set
+  university='SUTD', major='EPD', year='Y4', gender='Man',
+  personality='Introvert', prefer_working='Online', best_work_time='At night', location='South',
+  skills=array['C++','Product','AWS'], interests=array['Robotics','AI & ML','Sustainability'],
+  avatar_url='https://randomuser.me/api/portraits/men/61.jpg',
+  bio='EPD senior, into drone control systems and the occasional 2am firmware crash.'
+where id='a0000000-0000-0000-0000-000000000017';
+
+update public.profiles set
+  university='SUTD', major='ESD', year='Y2', gender='Woman',
+  personality='Extrovert', prefer_working='Face-to-face', best_work_time='In the day time', location='Central',
+  skills=array['SQL','Research','Business'], interests=array['Sustainability','Data Science','Social Impact'],
+  avatar_url='https://randomuser.me/api/portraits/women/38.jpg',
+  bio='ESD Y2, into water systems and why Singapore''s drains are smarter than most people think.'
+where id='a0000000-0000-0000-0000-000000000018';
+
+update public.profiles set
+  university='SUTD', major='ESD', year='Y3', gender='Man',
+  personality='Introvert', prefer_working='Online', best_work_time='At night', location='East',
+  skills=array['Python','SQL','Research'], interests=array['Sustainability','Data Science','EdTech'],
+  avatar_url='https://randomuser.me/api/portraits/men/29.jpg',
+  bio='ESD Y3. Supply chains are basically puzzles with real consequences, which is why I like them.'
+where id='a0000000-0000-0000-0000-000000000019';
+
+update public.profiles set
+  university='SUTD', major='CSD', year='Y2', gender='Woman',
+  personality='Introvert', prefer_working='Online', best_work_time='At night', location='North',
+  skills=array['Python','TypeScript','Docker'], interests=array['Web Dev','AI & ML','Data Science'],
+  avatar_url='https://randomuser.me/api/portraits/women/47.jpg',
+  bio='CSD Y2, backend person. Happiest when a service finally stops throwing 500s.'
+where id='a0000000-0000-0000-0000-000000000020';
+
+update public.profiles set
+  university='SUTD', major='CSD', year='Y4', gender='Man',
+  personality='Extrovert', prefer_working='Face-to-face', best_work_time='In the day time', location='West',
+  skills=array['Java','React','Node.js'], interests=array['Web Dev','EdTech','AI & ML'],
+  avatar_url='https://randomuser.me/api/portraits/men/71.jpg',
+  bio='CSD senior, full-stack by necessity. Will ship a side project instead of sleeping.'
+where id='a0000000-0000-0000-0000-000000000021';
+
+update public.profiles set
+  university='SUTD', major='DAI', year='Y3', gender='Woman',
+  personality='Extrovert', prefer_working='Face-to-face', best_work_time='In the day time', location='Central',
+  skills=array['Figma','UI/UX','Research'], interests=array['Design','EdTech','Social Impact'],
+  avatar_url='https://randomuser.me/api/portraits/women/55.jpg',
+  bio='DAI Y3, UX researcher at heart. I will ask you five follow-up questions about your onboarding flow.'
+where id='a0000000-0000-0000-0000-000000000022';
+
+update public.profiles set
+  university='SUTD', major='DAI', year='Y1', gender='Man',
+  personality='Introvert', prefer_working='Online', best_work_time='At night', location='South',
+  skills=array['Python','PyTorch','Figma'], interests=array['AI & ML','Design','Data Science'],
+  avatar_url='https://randomuser.me/api/portraits/men/18.jpg',
+  bio='DAI freshman, obsessed with generative design. My GPU fan is basically a pet at this point.'
+where id='a0000000-0000-0000-0000-000000000023';
+
+update public.profiles set
+  university='SUTD', major='ASD', year='Y2', gender='Woman',
+  personality='Extrovert', prefer_working='Face-to-face', best_work_time='In the day time', location='West',
+  skills=array['Figma','Design','Research'], interests=array['Sustainability','Design','Social Impact'],
+  avatar_url='https://randomuser.me/api/portraits/women/63.jpg',
+  bio='ASD Y2, mapping campus heat islands one shaded bench at a time.'
+where id='a0000000-0000-0000-0000-000000000024';
+
+update public.profiles set
+  university='SUTD', major='ASD', year='Y4', gender='Man',
+  personality='Introvert', prefer_working='Online', best_work_time='At night', location='North',
+  skills=array['Research','AWS','Figma'], interests=array['Sustainability','Robotics','Design'],
+  avatar_url='https://randomuser.me/api/portraits/men/90.jpg',
+  bio='ASD senior, parametric facades and the occasional Grasshopper script that actually works first try.'
+where id='a0000000-0000-0000-0000-000000000025';
+
+update public.profiles set
+  university='NUS', major='Statistics', year='Y3', gender='Woman',
+  personality='Introvert', prefer_working='Online', best_work_time='At night', location='Central',
+  skills=array['SQL','TensorFlow','Business'], interests=array['Data Science','AI & ML','Healthcare'],
+  avatar_url='https://randomuser.me/api/portraits/women/44.jpg',
+  bio='Statistics Y3. If your p-value story doesn''t hold up I will find out.'
+where id='a0000000-0000-0000-0000-000000000026';
+
+update public.profiles set
+  university='NUS', major='Electrical Engineering', year='Y2', gender='Man',
+  personality='Extrovert', prefer_working='Face-to-face', best_work_time='In the day time', location='South',
+  skills=array['Python','C++','Product'], interests=array['Robotics','AI & ML','Sustainability'],
+  avatar_url='https://randomuser.me/api/portraits/men/37.jpg',
+  bio='EE Y2, into robotics and control systems. Half my notes are just circuit diagrams.'
+where id='a0000000-0000-0000-0000-000000000027';
+
+update public.profiles set
+  university='NUS', major='Economics', year='Y4', gender='Man',
+  personality='Introvert', prefer_working='Online', best_work_time='At night', location='North',
+  skills=array['SQL','Business','Research'], interests=array['Data Science','Social Impact','EdTech'],
+  avatar_url='https://randomuser.me/api/portraits/men/64.jpg',
+  bio='Economics senior, spreadsheet enthusiast, mildly obsessed with market-design papers.'
+where id='a0000000-0000-0000-0000-000000000028';
+
+update public.profiles set
+  university='NUS', major='Environmental Studies', year='Y1', gender='Woman',
+  personality='Extrovert', prefer_working='Face-to-face', best_work_time='In the day time', location='East',
+  skills=array['Research','SQL','Figma'], interests=array['Sustainability','Social Impact','Data Science'],
+  avatar_url='https://randomuser.me/api/portraits/women/29.jpg',
+  bio='Environmental Studies Y1, still new here but already annoyingly passionate about recycling bins.'
+where id='a0000000-0000-0000-0000-000000000029';
+
+update public.profiles set
+  university='NUS', major='Chemical Engineering', year='Y3', gender='Man',
+  personality='Introvert', prefer_working='Online', best_work_time='At night', location='Central',
+  skills=array['Python','Research','AWS'], interests=array['Sustainability','Data Science','Robotics'],
+  avatar_url='https://randomuser.me/api/portraits/men/58.jpg',
+  bio='ChemE Y3. Process optimisation by day, occasional sustainability rabbit hole by night.'
+where id='a0000000-0000-0000-0000-000000000030';
+
+-- ------------------------------------------------------------
+-- 4b) Per-skill proficiency for the 15 new profiles.
+-- ------------------------------------------------------------
+insert into public.user_skills (user_id, skill_name, proficiency) values
+  ('a0000000-0000-0000-0000-000000000016','Product','Good'), ('a0000000-0000-0000-0000-000000000016','Research','Basic'), ('a0000000-0000-0000-0000-000000000016','Figma','Basic'),
+  ('a0000000-0000-0000-0000-000000000017','C++','Expert'), ('a0000000-0000-0000-0000-000000000017','Product','Good'), ('a0000000-0000-0000-0000-000000000017','AWS','Basic'),
+  ('a0000000-0000-0000-0000-000000000018','SQL','Good'), ('a0000000-0000-0000-0000-000000000018','Research','Good'), ('a0000000-0000-0000-0000-000000000018','Business','Basic'),
+  ('a0000000-0000-0000-0000-000000000019','Python','Good'), ('a0000000-0000-0000-0000-000000000019','SQL','Expert'), ('a0000000-0000-0000-0000-000000000019','Research','Good'),
+  ('a0000000-0000-0000-0000-000000000020','Python','Expert'), ('a0000000-0000-0000-0000-000000000020','TypeScript','Good'), ('a0000000-0000-0000-0000-000000000020','Docker','Good'),
+  ('a0000000-0000-0000-0000-000000000021','Java','Good'), ('a0000000-0000-0000-0000-000000000021','React','Expert'), ('a0000000-0000-0000-0000-000000000021','Node.js','Good'),
+  ('a0000000-0000-0000-0000-000000000022','Figma','Expert'), ('a0000000-0000-0000-0000-000000000022','UI/UX','Expert'), ('a0000000-0000-0000-0000-000000000022','Research','Basic'),
+  ('a0000000-0000-0000-0000-000000000023','Python','Basic'), ('a0000000-0000-0000-0000-000000000023','PyTorch','Basic'), ('a0000000-0000-0000-0000-000000000023','Figma','Basic'),
+  ('a0000000-0000-0000-0000-000000000024','Figma','Good'), ('a0000000-0000-0000-0000-000000000024','Design','Good'), ('a0000000-0000-0000-0000-000000000024','Research','Basic'),
+  ('a0000000-0000-0000-0000-000000000025','Research','Expert'), ('a0000000-0000-0000-0000-000000000025','AWS','Basic'), ('a0000000-0000-0000-0000-000000000025','Figma','Good'),
+  ('a0000000-0000-0000-0000-000000000026','SQL','Expert'), ('a0000000-0000-0000-0000-000000000026','TensorFlow','Good'), ('a0000000-0000-0000-0000-000000000026','Business','Basic'),
+  ('a0000000-0000-0000-0000-000000000027','Python','Good'), ('a0000000-0000-0000-0000-000000000027','C++','Good'), ('a0000000-0000-0000-0000-000000000027','Product','Basic'),
+  ('a0000000-0000-0000-0000-000000000028','SQL','Good'), ('a0000000-0000-0000-0000-000000000028','Business','Expert'), ('a0000000-0000-0000-0000-000000000028','Research','Good'),
+  ('a0000000-0000-0000-0000-000000000029','Research','Basic'), ('a0000000-0000-0000-0000-000000000029','SQL','Basic'), ('a0000000-0000-0000-0000-000000000029','Figma','Basic'),
+  ('a0000000-0000-0000-0000-000000000030','Python','Good'), ('a0000000-0000-0000-0000-000000000030','Research','Good'), ('a0000000-0000-0000-0000-000000000030','AWS','Basic');
+
+-- ------------------------------------------------------------
+-- 5b) 10 more projects — domains the first 10 didn't cover at all:
+--     fintech, transport prediction, wellness, game-dev tooling,
+--     hardware marketplace, IoT, accessibility, chore-splitting
+--     utility, career-prep AI.
+-- ------------------------------------------------------------
+insert into public.projects (id, owner_id, name, description, type, skills_needed, interests, min_size, max_size, timeline_start, timeline_end, privacy, joining_method, project_link, allow_multiple_groups, course_code, instructor, things_to_note, cover_image_url, photo_url, join_code) values
+
+('b0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000028','FinLit Quest',
+ 'A gamified budgeting app that turns "don''t blow your allowance" into a level-up system instead of a lecture, aimed at first-years who''ve never had to budget for themselves before.',
+ 'personal', array['React','SQL','Business'], array['EdTech','Social Impact'], 4, 8, '2026-09-03','2026-12-12',
+ 'public','approval', null, true, null, null,
+ 'Two tracks: the app itself, and the actual content/curriculum behind the lessons.',
+ 'https://picsum.photos/seed/finlitquest/800/400','https://picsum.photos/seed/finlitquest-sq/300/300','GRV-FINL3'),
+
+('b0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000019','TransitPulse',
+ 'Predicts how crowded the campus shuttle and nearby MRT platforms will be 10 minutes out, using historical tap-in patterns instead of just a live map that only shows what''s already happened.',
+ 'academic', array['Python','SQL','AWS'], array['Data Science','Sustainability'], 4, 8, '2026-09-08','2026-12-17',
+ 'public','approval', null, true, '40.016 Fundamentals of Transportation Systems', 'Prof. Lynette Cheah',
+ 'Data pipeline group and rider-facing app group, meet weekly to sync.',
+ 'https://picsum.photos/seed/transitpulse/800/400','https://picsum.photos/seed/transitpulse-sq/300/300','GRV-TRNS3'),
+
+('b0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000022','MindfulMinutes',
+ 'A 3-minute guided break app for between lectures — breathing exercises and short stretches, not another meditation app that wants a 20-minute commitment nobody has.',
+ 'personal', array['Figma','UI/UX','JavaScript'], array['Healthcare','Design'], 4, 7, '2026-08-18','2026-12-08',
+ 'public','approval', null, true, null, null,
+ 'Content group scripts the exercises, dev group builds the actual app.',
+ 'https://picsum.photos/seed/mindfulminutes/800/400','https://picsum.photos/seed/mindfulminutes-sq/300/300','GRV-MIND3'),
+
+('b0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000021','GameJam Toolkit',
+ 'A shared library of pre-built prefabs, UI kits and sound assets so student game-jam teams stop rebuilding the same inventory system from scratch every single jam.',
+ 'personal', array['TypeScript','JavaScript','Design'], array['Web Dev','EdTech'], 4, 9, '2026-08-22','2026-12-11',
+ 'public','approval', 'https://github.com/example/gamejamtoolkit', true, null, null,
+ 'Engine-agnostic where possible, but most current assets target a web-based stack.',
+ 'https://picsum.photos/seed/gamejamtoolkit/800/400','https://picsum.photos/seed/gamejamtoolkit-sq/300/300','GRV-GAME3'),
+
+('b0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000017','CircuitSwap',
+ 'A peer marketplace for used Arduino boards, sensors and leftover project parts, so half-finished componentry stops sitting in drawers after every module ends.',
+ 'personal', array['Product','React','Research'], array['Sustainability','Web Dev'], 4, 8, '2026-09-01','2026-12-20',
+ 'public','approval', null, true, null, null,
+ 'Marketplace/dev side and a smaller research group looking at campus e-waste data.',
+ 'https://picsum.photos/seed/circuitswap/800/400','https://picsum.photos/seed/circuitswap-sq/300/300','GRV-CIRC3'),
+
+('b0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000020','VoiceNotes AI',
+ 'Turns raw lecture audio into structured, searchable notes instead of one giant wall of transcript text — still tuning how it handles professors who talk very, very fast.',
+ 'academic', array['Python','AI/ML','Docker'], array['AI & ML','EdTech'], 4, 8, '2026-09-05','2026-12-14',
+ 'public','approval', null, true, '50.021 Artificial Intelligence', 'Prof. Kian Hsiang Low',
+ 'Model group handles transcription/summarisation, product group handles the note-taking UI.',
+ 'https://picsum.photos/seed/voicenotesai/800/400','https://picsum.photos/seed/voicenotesai-sq/300/300','GRV-VOIC3'),
+
+('b0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000016','UrbanFarm Sensors',
+ 'IoT soil-moisture and light sensors for the rooftop community garden, so watering happens on an actual schedule instead of whoever remembers first.',
+ 'academic', array['C++','Product','Research'], array['Sustainability','Robotics'], 4, 9, '2026-09-12','2026-12-19',
+ 'public','approval', null, true, '02.009 Design and Build for a Sustainable World', 'Prof. Lin Wei',
+ 'Hardware group builds/deploys sensors, software group builds the dashboard.',
+ 'https://picsum.photos/seed/urbanfarmsensors/800/400','https://picsum.photos/seed/urbanfarmsensors-sq/300/300','GRV-FARM3'),
+
+('b0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000024','AccessMap',
+ 'Crowdsourced wheelchair-accessibility mapping of campus — ramps, lifts, the doors that are technically automatic but never actually open in time.',
+ 'personal', array['Figma','Research','JavaScript'], array['Social Impact','Design'], 4, 8, '2026-08-10','2026-12-05',
+ 'public','approval', null, true, null, null,
+ 'Field survey group walks the campus, dev group builds the map itself.',
+ 'https://picsum.photos/seed/accessmap/800/400','https://picsum.photos/seed/accessmap-sq/300/300','GRV-ACCS3'),
+
+('b0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000026','ChoreSplit',
+ 'A fair chore-and-expense splitter for shared student housing, because "we''ll figure it out" never actually works once four people are involved.',
+ 'personal', array['React','SQL','Node.js'], array['Web Dev','Social Impact'], 4, 7, '2026-08-28','2026-12-09',
+ 'public','auto', 'https://choresplit.example.com', true, null, null,
+ 'Auto-accept — just come with an opinion about chore fairness.',
+ 'https://picsum.photos/seed/choresplit/800/400','https://picsum.photos/seed/choresplit-sq/300/300','GRV-CHOR3'),
+
+('b0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000023','PitchPrep',
+ 'An AI mock-interview and pitch-practice partner for case comps and startup pitches, giving structured feedback instead of just a recording you never rewatch.',
+ 'academic', array['Python','AI/ML','Figma'], array['AI & ML','EdTech'], 4, 8, '2026-09-15','2026-12-22',
+ 'public','approval', null, true, '01.117 Communication for Engineers', 'Prof. Natalie Yeo',
+ 'Model/feedback-logic group and the practice-UI group, weekly joint demo.',
+ 'https://picsum.photos/seed/pitchprep/800/400','https://picsum.photos/seed/pitchprep-sq/300/300','GRV-PTCH3');
+
+-- ------------------------------------------------------------
+-- 6b) 20 more groups (2 per new project), same "different vibe from
+--     its sibling" pattern as the first batch.
+-- ------------------------------------------------------------
+insert into public.groups (id, project_id, name, leader_id, recruiting, status, min_members, max_members, members_wanted, skills_wanted, personality_wanted, interests_wanted, joining_method, additional_notes) values
+
+('c0000000-0000-0000-0000-000000000021','b0000000-0000-0000-0000-000000000011','FinLit Core','a0000000-0000-0000-0000-000000000028', true,'Forming',2,4,2,array['SQL','Business'],array['Introvert','Online','Night owl'],array['Social Impact'],'approval','Numbers and mechanics side, async, fast iteration.'),
+('c0000000-0000-0000-0000-000000000022','b0000000-0000-0000-0000-000000000011','FinLit Outreach','a0000000-0000-0000-0000-000000000018', true,'Forming',2,5,3,array['Business','Research'],array['Extrovert','Face-to-face','Morning'],array['EdTech'],'approval','Curriculum and outreach side, daytime, beginner-friendly.'),
+
+('c0000000-0000-0000-0000-000000000023','b0000000-0000-0000-0000-000000000012','Transit Data','a0000000-0000-0000-0000-000000000019', true,'Forming',2,4,2,array['Python','AWS'],array['Introvert','Online','Night owl'],array['Data Science'],'approval','Model/pipeline side, async, comfortable with real data mess.'),
+('c0000000-0000-0000-0000-000000000024','b0000000-0000-0000-0000-000000000012','Transit Riders','a0000000-0000-0000-0000-000000000021', true,'Forming',2,5,3,array['React','SQL'],array['Extrovert','Face-to-face','Morning'],array['Sustainability'],'approval','Rider-facing app side, daytime, beginner-friendly.'),
+
+('c0000000-0000-0000-0000-000000000025','b0000000-0000-0000-0000-000000000013','Mindful Core','a0000000-0000-0000-0000-000000000022', true,'Forming',2,4,2,array['Figma','UI/UX'],array['Introvert','Online','Night owl'],array['Healthcare'],'approval','App-build side, deep-focus async work.'),
+('c0000000-0000-0000-0000-000000000026','b0000000-0000-0000-0000-000000000013','Mindful Outreach','a0000000-0000-0000-0000-000000000024', true,'Forming',2,5,3,array['Figma','Research'],array['Extrovert','Face-to-face','Morning'],array['Design'],'approval','Content/exercise-scripting side, daytime, no wellness background needed.'),
+
+('c0000000-0000-0000-0000-000000000027','b0000000-0000-0000-0000-000000000014','Toolkit Engine','a0000000-0000-0000-0000-000000000021', true,'Forming',2,4,2,array['TypeScript','JavaScript'],array['Introvert','Online','Night owl'],array['Web Dev'],'approval','Core engine/tooling, async, comfortable with TS.'),
+('c0000000-0000-0000-0000-000000000028','b0000000-0000-0000-0000-000000000014','Toolkit Assets','a0000000-0000-0000-0000-000000000023', true,'Forming',2,6,4,array['Design','Figma'],array['Extrovert','Face-to-face','Morning'],array['EdTech'],'approval','Asset/art side, casual pace, good for a first game-adjacent project.'),
+
+('c0000000-0000-0000-0000-000000000029','b0000000-0000-0000-0000-000000000015','Circuit Marketplace','a0000000-0000-0000-0000-000000000017', true,'Forming',2,4,2,array['Product','React'],array['Introvert','Online','Night owl'],array['Sustainability'],'approval','Marketplace build, async, fast-moving.'),
+('c0000000-0000-0000-0000-000000000030','b0000000-0000-0000-0000-000000000015','Circuit Research','a0000000-0000-0000-0000-000000000027', true,'Forming',2,5,3,array['Research','C++'],array['Extrovert','Face-to-face','Morning'],array['Web Dev'],'approval','E-waste data side, casual pace, good for first-timers.'),
+
+('c0000000-0000-0000-0000-000000000031','b0000000-0000-0000-0000-000000000016','VoiceNotes Model','a0000000-0000-0000-0000-000000000020', true,'Forming',2,4,2,array['Python','AI/ML'],array['Introvert','Online','Night owl'],array['AI & ML'],'approval','Transcription/summarisation model side, async, ML background useful.'),
+('c0000000-0000-0000-0000-000000000032','b0000000-0000-0000-0000-000000000016','VoiceNotes Product','a0000000-0000-0000-0000-000000000025', true,'Forming',2,5,3,array['Figma','Docker'],array['Extrovert','Face-to-face','Morning'],array['EdTech'],'approval','Note-taking UI side, daytime, beginner-friendly.'),
+
+('c0000000-0000-0000-0000-000000000033','b0000000-0000-0000-0000-000000000017','UrbanFarm Hardware','a0000000-0000-0000-0000-000000000016', true,'Forming',2,4,2,array['C++','Product'],array['Introvert','Online','Night owl'],array['Robotics'],'approval','Sensor build/deploy, hands-on hardware work.'),
+('c0000000-0000-0000-0000-000000000034','b0000000-0000-0000-0000-000000000017','UrbanFarm Software','a0000000-0000-0000-0000-000000000029', true,'Forming',2,5,3,array['Research','SQL'],array['Extrovert','Face-to-face','Morning'],array['Sustainability'],'approval','Dashboard/data side, casual pace, good for first-timers.'),
+
+('c0000000-0000-0000-0000-000000000035','b0000000-0000-0000-0000-000000000018','AccessMap Field','a0000000-0000-0000-0000-000000000024', true,'Forming',2,4,2,array['Research','Figma'],array['Introvert','Online','Night owl'],array['Social Impact'],'approval','Survey/data side, async write-ups between site visits.'),
+('c0000000-0000-0000-0000-000000000036','b0000000-0000-0000-0000-000000000018','AccessMap Dev','a0000000-0000-0000-0000-000000000030', true,'Forming',2,5,3,array['JavaScript','Figma'],array['Extrovert','Face-to-face','Morning'],array['Design'],'approval','Map-app build, daytime, beginner-friendly.'),
+
+('c0000000-0000-0000-0000-000000000037','b0000000-0000-0000-0000-000000000019','ChoreSplit Core','a0000000-0000-0000-0000-000000000026', true,'Forming',2,4,2,array['React','Node.js'],array['Introvert','Online','Night owl'],array['Web Dev'],'auto','Auto-accept, core app build, async.'),
+('c0000000-0000-0000-0000-000000000038','b0000000-0000-0000-0000-000000000019','ChoreSplit Feedback','a0000000-0000-0000-0000-000000000028', true,'Forming',2,5,3,array['Business','SQL'],array['Extrovert','Face-to-face','Morning'],array['Social Impact'],'auto','Auto-accept, user feedback/testing side, daytime.'),
+
+('c0000000-0000-0000-0000-000000000039','b0000000-0000-0000-0000-000000000020','PitchPrep Model','a0000000-0000-0000-0000-000000000023', true,'Forming',2,4,2,array['Python','AI/ML'],array['Introvert','Online','Night owl'],array['AI & ML'],'approval','Feedback-logic side, async, ML background useful.'),
+('c0000000-0000-0000-0000-000000000040','b0000000-0000-0000-0000-000000000020','PitchPrep Practice','a0000000-0000-0000-0000-000000000018', true,'Forming',2,5,3,array['Figma','Business'],array['Extrovert','Face-to-face','Morning'],array['EdTech'],'approval','Practice-UI side, daytime, beginner-friendly.');
+
+-- ------------------------------------------------------------
+-- 7b) Group membership for the 20 new groups — leader + 1 real member
+--     each, deliberately reusing some people across projects (same
+--     cross-leadership pattern the first batch already established,
+--     e.g. one person legitimately leads/joins groups on unrelated
+--     projects — allowed, only a 2nd group on the SAME project is
+--     blocked server-side).
+-- ------------------------------------------------------------
+insert into public.group_members (group_id, user_id, role) values
+('c0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000028','leader'), ('c0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000019','member'),
+('c0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000018','leader'), ('c0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000029','member'),
+('c0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000019','leader'), ('c0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000027','member'),
+('c0000000-0000-0000-0000-000000000024','a0000000-0000-0000-0000-000000000021','leader'), ('c0000000-0000-0000-0000-000000000024','a0000000-0000-0000-0000-000000000016','member'),
+('c0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000022','leader'), ('c0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000024','member'),
+('c0000000-0000-0000-0000-000000000026','a0000000-0000-0000-0000-000000000024','leader'), ('c0000000-0000-0000-0000-000000000026','a0000000-0000-0000-0000-000000000022','member'),
+('c0000000-0000-0000-0000-000000000027','a0000000-0000-0000-0000-000000000021','leader'), ('c0000000-0000-0000-0000-000000000027','a0000000-0000-0000-0000-000000000020','member'),
+('c0000000-0000-0000-0000-000000000028','a0000000-0000-0000-0000-000000000023','leader'), ('c0000000-0000-0000-0000-000000000028','a0000000-0000-0000-0000-000000000017','member'),
+('c0000000-0000-0000-0000-000000000029','a0000000-0000-0000-0000-000000000017','leader'), ('c0000000-0000-0000-0000-000000000029','a0000000-0000-0000-0000-000000000030','member'),
+('c0000000-0000-0000-0000-000000000030','a0000000-0000-0000-0000-000000000027','leader'), ('c0000000-0000-0000-0000-000000000030','a0000000-0000-0000-0000-000000000026','member'),
+('c0000000-0000-0000-0000-000000000031','a0000000-0000-0000-0000-000000000020','leader'), ('c0000000-0000-0000-0000-000000000031','a0000000-0000-0000-0000-000000000023','member'),
+('c0000000-0000-0000-0000-000000000032','a0000000-0000-0000-0000-000000000025','leader'), ('c0000000-0000-0000-0000-000000000032','a0000000-0000-0000-0000-000000000016','member'),
+('c0000000-0000-0000-0000-000000000033','a0000000-0000-0000-0000-000000000016','leader'), ('c0000000-0000-0000-0000-000000000033','a0000000-0000-0000-0000-000000000017','member'),
+('c0000000-0000-0000-0000-000000000034','a0000000-0000-0000-0000-000000000029','leader'), ('c0000000-0000-0000-0000-000000000034','a0000000-0000-0000-0000-000000000019','member'),
+('c0000000-0000-0000-0000-000000000035','a0000000-0000-0000-0000-000000000024','leader'), ('c0000000-0000-0000-0000-000000000035','a0000000-0000-0000-0000-000000000021','member'),
+('c0000000-0000-0000-0000-000000000036','a0000000-0000-0000-0000-000000000030','leader'), ('c0000000-0000-0000-0000-000000000036','a0000000-0000-0000-0000-000000000022','member'),
+('c0000000-0000-0000-0000-000000000037','a0000000-0000-0000-0000-000000000026','leader'), ('c0000000-0000-0000-0000-000000000037','a0000000-0000-0000-0000-000000000028','member'),
+('c0000000-0000-0000-0000-000000000038','a0000000-0000-0000-0000-000000000028','leader'), ('c0000000-0000-0000-0000-000000000038','a0000000-0000-0000-0000-000000000018','member'),
+('c0000000-0000-0000-0000-000000000039','a0000000-0000-0000-0000-000000000023','leader'), ('c0000000-0000-0000-0000-000000000039','a0000000-0000-0000-0000-000000000025','member'),
+('c0000000-0000-0000-0000-000000000040','a0000000-0000-0000-0000-000000000018','leader'), ('c0000000-0000-0000-0000-000000000040','a0000000-0000-0000-0000-000000000027','member');
+
+-- (project_members backfill in section 7 above is a dynamic SELECT over
+-- whatever's in group_members/projects, so it already picks up all of
+-- this new batch too — nothing to add here.)
+
+-- ------------------------------------------------------------
+-- 8b) Past projects for the 15 new profiles, 2 each, freestanding
+--     (same reasoning as section 8: none of the 20 current projects
+--     are "past" ones for these to link to).
+-- ------------------------------------------------------------
+insert into public.past_projects (user_id, project_id, role, write_up) values
+('a0000000-0000-0000-0000-000000000016',null,'Hardware Lead','Built the actuator rig for a robotics-club demo bot, spent more time on cable management than the actual code.'),
+('a0000000-0000-0000-0000-000000000016',null,'Prototyping','Helped a senior''s capstone project survive its 3am pre-demo motor failure.'),
+('a0000000-0000-0000-0000-000000000017',null,'Firmware','Wrote the flight-stabilisation firmware for a coursework drone, only crashed it twice during testing.'),
+('a0000000-0000-0000-0000-000000000017',null,'Team Lead','Led a mini quadcopter build for an EPD elective, budget was tighter than the frame tolerances.'),
+('a0000000-0000-0000-0000-000000000018',null,'Research','Modelled stormwater runoff for a class project, learned way more about Singapore''s drains than expected.'),
+('a0000000-0000-0000-0000-000000000018',null,'Data Analysis','Analysed campus water-usage data for an ESD assignment, found some genuinely surprising patterns.'),
+('a0000000-0000-0000-0000-000000000019',null,'Systems Analyst','Mapped a mock supply chain for a logistics case competition, we placed top 3.'),
+('a0000000-0000-0000-0000-000000000019',null,'Team Lead','Led a systems-thinking group project on food distribution, kept the model from getting too abstract.'),
+('a0000000-0000-0000-0000-000000000020',null,'Backend','Built the API layer for a CSD module project, first time deploying something that didn''t fall over under load.'),
+('a0000000-0000-0000-0000-000000000020',null,'Infra','Containerised a classmate''s messy Flask app so it finally ran the same way twice.'),
+('a0000000-0000-0000-0000-000000000021',null,'Full-stack','Shipped a small events app for a CSD elective, still gets the occasional random signup.'),
+('a0000000-0000-0000-0000-000000000021',null,'Team Lead','Led a 48-hour internal hackathon team, we didn''t win but the demo didn''t crash which felt like winning.'),
+('a0000000-0000-0000-0000-000000000022',null,'UX Research','Ran usability tests for a DAI studio project, three participants got genuinely confused by the same button.'),
+('a0000000-0000-0000-0000-000000000022',null,'Design Lead','Led the visual direction for a DAI group project on accessible signage.'),
+('a0000000-0000-0000-0000-000000000023',null,'ML Support','Trained a tiny style-transfer model for a DAI elective, GPU fan never forgave me.'),
+('a0000000-0000-0000-0000-000000000023',null,'Design','Built generative pattern variations for a first-year design brief.'),
+('a0000000-0000-0000-0000-000000000024',null,'Fieldwork','Surveyed accessibility gaps across two ASD studio sites, the ramps were worse than expected.'),
+('a0000000-0000-0000-0000-000000000024',null,'Design','Designed shaded-walkway concepts for an ASD urban-heat assignment.'),
+('a0000000-0000-0000-0000-000000000025',null,'Parametric Design','Scripted a parametric facade for an ASD studio brief, Grasshopper and I are no longer on speaking terms.'),
+('a0000000-0000-0000-0000-000000000025',null,'Team Lead','Led a small studio group through a housing-density brief, deadline was brutal.'),
+('a0000000-0000-0000-0000-000000000026',null,'Statistical Analysis','Ran the regression models for a Statistics module project on survey bias, results were messier than expected.'),
+('a0000000-0000-0000-0000-000000000026',null,'Data Cleaning','Cleaned a genuinely awful dataset for a healthcare-analytics case study.'),
+('a0000000-0000-0000-0000-000000000027',null,'Control Systems','Built a PID controller for an EE lab project, tuned it more times than I''d like to admit.'),
+('a0000000-0000-0000-0000-000000000027',null,'Hardware','Helped debug a robotics-club line-follower that kept veering left for no clear reason.'),
+('a0000000-0000-0000-0000-000000000028',null,'Market Analysis','Wrote the market-design section of an Economics term paper, cited way too many auction-theory papers.'),
+('a0000000-0000-0000-0000-000000000028',null,'Team Lead','Led a case-competition team on pricing strategy, we made the final round.'),
+('a0000000-0000-0000-0000-000000000029',null,'Research','Surveyed campus recycling habits for an Environmental Studies module, results were more depressing than expected.'),
+('a0000000-0000-0000-0000-000000000029',null,'Fieldwork','Helped audit a residence hall''s waste sorting for a sustainability assignment.'),
+('a0000000-0000-0000-0000-000000000030',null,'Process Optimisation','Optimised a mock chemical process flow for a ChemE assignment, shaved a surprising amount off the simulated cost.'),
+('a0000000-0000-0000-0000-000000000030',null,'Lab Support','Helped a labmate salvage a failed titration series with better error analysis.');
+
+-- ------------------------------------------------------------
+-- 9b) Ratings for the 15 new profiles — 3 prior-team clusters of 5
+--     (16-20, 21-25, 26-30), same freestanding pattern as section 9.
+-- ------------------------------------------------------------
+insert into public.ratings (rater_id, ratee_id, project_id, group_id, stars, comment) values
+-- prior team: Rachel, Faris, Michelle, Daniel, Amirah
+('a0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000017',null,null,5,'Faris kept the drone from becoming a very expensive paperweight, great under pressure.'),
+('a0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000016',null,null,5,'Rachel''s cable management alone saved our demo, seriously underrated skill.'),
+('a0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000018',null,null,4,'Michelle''s stormwater model held up better than I expected going in.'),
+('a0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000017',null,null,5,'Faris tuned the firmware fast, drone barely wobbled by the end.'),
+('a0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000019',null,null,5,'Daniel kept the supply-chain case grounded, top 3 was well deserved.'),
+('a0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000018',null,null,4,'Michelle''s water-usage analysis found things nobody else would''ve caught.'),
+('a0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000020',null,null,5,'Amirah''s API didn''t fall over once, genuinely impressive for a first deploy.'),
+('a0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000019',null,null,5,'Daniel''s systems-thinking lead kept our food-distribution model from spiralling into nonsense.'),
+('a0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000016',null,null,4,'Rachel''s actuator rig was solid, made the demo look way more polished than it had any right to.'),
+('a0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000020',null,null,5,'Amirah containerised my mess of a Flask app without complaint, lifesaver.'),
+('a0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000019',null,null,4,'Daniel''s a careful thinker, good to have on a team when things get messy.'),
+('a0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000016',null,null,5,'Rachel''s hands-on with hardware in a way that saved us real time.'),
+('a0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000020',null,null,5,'Amirah''s infra work is quietly excellent, things just work.'),
+('a0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000017',null,null,4,'Faris handles pressure well, drone crashes and all.'),
+-- prior team: Sean, Hui Ling, Zhi Xuan, Aisyah, Ryan Teo
+('a0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000022',null,null,5,'Hui Ling''s usability tests caught a confusing button literally everyone else missed.'),
+('a0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000021',null,null,5,'Sean shipped that events app fast and it''s still somehow running.'),
+('a0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000023',null,null,4,'Zhi Xuan''s generative patterns gave our brief way more range than expected.'),
+('a0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000022',null,null,5,'Hui Ling''s design direction pulled a messy studio project together.'),
+('a0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000024',null,null,5,'Aisyah''s accessibility survey findings were sobering but exactly what we needed.'),
+('a0000000-0000-0000-0000-000000000024','a0000000-0000-0000-0000-000000000023',null,null,4,'Zhi Xuan''s style-transfer experiment was more polished than a "GPU fan never forgave me" project has any right to be.'),
+('a0000000-0000-0000-0000-000000000024','a0000000-0000-0000-0000-000000000025',null,null,5,'Ryan''s facade script turned a vague brief into something genuinely buildable.'),
+('a0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000024',null,null,5,'Aisyah''s shaded-walkway concepts were the strongest part of our urban-heat submission.'),
+('a0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000021',null,null,4,'Sean''s hackathon team didn''t win but the demo running smoothly said a lot.'),
+('a0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000025',null,null,5,'Ryan led our housing-density group through a brutal deadline without anyone melting down.'),
+('a0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000023',null,null,4,'Zhi Xuan picks up new tools fast, good to have around under a tight brief.'),
+('a0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000021',null,null,5,'Sean''s full-stack instincts saved our internal hackathon build.'),
+('a0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000025',null,null,5,'Ryan''s parametric work is meticulous, even when Grasshopper clearly wasn''t cooperating.'),
+('a0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000022',null,null,4,'Hui Ling''s research made our studio brief feel actually evidence-based, not just opinions.'),
+-- prior team: Xin Yi, Arjun, Bryan, Farah, Kevin
+('a0000000-0000-0000-0000-000000000026','a0000000-0000-0000-0000-000000000027',null,null,5,'Arjun''s PID tuning patience paid off, controller was rock solid by the end.'),
+('a0000000-0000-0000-0000-000000000027','a0000000-0000-0000-0000-000000000026',null,null,4,'Xin Yi''s regression work held up to some tough questions from the module reviewer.'),
+('a0000000-0000-0000-0000-000000000027','a0000000-0000-0000-0000-000000000028',null,null,5,'Bryan''s market-design section was the strongest part of our term paper, hands down.'),
+('a0000000-0000-0000-0000-000000000028','a0000000-0000-0000-0000-000000000027',null,null,5,'Arjun debugged that line-follower faster than anyone else on the team would have.'),
+('a0000000-0000-0000-0000-000000000028','a0000000-0000-0000-0000-000000000029',null,null,4,'Farah''s recycling survey results were genuinely eye-opening, more depressing than expected but useful.'),
+('a0000000-0000-0000-0000-000000000029','a0000000-0000-0000-0000-000000000028',null,null,5,'Bryan led our pricing-strategy case team into the final round, sharp thinking under time pressure.'),
+('a0000000-0000-0000-0000-000000000029','a0000000-0000-0000-0000-000000000030',null,null,5,'Kevin''s process optimisation shaved real cost off our simulated line, impressive for a mock assignment.'),
+('a0000000-0000-0000-0000-000000000030','a0000000-0000-0000-0000-000000000029',null,null,4,'Farah''s waste-sorting audit was thorough, more useful data than I expected going in.'),
+('a0000000-0000-0000-0000-000000000030','a0000000-0000-0000-0000-000000000026',null,null,5,'Xin Yi''s data cleaning turned an unusable healthcare dataset into something we could actually model.'),
+('a0000000-0000-0000-0000-000000000026','a0000000-0000-0000-0000-000000000030',null,null,4,'Kevin''s lab error-analysis saved a titration series I''d already written off.'),
+('a0000000-0000-0000-0000-000000000026','a0000000-0000-0000-0000-000000000029',null,null,4,'Farah''s fieldwork is careful and well-documented, good collaborator.'),
+('a0000000-0000-0000-0000-000000000029','a0000000-0000-0000-0000-000000000026',null,null,5,'Xin Yi''s statistical instincts are sharp, caught a bias issue nobody else flagged.'),
+('a0000000-0000-0000-0000-000000000027','a0000000-0000-0000-0000-000000000030',null,null,4,'Kevin''s optimisation work is thorough, good to have on a technical team.'),
+('a0000000-0000-0000-0000-000000000030','a0000000-0000-0000-0000-000000000027',null,null,5,'Arjun''s control-systems debugging was fast and methodical.');
+
+-- ------------------------------------------------------------
+-- 10b) A few more join requests / saves so the new groups/projects
+--      aren't completely empty of activity either.
+-- ------------------------------------------------------------
+insert into public.join_requests (group_id, user_id, status, note, comment, decline_reason, declined_at) values
+('c0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000026','pending', 'Have SQL + stats background, happy to help with the data side.', 'Have SQL + stats background, happy to help with the data side.', null, null),
+('c0000000-0000-0000-0000-000000000033','a0000000-0000-0000-0000-000000000027','pending', 'EE background, comfortable with sensor wiring.', 'EE background, comfortable with sensor wiring.', null, null),
+('c0000000-0000-0000-0000-000000000040','a0000000-0000-0000-0000-000000000022','pending', null, null, null, null);
+
+insert into public.project_favorites (user_id, project_id) values
+('a0000000-0000-0000-0000-000000000016','b0000000-0000-0000-0000-000000000016'),
+('a0000000-0000-0000-0000-000000000020','b0000000-0000-0000-0000-000000000017'),
+('a0000000-0000-0000-0000-000000000028','b0000000-0000-0000-0000-000000000013');
+
 -- ------------------------------------------------------------
 -- Done. Verify:
 --   select username, full_name, university, major from public.profiles order by university, major;
 --   select name, type, privacy, join_code from public.projects order by name;
 --   select p.name, count(g.id) as n_groups from public.projects p join public.groups g on g.project_id = p.id group by p.name;
 --   select ratee_id, count(*), round(avg(stars),1) from public.ratings group by ratee_id order by 2;
+--   select count(*) from public.profiles;  -- expect 30
+--   select count(*) from public.projects;  -- expect 20
+--   select count(*) from public.groups;    -- expect 40
 -- ------------------------------------------------------------
