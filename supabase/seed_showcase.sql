@@ -1,5 +1,21 @@
 -- ============================================================
--- Groovp — full showcase reseed, v2 (SUTD + NUS only).
+-- Groovp — full showcase reseed, v3 (SUTD + NUS, built for a web
+-- experiment where a brand-new user signs up with their OWN email and
+-- has to: 1) create a profile, 2) find a project, 3) compare groups
+-- within it, 4) request to join one. Everything below is shaped
+-- around that flow specifically, not just data completeness:
+--   - The 12 non-Ended projects are all Public privacy (not Restricted)
+--     specifically so a signup with ANY email — not just @sutd/@nus —
+--     can see and request to join them. A brand-new participant has no
+--     university match, so a Restricted project would just be invisible
+--     to them; Public is the only tier that reliably works here.
+--   - Each of those 12 has 2-3 real recruiting groups, not one, with
+--     genuinely different vibes ("Chill" = daytime/face-to-face/
+--     extrovert/beginner-friendly vs "Intense" = night-owl/online/
+--     introvert/fast-moving, on different real skills_wanted) — so
+--     picking a group is an actual decision, not just clicking the
+--     only option.
+--
 -- ⚠️ DESTRUCTIVE: wipes every account and every piece of app data,
 -- then recreates 15 profiles (10 SUTD across all 5 pillars — EPD, ESD,
 -- CSD, DAI, ASD — plus 5 NUS) and 20 projects. Every one of the 20
@@ -8,7 +24,10 @@
 -- Every profile gets a photo, full personality, 2 real past projects,
 -- and 5-6 real ratings from actual former teammates (not filler).
 --
--- Login for ANY of the 15 accounts: password test1234, emails below.
+-- Login for ANY of the 15 pre-seeded accounts: password test1234,
+-- emails below. The actual experiment participant signs up fresh
+-- through the real /signup flow with their own email — this script
+-- only sets up the world they land in, not their own account.
 --
 -- One thing I can't verify from here: the exact `auth.users`/
 -- `auth.identities` column set for THIS Supabase project's current
@@ -305,91 +324,97 @@ insert into public.projects (id, owner_id, name, description, type, skills_neede
 ('b0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000001','AutoBrew',
  'Retrofitting a broken office coffee machine with a scheduling app and a usage-prediction model so it''s never empty right before a deadline.',
  'academic', array['Product','C++','Research'], array['Robotics','Sustainability'], 2, 4, '2026-08-15','2026-12-05',
- 'restricted','approval', null, true, '03.014 Design for Manufacture', 'Prof. Lin Wei',
+ 'public','approval', null, true, '03.014 Design for Manufacture', 'Prof. Lin Wei',
  'Working sessions Tue evenings in the EPD workshop.',
  'https://picsum.photos/seed/autobrew/800/400','https://picsum.photos/seed/autobrew-sq/300/300','GRV-BREW1'),
 
 ('b0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000005','DevMatch',
  'A slightly meta side project — a teammate-matching tool for hackathons, built to scratch our own itch after one too many mismatched teams.',
  'personal', array['Python','FastAPI','React'], array['Web Dev','AI & ML'], 2, 4, '2026-08-05','2026-11-15',
- 'public','approval', 'https://github.com/example/devmatch', false, null, null,
+ 'public','approval', 'https://github.com/example/devmatch', true, null, null,
  'Open to anyone from any school, that''s the whole point of the tool.',
  'https://picsum.photos/seed/devmatch/800/400','https://picsum.photos/seed/devmatch-sq/300/300','GRV-DMTCH'),
 
 ('b0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000006','QuickAPI',
  'A booking backend for campus event spaces — built because the existing sign-up sheet system was, genuinely, a physical clipboard.',
  'academic', array['Node.js','Docker','SQL'], array['Web Dev','Data Science'], 2, 4, '2026-08-20','2026-12-10',
- 'restricted','approval', null, true, '50.012 Networks', 'Prof. Sudipta Chattopadhyay',
+ 'public','approval', null, true, '50.012 Networks', 'Prof. Sudipta Chattopadhyay',
  'API docs live on the shared Notion, PRs welcome from the module cohort.',
  'https://picsum.photos/seed/quickapi/800/400','https://picsum.photos/seed/quickapi-sq/300/300','GRV-QAPI1'),
 
 ('b0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000009','GreenBlueprint',
  'A sustainable-housing visualizer — plug in a floor plan, see estimated energy use and passive cooling potential before a single brick is laid.',
  'academic', array['Figma','Research','Design'], array['Sustainability','Design'], 2, 4, '2026-08-10','2026-12-01',
- 'restricted','approval', null, true, '20.101 Architecture Studio', 'Prof. Khoo Peng Beng',
+ 'public','approval', null, true, '20.101 Architecture Studio', 'Prof. Khoo Peng Beng',
  'Studio crits every other Friday, come with something to show.',
  'https://picsum.photos/seed/greenblueprint/800/400','https://picsum.photos/seed/greenblueprint-sq/300/300','GRV-GBLU1'),
 
 ('b0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000010','CampusHeritage AR',
  'An AR walking tour overlaying old photos and stories onto current campus buildings, mostly so freshmen stop calling the oldest block "the ugly one."',
  'personal', array['Figma','AWS','Research'], array['Sustainability','Social Impact'], 2, 4, '2026-08-01','2026-11-20',
- 'public','approval', null, false, null, null,
+ 'public','approval', null, true, null, null,
  'Looking for anyone into AR/heritage stuff, school doesn''t matter.',
  'https://picsum.photos/seed/campusheritage/800/400','https://picsum.photos/seed/campusheritage-sq/300/300','GRV-HERIT'),
 
 ('b0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000002','EcoPack',
  'Prototyping biodegradable packaging from campus food waste — mostly failed attempts so far, but the one that worked smelled surprisingly fine.',
  'academic', array['Product','Research','AWS'], array['Sustainability','Robotics'], 2, 4, '2026-08-12','2026-12-08',
- 'restricted','approval', null, true, '03.020 Materials for Design', 'Prof. Sanjairaj Vijayavenkataraman',
+ 'public','approval', null, true, '03.020 Materials for Design', 'Prof. Sanjairaj Vijayavenkataraman',
  'Materials lab access Mon/Wed afternoons, sign up on the shared sheet.',
  'https://picsum.photos/seed/ecopack/800/400','https://picsum.photos/seed/ecopack-sq/300/300','GRV-ECOPK'),
 
 ('b0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000003','CarbonLens',
  'A dashboard estimating each building''s daily carbon output from public campus energy-meter data, built to make the sustainability report less of a PDF nobody reads.',
  'academic', array['Python','SQL','AWS'], array['Sustainability','Data Science'], 2, 4, '2026-08-18','2026-12-12',
- 'restricted','approval', null, true, '02.005 Systems Thinking', 'Prof. Fadel Digham',
+ 'public','approval', null, true, '02.005 Systems Thinking', 'Prof. Fadel Digham',
  'Data refreshes nightly, check the shared dashboard link each morning.',
  'https://picsum.photos/seed/carbonlens/800/400','https://picsum.photos/seed/carbonlens-sq/300/300','GRV-CLENS'),
 
 ('b0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000004','PolicySim',
  'A lightweight simulator letting you tweak one urban policy lever at a time and see rough downstream effects — built to make a policy module less abstract.',
  'personal', array['Python','Research','Business'], array['Social Impact','Data Science'], 2, 4, '2026-08-22','2026-12-02',
- 'public','approval', null, false, null, null,
+ 'public','approval', null, true, null, null,
  'Personal project, but happy to have collaborators from any background.',
  'https://picsum.photos/seed/policysim/800/400','https://picsum.photos/seed/policysim-sq/300/300','GRV-PSIM1'),
 
 ('b0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000007','PixelPortfolio',
  'A no-code portfolio site builder for design students who don''t want to touch a single line of CSS. Personal project, might actually ship it this time.',
  'personal', array['Figma','UI/UX','JavaScript'], array['Design','EdTech'], 1, 2, '2026-08-10','2026-10-15',
- 'public','auto', 'https://pixelportfolio.example.com', false, null, null,
+ 'public','auto', 'https://pixelportfolio.example.com', true, null, null,
  'Looking for one more person, ideally someone who actually likes writing CSS.',
  'https://picsum.photos/seed/pixelportfolio/800/400','https://picsum.photos/seed/pixelportfolio-sq/300/300','GRV-PIXEL'),
 
 ('b0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000012','HealthBridge',
  'A triage-assistant chatbot for a telehealth startup competition, helping route patients to the right kind of clinic before they even call.',
  'academic', array['Java','AI/ML','AWS'], array['Healthcare','AI & ML'], 2, 4, '2026-08-25','2026-12-05',
- 'restricted','approval', null, true, 'BT4222 Mining Web Data for Business Insights', 'Prof. Kyong Jin Shim',
+ 'public','approval', null, true, 'BT4222 Mining Web Data for Business Insights', 'Prof. Kyong Jin Shim',
  'Data pulls run overnight, check the shared drive each morning for fresh CSVs.',
  'https://picsum.photos/seed/healthbridge/800/400','https://picsum.photos/seed/healthbridge-sq/300/300','GRV-HBRDG'),
 
 ('b0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000013','CampusConnect',
  'A lightweight app to help exchange and incoming students find study groups, flatmates and people to eat with. Orientation week is chaos and everyone''s lost.',
  'personal', array['React','JavaScript','SQL'], array['Web Dev','Social Impact'], 3, 6, '2026-08-01','2026-11-30',
- 'public','approval', 'https://campusconnect.example.com', false, null, null,
+ 'public','approval', 'https://campusconnect.example.com', true, null, null,
  'Open to anyone regardless of school, this one''s meant to cross campuses.',
  'https://picsum.photos/seed/campusconnect/800/400','https://picsum.photos/seed/campusconnect-sq/300/300','GRV-CAMPU'),
 
 ('b0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000015','StudySpace',
  'Modular furniture concepts for micro-apartments near campus, designed for students who''ve somehow ended up with a 9sqm room and big ambitions.',
  'academic', array['Figma','Design','Research'], array['Design','Sustainability'], 2, 4, '2026-08-14','2026-12-06',
- 'restricted','approval', null, true, 'ID3101 Design Studio', 'Prof. Alvin Chua',
+ 'public','approval', null, true, 'ID3101 Design Studio', 'Prof. Alvin Chua',
  'Studio reviews biweekly, physical models expected by week 10.',
  'https://picsum.photos/seed/studyspace/800/400','https://picsum.photos/seed/studyspace-sq/300/300','GRV-SSPAC');
 
 -- ------------------------------------------------------------
--- 6) One group per project, same id suffix as its project for easy
---    cross-reference. Projects 1-8 are Ended (past timeline, full
---    cross-ratings below); 9-20 are Forming/recruiting.
+-- 6) Groups. Projects 1-8 are Ended (past timeline, full cross-ratings
+--    below, single group each — history, not something a new user
+--    should be able to join). Projects 9-20 are Forming/recruiting and
+--    switched to Public privacy (see section 5) specifically so a new
+--    signup with any email can see and request to join them — this
+--    batch is built around the web-experiment find-a-group flow, not
+--    just data completeness. Each of those 12 gets 2-3 real groups
+--    (section 6b, right after) with genuinely different vibes to
+--    choose between, not just headcount padding.
 -- ------------------------------------------------------------
 insert into public.groups (id, project_id, name, leader_id, recruiting, status, min_members, max_members, members_wanted, skills_wanted, personality_wanted, interests_wanted, joining_method, additional_notes) values
 ('c0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000001','SmartCart Crew','a0000000-0000-0000-0000-000000000001', false,'Ended',4,4,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
@@ -412,7 +437,31 @@ insert into public.groups (id, project_id, name, leader_id, recruiting, status, 
 ('c0000000-0000-0000-0000-000000000017','b0000000-0000-0000-0000-000000000017','Pixel Crew','a0000000-0000-0000-0000-000000000007', true,'Forming',1,2,1,array['Figma','UI/UX'],array[]::text[],array['Design'],'auto','Auto-accept, come with a portfolio link.'),
 ('c0000000-0000-0000-0000-000000000018','b0000000-0000-0000-0000-000000000018','HealthBridge Team','a0000000-0000-0000-0000-000000000012', true,'Forming',2,4,2,array['Java','AI/ML'],array[]::text[],array['Healthcare'],'approval',null),
 ('c0000000-0000-0000-0000-000000000019','b0000000-0000-0000-0000-000000000019','CampusConnect Crew','a0000000-0000-0000-0000-000000000013', true,'Forming',3,6,3,array['React','SQL'],array[]::text[],array['Web Dev'],'approval','Open cross-school.'),
-('c0000000-0000-0000-0000-000000000020','b0000000-0000-0000-0000-000000000020','StudySpace Studio','a0000000-0000-0000-0000-000000000015', true,'Forming',2,4,2,array['Figma','Design'],array[]::text[],array['Design'],'approval',null);
+('c0000000-0000-0000-0000-000000000020','b0000000-0000-0000-0000-000000000020','StudySpace Studio','a0000000-0000-0000-0000-000000000015', true,'Forming',2,4,2,array['Figma','Design'],array[]::text[],array['Design'],'approval',null),
+
+-- ------------------------------------------------------------
+-- 6b) Second (and third, on 4 of them) groups on the same 12 projects
+--     above — every joinable project now has a real choice between
+--     differently-vibed teams, not just headcount padding. "Chill" =
+--     daytime/face-to-face/extrovert/beginner-friendly, "Intense" =
+--     night-owl/online/introvert/fast-moving, on real skills_wanted.
+-- ------------------------------------------------------------
+('c0000000-0000-0000-0000-000000000021','b0000000-0000-0000-0000-000000000009','AutoBrew Beginners','a0000000-0000-0000-0000-000000000002', true,'Forming',2,5,3,array['Product'],array['Extrovert','Face-to-face','Morning'],array['Robotics'],'approval','Casual pace, daytime in-person sessions — good if you''re newer to product design.'),
+('c0000000-0000-0000-0000-000000000022','b0000000-0000-0000-0000-000000000010','DevMatch Fast Track','a0000000-0000-0000-0000-000000000007', true,'Forming',2,3,2,array['React','FastAPI'],array['Introvert','Online','Night owl'],array['AI & ML'],'approval','Moving fast, mostly async at night — come comfortable with the stack.'),
+('c0000000-0000-0000-0000-000000000023','b0000000-0000-0000-0000-000000000010','DevMatch Learners','a0000000-0000-0000-0000-000000000013', true,'Forming',2,5,3,array['Python'],array['Extrovert','Face-to-face','Morning'],array['Web Dev'],'approval','Relaxed pace, good for a first project, happy to teach as we go.'),
+('c0000000-0000-0000-0000-000000000024','b0000000-0000-0000-0000-000000000011','QuickAPI Daytime','a0000000-0000-0000-0000-000000000011', true,'Forming',2,5,3,array['SQL'],array['Extrovert','Face-to-face','Morning'],array['Web Dev'],'approval','Daytime sessions, beginner-friendly on the backend side.'),
+('c0000000-0000-0000-0000-000000000025','b0000000-0000-0000-0000-000000000011','QuickAPI Night Shift','a0000000-0000-0000-0000-000000000004', true,'Forming',2,3,2,array['Node.js','Docker'],array['Introvert','Online','Night owl'],array['Data Science'],'approval','Async, fast-moving, some backend experience expected.'),
+('c0000000-0000-0000-0000-000000000026','b0000000-0000-0000-0000-000000000012','GreenBlueprint Studio B','a0000000-0000-0000-0000-000000000010', true,'Forming',2,3,2,array['Figma','Research'],array['Introvert','Online','Night owl'],array['Sustainability'],'approval','Deep-focus studio sessions, mostly solo work synced async.'),
+('c0000000-0000-0000-0000-000000000027','b0000000-0000-0000-0000-000000000013','Heritage AR Walkers','a0000000-0000-0000-0000-000000000015', true,'Forming',2,5,3,array['Figma'],array['Extrovert','Face-to-face','Morning'],array['Social Impact'],'approval','Casual, in-person walks around campus to scope AR spots.'),
+('c0000000-0000-0000-0000-000000000028','b0000000-0000-0000-0000-000000000014','EcoPack Night Lab','a0000000-0000-0000-0000-000000000003', true,'Forming',2,3,2,array['Research','AWS'],array['Introvert','Online','Night owl'],array['Sustainability'],'approval','Lab sessions can run late, come ready to iterate fast.'),
+('c0000000-0000-0000-0000-000000000029','b0000000-0000-0000-0000-000000000015','CarbonLens Daytime','a0000000-0000-0000-0000-000000000004', true,'Forming',2,5,3,array['Python'],array['Extrovert','Face-to-face','Morning'],array['Sustainability'],'approval','Relaxed pace, good if you''re newer to data work.'),
+('c0000000-0000-0000-0000-000000000030','b0000000-0000-0000-0000-000000000016','PolicySim Fast Track','a0000000-0000-0000-0000-000000000011', true,'Forming',2,3,2,array['Business','Research'],array['Introvert','Online','Night owl'],array['Social Impact'],'approval','Fast iteration, mostly async discussion.'),
+('c0000000-0000-0000-0000-000000000031','b0000000-0000-0000-0000-000000000017','Pixel Beginners','a0000000-0000-0000-0000-000000000008', true,'Forming',2,3,2,array['Figma'],array['Extrovert','Face-to-face','Morning'],array['Design'],'approval','Laid-back, in-person, good if you''re just getting into UI/UX.'),
+('c0000000-0000-0000-0000-000000000032','b0000000-0000-0000-0000-000000000018','HealthBridge Data Team','a0000000-0000-0000-0000-000000000014', true,'Forming',2,3,2,array['TensorFlow','SQL'],array['Introvert','Online','Night owl'],array['AI & ML'],'approval','Deep in the data side, async and fast-moving.'),
+('c0000000-0000-0000-0000-000000000033','b0000000-0000-0000-0000-000000000018','HealthBridge Daytime','a0000000-0000-0000-0000-000000000006', true,'Forming',2,5,3,array['Java'],array['Extrovert','Face-to-face','Morning'],array['Healthcare'],'approval','Daytime, backend-focused, beginner-friendly.'),
+('c0000000-0000-0000-0000-000000000034','b0000000-0000-0000-0000-000000000019','CampusConnect Design Team','a0000000-0000-0000-0000-000000000008', true,'Forming',2,6,4,array['Figma'],array['Extrovert','Face-to-face','Morning'],array['Social Impact'],'approval','Design-focused sub-team, relaxed pace, in person.'),
+('c0000000-0000-0000-0000-000000000035','b0000000-0000-0000-0000-000000000019','CampusConnect Fullstack','a0000000-0000-0000-0000-000000000005', true,'Forming',2,4,2,array['React','Node.js'],array['Introvert','Online','Night owl'],array['Web Dev'],'approval','Fullstack sub-team, fast-moving, mostly async.'),
+('c0000000-0000-0000-0000-000000000036','b0000000-0000-0000-0000-000000000020','StudySpace Studio B','a0000000-0000-0000-0000-000000000009', true,'Forming',2,3,2,array['Research','Design'],array['Introvert','Online','Night owl'],array['Design'],'approval','Studio deep-work sessions, mostly solo synced async.');
 
 -- ------------------------------------------------------------
 -- 7) Ended-group membership. Every person is in exactly 2 of the 8
@@ -458,6 +507,26 @@ insert into public.group_members (group_id, user_id, role) values
 ('c0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000008','leader'),
 ('c0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000004','member'),
 ('c0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000012','member');
+
+-- Second/third-group leaders (sole member so far — genuinely open to a
+-- first real join, which is the point of this batch).
+insert into public.group_members (group_id, user_id, role) values
+('c0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000002','leader'),
+('c0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000007','leader'),
+('c0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000013','leader'),
+('c0000000-0000-0000-0000-000000000024','a0000000-0000-0000-0000-000000000011','leader'),
+('c0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000004','leader'),
+('c0000000-0000-0000-0000-000000000026','a0000000-0000-0000-0000-000000000010','leader'),
+('c0000000-0000-0000-0000-000000000027','a0000000-0000-0000-0000-000000000015','leader'),
+('c0000000-0000-0000-0000-000000000028','a0000000-0000-0000-0000-000000000003','leader'),
+('c0000000-0000-0000-0000-000000000029','a0000000-0000-0000-0000-000000000004','leader'),
+('c0000000-0000-0000-0000-000000000030','a0000000-0000-0000-0000-000000000011','leader'),
+('c0000000-0000-0000-0000-000000000031','a0000000-0000-0000-0000-000000000008','leader'),
+('c0000000-0000-0000-0000-000000000032','a0000000-0000-0000-0000-000000000014','leader'),
+('c0000000-0000-0000-0000-000000000033','a0000000-0000-0000-0000-000000000006','leader'),
+('c0000000-0000-0000-0000-000000000034','a0000000-0000-0000-0000-000000000008','leader'),
+('c0000000-0000-0000-0000-000000000035','a0000000-0000-0000-0000-000000000005','leader'),
+('c0000000-0000-0000-0000-000000000036','a0000000-0000-0000-0000-000000000009','leader');
 
 insert into public.project_members (project_id, user_id)
 select g.project_id, gm.user_id from public.group_members gm join public.groups g on g.id = gm.group_id
