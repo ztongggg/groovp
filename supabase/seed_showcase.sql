@@ -1,28 +1,28 @@
 -- ============================================================
--- Groovp — full showcase reseed, v3 (SUTD + NUS, built for a web
+-- Groovp — full showcase reseed, v4 (SUTD + NUS, built for a web
 -- experiment where a brand-new user signs up with their OWN email and
 -- has to: 1) create a profile, 2) find a project, 3) compare groups
 -- within it, 4) request to join one. Everything below is shaped
 -- around that flow specifically, not just data completeness:
---   - The 12 non-Ended projects are all Public privacy (not Restricted)
---     specifically so a signup with ANY email — not just @sutd/@nus —
---     can see and request to join them. A brand-new participant has no
---     university match, so a Restricted project would just be invisible
---     to them; Public is the only tier that reliably works here.
---   - Each of those 12 has 2-3 real recruiting groups, not one, with
---     genuinely different vibes ("Chill" = daytime/face-to-face/
---     extrovert/beginner-friendly vs "Intense" = night-owl/online/
---     introvert/fast-moving, on different real skills_wanted) — so
---     picking a group is an actual decision, not just clicking the
---     only option.
+--   - Every project is Public privacy and currently recruiting — none
+--     are "Ended." A brand-new participant has no university match, so
+--     a Restricted project would just be invisible to them, and an
+--     Ended one has nothing to join. Every single project here is a
+--     real, live option.
+--   - Each project has 2 real groups already populated with seeded
+--     members (never just a lone leader), and each group has a
+--     genuinely different vibe — "Chill" (daytime/face-to-face/
+--     extrovert, lighter skill ask) vs "Intense" (night-owl/online/
+--     introvert, heavier ask) — recruiting different kinds of people,
+--     so picking a group is an actual decision. No group is full.
 --
 -- ⚠️ DESTRUCTIVE: wipes every account and every piece of app data,
 -- then recreates 15 profiles (10 SUTD across all 5 pillars — EPD, ESD,
--- CSD, DAI, ASD — plus 5 NUS) and 20 projects. Every one of the 20
--- catalog skills and all 9 canonical interests is used by at least one
--- project (checked by hand, see the coverage note before section 5).
--- Every profile gets a photo, full personality, 2 real past projects,
--- and 5-6 real ratings from actual former teammates (not filler).
+-- CSD, DAI, ASD — plus 5 NUS) and 10 projects. Every profile gets a
+-- photo, full personality, 2 real past projects, and 5-6 real ratings
+-- from actual former teammates (not filler) — that history is kept
+-- freestanding (no project_id) since none of the current 10 projects
+-- are "past" ones for it to attach to.
 --
 -- Login for ANY of the 15 pre-seeded accounts: password test1234,
 -- emails below. The actual experiment participant signs up fresh
@@ -250,284 +250,162 @@ insert into public.user_skills (user_id, skill_name, proficiency) values
   ('a0000000-0000-0000-0000-000000000015','Figma','Good'), ('a0000000-0000-0000-0000-000000000015','UI/UX','Good'), ('a0000000-0000-0000-0000-000000000015','Design','Basic');
 
 -- ------------------------------------------------------------
--- 5) 20 projects. Coverage check (every catalog skill / canonical
---    interest appears in skills_needed/interests of at least one row
---    below — verified by hand against skill_catalog's 20 entries and
---    the 9-interest constraint):
---    Skills: Python(2,5,10,15) React(2,10,17,19) TypeScript(8) JavaScript(4,17,19)
---      Node.js(6,11) SQL(3,5,7,11,15,19) Figma(3,7,8,9,12,13,17,20) UI/UX(4,8,17)
---      Java(5,18) C++(1,9) TensorFlow(4,18) AWS(8,10,13,14,15,18) Docker(6,11)
---      Research(1,2,4,9,10,12,14,20) Product(1,9,14) Design(3,8,9,12,17,20)
---      Business(7,16) AI/ML(2,5,6,18) FastAPI(10) PyTorch(6)
---    Interests: Robotics(1,2,10,14) Sustainability(1,3,9,10,12,14,15,20) AI & ML(2,5,6,10,18)
---      Data Science(2,5,7,15,16,18) Design(3,8,12,17,20) Social Impact(4,7,10,16,19)
---      Healthcare(5,18) EdTech(6,8,17,19) Web Dev(10,11,13,19)
+-- 5) 10 projects. Every one Public privacy, currently recruiting, real
+--    future timeline (nothing "Ended"). 5 academic (course_code/
+--    instructor set) + 5 personal.
 -- ------------------------------------------------------------
 insert into public.projects (id, owner_id, name, description, type, skills_needed, interests, min_size, max_size, timeline_start, timeline_end, privacy, joining_method, project_link, allow_multiple_groups, course_code, instructor, things_to_note, cover_image_url, photo_url, join_code) values
 
-('b0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000001','SmartCart',
- 'An autonomous grocery trolley that follows you around and stops you buying instant noodles for the fifth day running. EPD/ESD capstone build.',
- 'academic', array['Product','C++','Research'], array['Robotics','Sustainability'], 3, 5, '2026-02-01','2026-05-20',
- 'restricted','approval', null, true, '03.007 Product Development Studio', 'Prof. Lin Wei',
- 'Wrapped for the studio deadline, the hardware still lives in the EPD lab if anyone wants to poke it.',
- 'https://picsum.photos/seed/smartcart/800/400','https://picsum.photos/seed/smartcart-sq/300/300','GRV-CART1'),
+('b0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000005','NeuralCompanion',
+ 'An AI study buddy that quizzes you based on your own lecture notes instead of generic flashcards, so revision actually matches what''s on your slides instead of a generic question bank. Two sub-teams are running in parallel right now — one on the model side, one making sure the thing is actually pleasant to use.',
+ 'academic', array['Python','React','AI/ML'], array['AI & ML','Data Science'], 4, 9, '2026-09-01','2026-12-15',
+ 'public','approval', 'https://github.com/example/neuralcompanion', true, '50.038 Computational Data Science', 'Prof. Dorien Herremans',
+ 'Two active groups below — pick whichever pace suits you, both report into the same weekly demo.',
+ 'https://picsum.photos/seed/neuralcompanion2/800/400','https://picsum.photos/seed/neuralcompanion2-sq/300/300','GRV-NEUR2'),
 
-('b0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000006','NeuralCompanion',
- 'An AI study buddy that quizzes you based on your own lecture notes instead of generic flashcards. Built for finals season, by people who''ve suffered through finals season.',
- 'academic', array['Python','React','AI/ML'], array['AI & ML','Data Science'], 3, 5, '2026-01-15','2026-04-30',
- 'restricted','approval', 'https://github.com/example/neuralcompanion', true, '50.038 Computational Data Science', 'Prof. Dorien Herremans',
- 'Weekly sync was Wed 6pm on Discord, everything else async.',
- 'https://picsum.photos/seed/neuralcompanion/800/400','https://picsum.photos/seed/neuralcompanion-sq/300/300','GRV-NEURA'),
+('b0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000003','EcoTrack Campus',
+ 'Tracks your carbon footprint around campus — canteen food choices, aircon habits, printing — and nudges you toward greener defaults without being preachy about it. Split into a data-crunching side and a design side, both still filling out.',
+ 'academic', array['Python','Figma','SQL'], array['Sustainability','Social Impact'], 4, 8, '2026-09-05','2026-12-10',
+ 'public','approval', null, true, '01.102 Sustainable Design', 'Prof. Sarah Chua',
+ 'Weekly studio slot Thursdays, plus async check-ins the rest of the week.',
+ 'https://picsum.photos/seed/ecotrackcampus2/800/400','https://picsum.photos/seed/ecotrackcampus2-sq/300/300','GRV-ECOT2'),
 
-('b0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000009','HackTheCity',
- 'A 36-hour cross-university hackathon build — urban sustainability dashboards for smaller Singapore town councils, made with three different schools'' worth of sleep deprivation.',
- 'personal', array['Figma','SQL','Design'], array['Sustainability','Design'], 3, 5, '2026-03-14','2026-03-16',
- 'public','approval', null, false, null, null,
- 'Hackathon''s over, keeping the repo up in case any town council actually wants it.',
- 'https://picsum.photos/seed/hackthecity/800/400','https://picsum.photos/seed/hackthecity-sq/300/300','GRV-HACKC'),
-
-('b0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000014','CampusEats',
- 'A food-waste tracker for campus canteens — log what gets thrown out, nudge stalls toward better portioning. NUS module project.',
- 'academic', array['JavaScript','TensorFlow','UI/UX'], array['Sustainability','Social Impact'], 3, 4, '2026-01-08','2026-04-10',
- 'restricted','approval', null, true, 'BT3103 Application Development', 'Prof. Tan Yong Chin',
- 'Handed off the dataset to the canteen operator after the module ended.',
- 'https://picsum.photos/seed/campuseats/800/400','https://picsum.photos/seed/campuseats-sq/300/300','GRV-EATS1'),
-
-('b0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000005','MediMate',
- 'A symptom-checker chatbot from an SUTD-NUS healthcare hackathon. Not trying to replace doctors, just trying to stop your friends Googling their symptoms at 3am.',
- 'personal', array['Java','SQL','AI/ML'], array['Healthcare','Data Science'], 3, 4, '2026-02-20','2026-02-22',
- 'public','approval', 'https://github.com/example/medimate', false, null, null,
- 'Hackathon project, dormant now but happy to hand it off if someone wants to build on it.',
- 'https://picsum.photos/seed/medimate/800/400','https://picsum.photos/seed/medimate-sq/300/300','GRV-MEDIM'),
-
-('b0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000010','OrientMate',
- 'A scavenger-hunt style app for freshmen orientation week, built overnight with people from three different courses who''d never met before that night.',
- 'personal', array['Node.js','Docker','PyTorch'], array['EdTech','AI & ML'], 3, 5, '2026-01-04','2026-01-05',
- 'public','approval', null, false, null, null,
- '24hr build, shipped at 6am on 3 hours of sleep and somehow it worked.',
- 'https://picsum.photos/seed/orientmate/800/400','https://picsum.photos/seed/orientmate-sq/300/300','GRV-ORIEN'),
-
-('b0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000011','DataViz for Social Good',
- 'Interactive dashboards built for a local nonprofit, visualizing donation and volunteer data they''d been sitting on in spreadsheets for years.',
- 'personal', array['SQL','Business','Figma'], array['Data Science','Social Impact'], 3, 4, '2026-04-01','2026-04-03',
- 'public','approval', null, false, null, null,
- 'Weekend build for a local nonprofit, they''re actually still using it.',
- 'https://picsum.photos/seed/datavizsocial/800/400','https://picsum.photos/seed/datavizsocial-sq/300/300','GRV-DVIZS'),
-
-('b0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000008','PortfolioBuilder',
- 'A no-code-ish portfolio site generator for design students who don''t want to touch a single line of CSS. Grew out of a design studio side-project.',
- 'personal', array['TypeScript','UI/UX','AWS'], array['Design','EdTech'], 2, 3, '2026-05-01','2026-05-25',
- 'public','auto', 'https://portfoliobuilder.example.com', false, null, null,
- 'Wrapped for now, might revisit if enough people ask.',
- 'https://picsum.photos/seed/portfoliobuilder/800/400','https://picsum.photos/seed/portfoliobuilder-sq/300/300','GRV-PFOLI'),
-
-('b0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000001','AutoBrew',
- 'Retrofitting a broken office coffee machine with a scheduling app and a usage-prediction model so it''s never empty right before a deadline.',
- 'academic', array['Product','C++','Research'], array['Robotics','Sustainability'], 2, 4, '2026-08-15','2026-12-05',
- 'public','approval', null, true, '03.014 Design for Manufacture', 'Prof. Lin Wei',
- 'Working sessions Tue evenings in the EPD workshop.',
- 'https://picsum.photos/seed/autobrew/800/400','https://picsum.photos/seed/autobrew-sq/300/300','GRV-BREW1'),
-
-('b0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000005','DevMatch',
- 'A slightly meta side project — a teammate-matching tool for hackathons, built to scratch our own itch after one too many mismatched teams.',
- 'personal', array['Python','FastAPI','React'], array['Web Dev','AI & ML'], 2, 4, '2026-08-05','2026-11-15',
- 'public','approval', 'https://github.com/example/devmatch', true, null, null,
- 'Open to anyone from any school, that''s the whole point of the tool.',
- 'https://picsum.photos/seed/devmatch/800/400','https://picsum.photos/seed/devmatch-sq/300/300','GRV-DMTCH'),
-
-('b0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000006','QuickAPI',
- 'A booking backend for campus event spaces — built because the existing sign-up sheet system was, genuinely, a physical clipboard.',
- 'academic', array['Node.js','Docker','SQL'], array['Web Dev','Data Science'], 2, 4, '2026-08-20','2026-12-10',
- 'public','approval', null, true, '50.012 Networks', 'Prof. Sudipta Chattopadhyay',
- 'API docs live on the shared Notion, PRs welcome from the module cohort.',
- 'https://picsum.photos/seed/quickapi/800/400','https://picsum.photos/seed/quickapi-sq/300/300','GRV-QAPI1'),
-
-('b0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000009','GreenBlueprint',
- 'A sustainable-housing visualizer — plug in a floor plan, see estimated energy use and passive cooling potential before a single brick is laid.',
- 'academic', array['Figma','Research','Design'], array['Sustainability','Design'], 2, 4, '2026-08-10','2026-12-01',
- 'public','approval', null, true, '20.101 Architecture Studio', 'Prof. Khoo Peng Beng',
- 'Studio crits every other Friday, come with something to show.',
- 'https://picsum.photos/seed/greenblueprint/800/400','https://picsum.photos/seed/greenblueprint-sq/300/300','GRV-GBLU1'),
-
-('b0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000010','CampusHeritage AR',
- 'An AR walking tour overlaying old photos and stories onto current campus buildings, mostly so freshmen stop calling the oldest block "the ugly one."',
- 'personal', array['Figma','AWS','Research'], array['Sustainability','Social Impact'], 2, 4, '2026-08-01','2026-11-20',
- 'public','approval', null, true, null, null,
- 'Looking for anyone into AR/heritage stuff, school doesn''t matter.',
- 'https://picsum.photos/seed/campusheritage/800/400','https://picsum.photos/seed/campusheritage-sq/300/300','GRV-HERIT'),
-
-('b0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000002','EcoPack',
- 'Prototyping biodegradable packaging from campus food waste — mostly failed attempts so far, but the one that worked smelled surprisingly fine.',
- 'academic', array['Product','Research','AWS'], array['Sustainability','Robotics'], 2, 4, '2026-08-12','2026-12-08',
- 'public','approval', null, true, '03.020 Materials for Design', 'Prof. Sanjairaj Vijayavenkataraman',
- 'Materials lab access Mon/Wed afternoons, sign up on the shared sheet.',
- 'https://picsum.photos/seed/ecopack/800/400','https://picsum.photos/seed/ecopack-sq/300/300','GRV-ECOPK'),
-
-('b0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000003','CarbonLens',
- 'A dashboard estimating each building''s daily carbon output from public campus energy-meter data, built to make the sustainability report less of a PDF nobody reads.',
- 'academic', array['Python','SQL','AWS'], array['Sustainability','Data Science'], 2, 4, '2026-08-18','2026-12-12',
- 'public','approval', null, true, '02.005 Systems Thinking', 'Prof. Fadel Digham',
- 'Data refreshes nightly, check the shared dashboard link each morning.',
- 'https://picsum.photos/seed/carbonlens/800/400','https://picsum.photos/seed/carbonlens-sq/300/300','GRV-CLENS'),
-
-('b0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000004','PolicySim',
- 'A lightweight simulator letting you tweak one urban policy lever at a time and see rough downstream effects — built to make a policy module less abstract.',
- 'personal', array['Python','Research','Business'], array['Social Impact','Data Science'], 2, 4, '2026-08-22','2026-12-02',
- 'public','approval', null, true, null, null,
- 'Personal project, but happy to have collaborators from any background.',
- 'https://picsum.photos/seed/policysim/800/400','https://picsum.photos/seed/policysim-sq/300/300','GRV-PSIM1'),
-
-('b0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000007','PixelPortfolio',
- 'A no-code portfolio site builder for design students who don''t want to touch a single line of CSS. Personal project, might actually ship it this time.',
- 'personal', array['Figma','UI/UX','JavaScript'], array['Design','EdTech'], 1, 2, '2026-08-10','2026-10-15',
- 'public','auto', 'https://pixelportfolio.example.com', true, null, null,
- 'Looking for one more person, ideally someone who actually likes writing CSS.',
- 'https://picsum.photos/seed/pixelportfolio/800/400','https://picsum.photos/seed/pixelportfolio-sq/300/300','GRV-PIXEL'),
-
-('b0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000012','HealthBridge',
- 'A triage-assistant chatbot for a telehealth startup competition, helping route patients to the right kind of clinic before they even call.',
- 'academic', array['Java','AI/ML','AWS'], array['Healthcare','AI & ML'], 2, 4, '2026-08-25','2026-12-05',
+('b0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000012','HealthBridge',
+ 'A triage-assistant chatbot that helps route people to the right kind of clinic before they even call — built for a telehealth startup competition, still actively developed with the pitch deadline a few months out.',
+ 'academic', array['Java','AI/ML','AWS'], array['Healthcare','AI & ML'], 4, 8, '2026-08-25','2026-12-05',
  'public','approval', null, true, 'BT4222 Mining Web Data for Business Insights', 'Prof. Kyong Jin Shim',
  'Data pulls run overnight, check the shared drive each morning for fresh CSVs.',
- 'https://picsum.photos/seed/healthbridge/800/400','https://picsum.photos/seed/healthbridge-sq/300/300','GRV-HBRDG'),
+ 'https://picsum.photos/seed/healthbridge2/800/400','https://picsum.photos/seed/healthbridge2-sq/300/300','GRV-HLTH2'),
 
-('b0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000013','CampusConnect',
- 'A lightweight app to help exchange and incoming students find study groups, flatmates and people to eat with. Orientation week is chaos and everyone''s lost.',
- 'personal', array['React','JavaScript','SQL'], array['Web Dev','Social Impact'], 3, 6, '2026-08-01','2026-11-30',
+('b0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000013','CampusConnect',
+ 'Helps new and exchange students find study groups, flatmates and people to eat with during orientation week, when everyone''s overwhelmed and half the campus apps are still confusing. Open to any school — that''s the whole point of the tool.',
+ 'personal', array['React','Node.js','SQL'], array['Web Dev','Social Impact'], 4, 10, '2026-08-01','2026-12-20',
  'public','approval', 'https://campusconnect.example.com', true, null, null,
- 'Open to anyone regardless of school, this one''s meant to cross campuses.',
- 'https://picsum.photos/seed/campusconnect/800/400','https://picsum.photos/seed/campusconnect-sq/300/300','GRV-CAMPU'),
+ 'Fully cross-school by design — Discord for async chat, weekly voice sync Sundays.',
+ 'https://picsum.photos/seed/campusconnect2/800/400','https://picsum.photos/seed/campusconnect2-sq/300/300','GRV-CMPU2'),
 
-('b0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000015','StudySpace',
- 'Modular furniture concepts for micro-apartments near campus, designed for students who''ve somehow ended up with a 9sqm room and big ambitions.',
- 'academic', array['Figma','Design','Research'], array['Design','Sustainability'], 2, 4, '2026-08-14','2026-12-06',
- 'public','approval', null, true, 'ID3101 Design Studio', 'Prof. Alvin Chua',
- 'Studio reviews biweekly, physical models expected by week 10.',
- 'https://picsum.photos/seed/studyspace/800/400','https://picsum.photos/seed/studyspace-sq/300/300','GRV-SSPAC');
+('b0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000001','AutoBrew',
+ 'Retrofitting the office coffee machine with a scheduling app and a usage-prediction model, so it''s never empty right before a deadline crunch. Hardware side and software side are separate groups that meet up to integrate every other week.',
+ 'academic', array['Product','C++','Research'], array['Robotics','Sustainability'], 4, 9, '2026-09-10','2026-12-18',
+ 'public','approval', null, true, '03.014 Design for Manufacture', 'Prof. Lin Wei',
+ 'Hardware access is in the EPD workshop, sign up for a slot on the shared calendar.',
+ 'https://picsum.photos/seed/autobrew2/800/400','https://picsum.photos/seed/autobrew2-sq/300/300','GRV-BREW2'),
+
+('b0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000009','GreenBlueprint',
+ 'A sustainable-housing visualizer — plug in a floor plan, see estimated energy use and passive cooling potential before a single brick is laid. Research/modeling and on-site fieldwork are two different ways to contribute.',
+ 'personal', array['Figma','Research','Design'], array['Sustainability','Design'], 4, 9, '2026-08-15','2026-12-22',
+ 'public','approval', null, true, null, null,
+ 'Fieldwork group does occasional site visits, research group is fully remote-friendly.',
+ 'https://picsum.photos/seed/greenblueprint2/800/400','https://picsum.photos/seed/greenblueprint2-sq/300/300','GRV-GRBL2'),
+
+('b0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000011','DataViz for Social Good',
+ 'Interactive dashboards for a local nonprofit, turning years of donation and volunteer spreadsheets into something their board can actually read at a glance. Analysts dig into the numbers, storytellers make sure the charts actually communicate.',
+ 'personal', array['SQL','Business','Figma'], array['Data Science','Social Impact'], 4, 9, '2026-08-20','2026-12-19',
+ 'public','approval', null, true, null, null,
+ 'Real client, real deadline — the nonprofit''s board meets quarterly and wants a demo each time.',
+ 'https://picsum.photos/seed/datavizsocial2/800/400','https://picsum.photos/seed/datavizsocial2-sq/300/300','GRV-DVSG2'),
+
+('b0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000007','PixelPortfolio',
+ 'A no-code-ish portfolio site builder for design students who don''t want to touch a single line of CSS — still actively adding templates and a proper theme editor.',
+ 'personal', array['Figma','UI/UX','JavaScript'], array['Design','EdTech'], 4, 7, '2026-08-12','2026-12-01',
+ 'public','auto', 'https://pixelportfolio.example.com', true, null, null,
+ 'Design group is auto-accept — just show up with a portfolio link. Dev group is approval-based.',
+ 'https://picsum.photos/seed/pixelportfolio2/800/400','https://picsum.photos/seed/pixelportfolio2-sq/300/300','GRV-PIXL2'),
+
+('b0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000010','CampusHeritage AR',
+ 'An AR walking tour overlaying old photos and stories onto current campus buildings, so freshmen stop calling the oldest block "the ugly one." Design/content side and the AR engineering side both still recruiting.',
+ 'personal', array['Figma','AWS','Research'], array['Sustainability','Social Impact'], 4, 9, '2026-08-05','2026-12-14',
+ 'public','approval', null, true, null, null,
+ 'Open cross-school, no heritage/AR experience required, just curiosity.',
+ 'https://picsum.photos/seed/campusheritage2/800/400','https://picsum.photos/seed/campusheritage2-sq/300/300','GRV-HRTG2'),
+
+('b0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000004','PolicySim',
+ 'A lightweight simulator where you tweak one urban policy lever at a time and see rough downstream effects — built to make a policy module less abstract, and genuinely used by a couple of other students to study for exams now.',
+ 'academic', array['Python','Research','Business'], array['Social Impact','Data Science'], 4, 9, '2026-09-08','2026-12-16',
+ 'public','approval', null, true, '02.005 Systems Thinking', 'Prof. Fadel Digham',
+ 'Research group models the policy logic, comms group handles the write-ups and explainer content.',
+ 'https://picsum.photos/seed/policysim2/800/400','https://picsum.photos/seed/policysim2-sq/300/300','GRV-PLCY2');
 
 -- ------------------------------------------------------------
--- 6) Groups. Projects 1-8 are Ended (past timeline, full cross-ratings
---    below, single group each — history, not something a new user
---    should be able to join). Projects 9-20 are Forming/recruiting and
---    switched to Public privacy (see section 5) specifically so a new
---    signup with any email can see and request to join them — this
---    batch is built around the web-experiment find-a-group flow, not
---    just data completeness. Each of those 12 gets 2-3 real groups
---    (section 6b, right after) with genuinely different vibes to
---    choose between, not just headcount padding.
+-- 6) Groups — 2 per project, 20 total. Every group already has a
+--    leader + 1 real member (never a lone leader), room to grow, and a
+--    deliberately different vibe from its sibling group on the same
+--    project: "Fast Track"/"Builders"/"Analysts" etc = Introvert/
+--    Online/Night owl on a heavier skill ask; "Beginners"/"Design"/
+--    "Comms" etc = Extrovert/Face-to-face/Morning on a lighter one.
 -- ------------------------------------------------------------
 insert into public.groups (id, project_id, name, leader_id, recruiting, status, min_members, max_members, members_wanted, skills_wanted, personality_wanted, interests_wanted, joining_method, additional_notes) values
-('c0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000001','SmartCart Crew','a0000000-0000-0000-0000-000000000001', false,'Ended',4,4,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
-('c0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000002','Neural Team','a0000000-0000-0000-0000-000000000006', false,'Ended',4,4,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
-('c0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000003','HackTheCity Squad','a0000000-0000-0000-0000-000000000009', false,'Ended',4,4,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
-('c0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000004','CampusEats Team','a0000000-0000-0000-0000-000000000014', false,'Ended',3,3,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
-('c0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000005','MediMate Core','a0000000-0000-0000-0000-000000000005', false,'Ended',4,4,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
-('c0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000006','OrientMate Crew','a0000000-0000-0000-0000-000000000010', false,'Ended',4,4,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
-('c0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000007','Insight Squad','a0000000-0000-0000-0000-000000000011', false,'Ended',4,4,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
-('c0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000008','Portfolio Trio','a0000000-0000-0000-0000-000000000008', false,'Ended',3,3,0,array[]::text[],array[]::text[],array[]::text[],'approval',null),
 
-('c0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000009','AutoBrew Crew','a0000000-0000-0000-0000-000000000001', true,'Forming',2,4,2,array['Product','C++'],array[]::text[],array['Robotics'],'approval','Ideally someone into embedded systems.'),
-('c0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000010','DevMatch Team','a0000000-0000-0000-0000-000000000005', true,'Forming',2,4,2,array['Python','FastAPI'],array[]::text[],array['AI & ML'],'approval',null),
-('c0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000011','QuickAPI Team','a0000000-0000-0000-0000-000000000006', true,'Forming',2,4,2,array['Node.js','SQL'],array[]::text[],array['Web Dev'],'approval',null),
-('c0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000012','GreenBlueprint Studio','a0000000-0000-0000-0000-000000000009', true,'Forming',2,4,2,array['Figma','Research'],array[]::text[],array['Sustainability'],'approval',null),
-('c0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000013','Heritage AR Team','a0000000-0000-0000-0000-000000000010', true,'Forming',2,4,2,array['Figma','AWS'],array[]::text[],array['Social Impact'],'approval','Open cross-school.'),
-('c0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000014','EcoPack Lab','a0000000-0000-0000-0000-000000000002', true,'Forming',2,4,2,array['Product','Research'],array[]::text[],array['Sustainability'],'approval',null),
-('c0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000015','CarbonLens Team','a0000000-0000-0000-0000-000000000003', true,'Forming',2,4,2,array['Python','SQL'],array[]::text[],array['Sustainability'],'approval',null),
-('c0000000-0000-0000-0000-000000000016','b0000000-0000-0000-0000-000000000016','PolicySim Team','a0000000-0000-0000-0000-000000000004', true,'Forming',2,4,2,array['Python','Research'],array[]::text[],array['Social Impact'],'approval','Open cross-school.'),
-('c0000000-0000-0000-0000-000000000017','b0000000-0000-0000-0000-000000000017','Pixel Crew','a0000000-0000-0000-0000-000000000007', true,'Forming',1,2,1,array['Figma','UI/UX'],array[]::text[],array['Design'],'auto','Auto-accept, come with a portfolio link.'),
-('c0000000-0000-0000-0000-000000000018','b0000000-0000-0000-0000-000000000018','HealthBridge Team','a0000000-0000-0000-0000-000000000012', true,'Forming',2,4,2,array['Java','AI/ML'],array[]::text[],array['Healthcare'],'approval',null),
-('c0000000-0000-0000-0000-000000000019','b0000000-0000-0000-0000-000000000019','CampusConnect Crew','a0000000-0000-0000-0000-000000000013', true,'Forming',3,6,3,array['React','SQL'],array[]::text[],array['Web Dev'],'approval','Open cross-school.'),
-('c0000000-0000-0000-0000-000000000020','b0000000-0000-0000-0000-000000000020','StudySpace Studio','a0000000-0000-0000-0000-000000000015', true,'Forming',2,4,2,array['Figma','Design'],array[]::text[],array['Design'],'approval',null),
+-- NeuralCompanion
+('c0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000001','Neural Fast Track','a0000000-0000-0000-0000-000000000005', true,'Forming',2,4,2,array['Python','AI/ML'],array['Introvert','Online','Night owl'],array['AI & ML'],'approval','Moving fast, mostly async at night — come comfortable with PyTorch or TensorFlow.'),
+('c0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000001','Neural Beginners','a0000000-0000-0000-0000-000000000013', true,'Forming',2,5,3,array['React','Python'],array['Extrovert','Face-to-face','Morning'],array['EdTech'],'approval','Relaxed pace, good for a first AI-adjacent project, happy to teach as we go.'),
 
--- ------------------------------------------------------------
--- 6b) Second (and third, on 4 of them) groups on the same 12 projects
---     above — every joinable project now has a real choice between
---     differently-vibed teams, not just headcount padding. "Chill" =
---     daytime/face-to-face/extrovert/beginner-friendly, "Intense" =
---     night-owl/online/introvert/fast-moving, on real skills_wanted.
--- ------------------------------------------------------------
-('c0000000-0000-0000-0000-000000000021','b0000000-0000-0000-0000-000000000009','AutoBrew Beginners','a0000000-0000-0000-0000-000000000002', true,'Forming',2,5,3,array['Product'],array['Extrovert','Face-to-face','Morning'],array['Robotics'],'approval','Casual pace, daytime in-person sessions — good if you''re newer to product design.'),
-('c0000000-0000-0000-0000-000000000022','b0000000-0000-0000-0000-000000000010','DevMatch Fast Track','a0000000-0000-0000-0000-000000000007', true,'Forming',2,3,2,array['React','FastAPI'],array['Introvert','Online','Night owl'],array['AI & ML'],'approval','Moving fast, mostly async at night — come comfortable with the stack.'),
-('c0000000-0000-0000-0000-000000000023','b0000000-0000-0000-0000-000000000010','DevMatch Learners','a0000000-0000-0000-0000-000000000013', true,'Forming',2,5,3,array['Python'],array['Extrovert','Face-to-face','Morning'],array['Web Dev'],'approval','Relaxed pace, good for a first project, happy to teach as we go.'),
-('c0000000-0000-0000-0000-000000000024','b0000000-0000-0000-0000-000000000011','QuickAPI Daytime','a0000000-0000-0000-0000-000000000011', true,'Forming',2,5,3,array['SQL'],array['Extrovert','Face-to-face','Morning'],array['Web Dev'],'approval','Daytime sessions, beginner-friendly on the backend side.'),
-('c0000000-0000-0000-0000-000000000025','b0000000-0000-0000-0000-000000000011','QuickAPI Night Shift','a0000000-0000-0000-0000-000000000004', true,'Forming',2,3,2,array['Node.js','Docker'],array['Introvert','Online','Night owl'],array['Data Science'],'approval','Async, fast-moving, some backend experience expected.'),
-('c0000000-0000-0000-0000-000000000026','b0000000-0000-0000-0000-000000000012','GreenBlueprint Studio B','a0000000-0000-0000-0000-000000000010', true,'Forming',2,3,2,array['Figma','Research'],array['Introvert','Online','Night owl'],array['Sustainability'],'approval','Deep-focus studio sessions, mostly solo work synced async.'),
-('c0000000-0000-0000-0000-000000000027','b0000000-0000-0000-0000-000000000013','Heritage AR Walkers','a0000000-0000-0000-0000-000000000015', true,'Forming',2,5,3,array['Figma'],array['Extrovert','Face-to-face','Morning'],array['Social Impact'],'approval','Casual, in-person walks around campus to scope AR spots.'),
-('c0000000-0000-0000-0000-000000000028','b0000000-0000-0000-0000-000000000014','EcoPack Night Lab','a0000000-0000-0000-0000-000000000003', true,'Forming',2,3,2,array['Research','AWS'],array['Introvert','Online','Night owl'],array['Sustainability'],'approval','Lab sessions can run late, come ready to iterate fast.'),
-('c0000000-0000-0000-0000-000000000029','b0000000-0000-0000-0000-000000000015','CarbonLens Daytime','a0000000-0000-0000-0000-000000000004', true,'Forming',2,5,3,array['Python'],array['Extrovert','Face-to-face','Morning'],array['Sustainability'],'approval','Relaxed pace, good if you''re newer to data work.'),
-('c0000000-0000-0000-0000-000000000030','b0000000-0000-0000-0000-000000000016','PolicySim Fast Track','a0000000-0000-0000-0000-000000000011', true,'Forming',2,3,2,array['Business','Research'],array['Introvert','Online','Night owl'],array['Social Impact'],'approval','Fast iteration, mostly async discussion.'),
-('c0000000-0000-0000-0000-000000000031','b0000000-0000-0000-0000-000000000017','Pixel Beginners','a0000000-0000-0000-0000-000000000008', true,'Forming',2,3,2,array['Figma'],array['Extrovert','Face-to-face','Morning'],array['Design'],'approval','Laid-back, in-person, good if you''re just getting into UI/UX.'),
-('c0000000-0000-0000-0000-000000000032','b0000000-0000-0000-0000-000000000018','HealthBridge Data Team','a0000000-0000-0000-0000-000000000014', true,'Forming',2,3,2,array['TensorFlow','SQL'],array['Introvert','Online','Night owl'],array['AI & ML'],'approval','Deep in the data side, async and fast-moving.'),
-('c0000000-0000-0000-0000-000000000033','b0000000-0000-0000-0000-000000000018','HealthBridge Daytime','a0000000-0000-0000-0000-000000000006', true,'Forming',2,5,3,array['Java'],array['Extrovert','Face-to-face','Morning'],array['Healthcare'],'approval','Daytime, backend-focused, beginner-friendly.'),
-('c0000000-0000-0000-0000-000000000034','b0000000-0000-0000-0000-000000000019','CampusConnect Design Team','a0000000-0000-0000-0000-000000000008', true,'Forming',2,6,4,array['Figma'],array['Extrovert','Face-to-face','Morning'],array['Social Impact'],'approval','Design-focused sub-team, relaxed pace, in person.'),
-('c0000000-0000-0000-0000-000000000035','b0000000-0000-0000-0000-000000000019','CampusConnect Fullstack','a0000000-0000-0000-0000-000000000005', true,'Forming',2,4,2,array['React','Node.js'],array['Introvert','Online','Night owl'],array['Web Dev'],'approval','Fullstack sub-team, fast-moving, mostly async.'),
-('c0000000-0000-0000-0000-000000000036','b0000000-0000-0000-0000-000000000020','StudySpace Studio B','a0000000-0000-0000-0000-000000000009', true,'Forming',2,3,2,array['Research','Design'],array['Introvert','Online','Night owl'],array['Design'],'approval','Studio deep-work sessions, mostly solo synced async.');
+-- EcoTrack Campus
+('c0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000002','Green Data Team','a0000000-0000-0000-0000-000000000003', true,'Forming',2,4,2,array['Python','SQL'],array['Introvert','Online','Night owl'],array['Data Science'],'approval','Backend-focused, async, some Python expected.'),
+('c0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000002','Green Design Team','a0000000-0000-0000-0000-000000000009', true,'Forming',2,4,2,array['Figma','Research'],array['Extrovert','Face-to-face','Morning'],array['Sustainability'],'approval','In-person studio sessions, beginner-friendly on the design side.'),
+
+-- HealthBridge
+('c0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000003','HealthBridge Data','a0000000-0000-0000-0000-000000000012', true,'Forming',2,3,2,array['TensorFlow','SQL'],array['Introvert','Online','Night owl'],array['AI & ML'],'approval','Deep in the model/data side, async and fast-moving.'),
+('c0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000003','HealthBridge Frontend','a0000000-0000-0000-0000-000000000007', true,'Forming',2,5,3,array['Figma','Java'],array['Extrovert','Face-to-face','Morning'],array['Healthcare'],'approval','Daytime, UI-focused, beginner-friendly.'),
+
+-- CampusConnect
+('c0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000004','Connect Fullstack','a0000000-0000-0000-0000-000000000013', true,'Forming',2,4,2,array['React','Node.js'],array['Introvert','Online','Night owl'],array['Web Dev'],'approval','Fast-moving, mostly async, come comfortable with React.'),
+('c0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000004','Connect Growth','a0000000-0000-0000-0000-000000000011', true,'Forming',2,6,4,array['Business','Product'],array['Extrovert','Face-to-face','Morning'],array['Social Impact'],'approval','Not just engineering — outreach, partnerships, getting the word out to other schools.'),
+
+-- AutoBrew
+('c0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000005','AutoBrew Builders','a0000000-0000-0000-0000-000000000001', true,'Forming',2,4,2,array['Product','C++'],array['Introvert','Online','Night owl'],array['Robotics'],'approval','Hands-on hardware work, moving fast toward a working prototype.'),
+('c0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000005','AutoBrew Testers','a0000000-0000-0000-0000-000000000002', true,'Forming',2,5,3,array['Research','AWS'],array['Extrovert','Face-to-face','Morning'],array['Sustainability'],'approval','Usage-data and testing side, casual pace, good if you''re newer to product work.'),
+
+-- GreenBlueprint
+('c0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000006','Blueprint Studio','a0000000-0000-0000-0000-000000000009', true,'Forming',2,4,2,array['Figma','Research'],array['Introvert','Online','Night owl'],array['Design'],'approval','Deep-focus studio work, mostly solo synced async.'),
+('c0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000006','Blueprint Fieldwork','a0000000-0000-0000-0000-000000000010', true,'Forming',2,5,3,array['Figma','AWS'],array['Extrovert','Face-to-face','Morning'],array['Sustainability'],'approval','Occasional site visits, casual pace, good for first-timers.'),
+
+-- DataViz for Social Good
+('c0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000007','DataViz Analysts','a0000000-0000-0000-0000-000000000011', true,'Forming',2,4,2,array['SQL','Business'],array['Introvert','Online','Night owl'],array['Data Science'],'approval','Numbers-focused, async, some SQL expected.'),
+('c0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000007','DataViz Storytellers','a0000000-0000-0000-0000-000000000008', true,'Forming',2,5,3,array['Figma','Design'],array['Extrovert','Face-to-face','Morning'],array['Social Impact'],'approval','Visual/communication side, daytime, beginner-friendly.'),
+
+-- PixelPortfolio
+('c0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000008','Pixel Design','a0000000-0000-0000-0000-000000000007', true,'Forming',2,4,2,array['Figma','UI/UX'],array['Extrovert','Face-to-face','Morning'],array['Design'],'auto','Auto-accept, just come with a portfolio link.'),
+('c0000000-0000-0000-0000-000000000016','b0000000-0000-0000-0000-000000000008','Pixel Dev','a0000000-0000-0000-0000-000000000015', true,'Forming',2,3,2,array['JavaScript','TypeScript'],array['Introvert','Online','Night owl'],array['EdTech'],'approval','Fast-moving on the template engine, come comfortable with JS.'),
+
+-- CampusHeritage AR
+('c0000000-0000-0000-0000-000000000017','b0000000-0000-0000-0000-000000000009','Heritage Walkers','a0000000-0000-0000-0000-000000000010', true,'Forming',2,5,3,array['Figma','Research'],array['Extrovert','Face-to-face','Morning'],array['Sustainability'],'approval','Casual, in-person walks around campus to scope AR spots.'),
+('c0000000-0000-0000-0000-000000000018','b0000000-0000-0000-0000-000000000009','Heritage Tech','a0000000-0000-0000-0000-000000000004', true,'Forming',2,4,2,array['AWS','Research'],array['Introvert','Online','Night owl'],array['Social Impact'],'approval','AR engineering side, async, some cloud/backend experience useful.'),
+
+-- PolicySim
+('c0000000-0000-0000-0000-000000000019','b0000000-0000-0000-0000-000000000010','PolicySim Research','a0000000-0000-0000-0000-000000000004', true,'Forming',2,4,2,array['Python','Research'],array['Introvert','Online','Night owl'],array['Data Science'],'approval','Modeling-heavy, fast iteration, mostly async discussion.'),
+('c0000000-0000-0000-0000-000000000020','b0000000-0000-0000-0000-000000000010','PolicySim Comms','a0000000-0000-0000-0000-000000000011', true,'Forming',2,5,3,array['Business','SQL'],array['Extrovert','Face-to-face','Morning'],array['Social Impact'],'approval','Write-ups and explainer content, daytime, beginner-friendly.');
 
 -- ------------------------------------------------------------
--- 7) Ended-group membership. Every person is in exactly 2 of the 8
---    Ended groups (a 3x5 Latin-square-style design), guaranteeing
---    5-6 real ratings each once cross-rated below.
+-- 7) Group membership — every group starts with its leader + 1 real
+--    member already in it (never a lone leader), well short of max,
+--    genuinely recruiting.
 -- ------------------------------------------------------------
 insert into public.group_members (group_id, user_id, role) values
--- EG1 SmartCart: Aiden(leader), Nabila, Devi, Kai Zhi
-('c0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000001','leader'),
-('c0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000002','member'),
-('c0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000003','member'),
-('c0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000004','member'),
--- EG2 NeuralCompanion: Jun Hao(leader), Priya, Marcus, Farhana
-('c0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000006','leader'),
-('c0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000005','member'),
-('c0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000007','member'),
-('c0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000008','member'),
--- EG3 HackTheCity: Chloe(leader), Wei Jian, Ryan, Aisyah
-('c0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000009','leader'),
-('c0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000010','member'),
-('c0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000011','member'),
-('c0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000012','member'),
--- EG4 CampusEats: Grace(leader), Haziq, Ben
-('c0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000014','leader'),
-('c0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000013','member'),
-('c0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000015','member'),
--- EG5 MediMate: Priya(leader), Aiden, Chloe, Haziq
-('c0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000005','leader'),
-('c0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000001','member'),
-('c0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000009','member'),
-('c0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000013','member'),
--- EG6 OrientMate: Wei Jian(leader), Nabila, Jun Hao, Grace
-('c0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000010','leader'),
-('c0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000002','member'),
-('c0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000006','member'),
-('c0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000014','member'),
--- EG7 DataViz for Social Good: Ryan(leader), Devi, Marcus, Ben
-('c0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000011','leader'),
-('c0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000003','member'),
-('c0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000007','member'),
-('c0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000015','member'),
--- EG8 PortfolioBuilder: Farhana(leader), Kai Zhi, Aisyah
-('c0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000008','leader'),
-('c0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000004','member'),
-('c0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000012','member');
+('c0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000005','leader'), ('c0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000006','member'),
+('c0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000013','leader'), ('c0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000014','member'),
+('c0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000003','leader'), ('c0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000004','member'),
+('c0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000009','leader'), ('c0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000010','member'),
+('c0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000012','leader'), ('c0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000014','member'),
+('c0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000007','leader'), ('c0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000015','member'),
+('c0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000013','leader'), ('c0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000005','member'),
+('c0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000011','leader'), ('c0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000002','member'),
+('c0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000001','leader'), ('c0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000010','member'),
+('c0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000002','leader'), ('c0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000004','member'),
+('c0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000009','leader'), ('c0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000015','member'),
+('c0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000010','leader'), ('c0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000003','member'),
+('c0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000011','leader'), ('c0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000013','member'),
+('c0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000008','leader'), ('c0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000007','member'),
+('c0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000007','leader'), ('c0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000008','member'),
+('c0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000015','leader'), ('c0000000-0000-0000-0000-000000000016','a0000000-0000-0000-0000-000000000005','member'),
+('c0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000010','leader'), ('c0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000009','member'),
+('c0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000004','leader'), ('c0000000-0000-0000-0000-000000000018','a0000000-0000-0000-0000-000000000012','member'),
+('c0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000004','leader'), ('c0000000-0000-0000-0000-000000000019','a0000000-0000-0000-0000-000000000003','member'),
+('c0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000011','leader'), ('c0000000-0000-0000-0000-000000000020','a0000000-0000-0000-0000-000000000014','member');
 
--- Second/third-group leaders (sole member so far — genuinely open to a
--- first real join, which is the point of this batch).
-insert into public.group_members (group_id, user_id, role) values
-('c0000000-0000-0000-0000-000000000021','a0000000-0000-0000-0000-000000000002','leader'),
-('c0000000-0000-0000-0000-000000000022','a0000000-0000-0000-0000-000000000007','leader'),
-('c0000000-0000-0000-0000-000000000023','a0000000-0000-0000-0000-000000000013','leader'),
-('c0000000-0000-0000-0000-000000000024','a0000000-0000-0000-0000-000000000011','leader'),
-('c0000000-0000-0000-0000-000000000025','a0000000-0000-0000-0000-000000000004','leader'),
-('c0000000-0000-0000-0000-000000000026','a0000000-0000-0000-0000-000000000010','leader'),
-('c0000000-0000-0000-0000-000000000027','a0000000-0000-0000-0000-000000000015','leader'),
-('c0000000-0000-0000-0000-000000000028','a0000000-0000-0000-0000-000000000003','leader'),
-('c0000000-0000-0000-0000-000000000029','a0000000-0000-0000-0000-000000000004','leader'),
-('c0000000-0000-0000-0000-000000000030','a0000000-0000-0000-0000-000000000011','leader'),
-('c0000000-0000-0000-0000-000000000031','a0000000-0000-0000-0000-000000000008','leader'),
-('c0000000-0000-0000-0000-000000000032','a0000000-0000-0000-0000-000000000014','leader'),
-('c0000000-0000-0000-0000-000000000033','a0000000-0000-0000-0000-000000000006','leader'),
-('c0000000-0000-0000-0000-000000000034','a0000000-0000-0000-0000-000000000008','leader'),
-('c0000000-0000-0000-0000-000000000035','a0000000-0000-0000-0000-000000000005','leader'),
-('c0000000-0000-0000-0000-000000000036','a0000000-0000-0000-0000-000000000009','leader');
-
+-- Project roster: every group member + every owner is a project member —
+-- same backfill schema_v4.sql used, reused here so the privacy RLS's
+-- membership check (schema_v13.sql) actually recognizes them.
 insert into public.project_members (project_id, user_id)
 select g.project_id, gm.user_id from public.group_members gm join public.groups g on g.id = gm.group_id
 on conflict do nothing;
@@ -536,167 +414,166 @@ select p.id, p.owner_id from public.projects p
 on conflict do nothing;
 
 -- ------------------------------------------------------------
--- 8) Past projects — everyone's 2 real Ended-group memberships above,
---    written up with their actual role on that team.
+-- 8) Past projects — everyone's real prior work, kept freestanding
+--    (no project_id) since none of the current 10 projects are "past"
+--    ones for it to link to. Two entries each, 30 total.
 -- ------------------------------------------------------------
 insert into public.past_projects (user_id, project_id, role, write_up) values
-('a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000001','Team Lead','Led SmartCart end to end — mechanical integration was the fun part, the wiring loom less so.'),
-('a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000005','ML Support','Helped tune MediMate''s symptom-classifier, small dataset but it held up.'),
-('a0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000001','Prototyping','Built and rebuilt the trolley chassis about six times until it stopped tipping over.'),
-('a0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000006','Logistics','Ran the clue-prop side of OrientMate, printed way too many QR codes.'),
-('a0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000001','Data & Sensors','Wired up SmartCart''s obstacle sensors and logged way too many false positives on stray chairs.'),
-('a0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000007','Data Cleaning','Cleaned three years of messy nonprofit spreadsheets for the DataViz dashboard.'),
-('a0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000001','Systems Integration','Made sure SmartCart''s subsystems actually talked to each other, mostly.'),
-('a0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000008','Cloud Setup','Set up the hosting for PortfolioBuilder, first time actually using AWS for something real.'),
-('a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000002','Team Lead','Led NeuralCompanion, mostly kept the model training from eating our entire compute budget.'),
-('a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000005','Team Lead','Ran MediMate through a healthcare hackathon on minimal sleep and worse coffee.'),
-('a0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000002','Team Lead','Led NeuralCompanion''s backend, spent way too long optimizing an endpoint that barely got called.'),
-('a0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000006','Backend & ML','Built OrientMate''s clue-matching logic overnight, first hackathon win.'),
-('a0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000002','Frontend & Design','Designed and built NeuralCompanion''s whole quiz UI in a weekend.'),
-('a0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000007','Visual Design','Made the DataViz dashboard actually legible, nonprofit staff said it was the first chart they''d understood all year.'),
-('a0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000002','ML Engineer','Trained NeuralCompanion''s note-summarization model, still proud of the eval scores.'),
-('a0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000008','Team Lead','Led PortfolioBuilder from a studio side-project into something people actually used.'),
-('a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000003','Team Lead','Led HackTheCity, coordinated four schools'' worth of sleep-deprived designers.'),
-('a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000005','UX Design','Designed MediMate''s chat interface so it didn''t feel like talking to a form.'),
-('a0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000003','Design','Handled HackTheCity''s dashboard visuals, first time working with people outside SUTD.'),
-('a0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000006','Team Lead','Led OrientMate, the most sleep-deprived I''ve ever been and proudest of a build.'),
-('a0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000003','Data','Pulled and cleaned public transport data for HackTheCity''s dashboard.'),
-('a0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000007','Team Lead','Led the DataViz build for a local nonprofit, they''re still using it which feels good.'),
-('a0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000003','Backend','Wired up HackTheCity''s data pipeline, my first proper cross-school team.'),
-('a0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000008','QA','Tested PortfolioBuilder across three browsers so nobody else had to.'),
-('a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000004','Frontend','Built CampusEats'' logging UI, first real app I shipped.'),
-('a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000005','QA & Demo','Ran the live demo for MediMate at the hackathon showcase, nerve-wracking but fun.'),
-('a0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000004','Team Lead','Led CampusEats, model wasn''t perfect but the canteen operator actually adopted it.'),
-('a0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000006','ML Support','Helped tune OrientMate''s clue-matching thresholds at about 4am.'),
-('a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000004','Design','Designed CampusEats'' portion-size icons so the logging felt less like a chore.'),
-('a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000007','Visual Design','Helped polish the DataViz dashboard''s charts for the nonprofit''s board presentation.');
+('a0000000-0000-0000-0000-000000000001',null,'Team Lead','Led SmartCart end to end — mechanical integration was the fun part, the wiring loom less so.'),
+('a0000000-0000-0000-0000-000000000001',null,'ML Support','Helped tune MediMate''s symptom-classifier, small dataset but it held up.'),
+('a0000000-0000-0000-0000-000000000002',null,'Prototyping','Built and rebuilt the trolley chassis about six times until it stopped tipping over.'),
+('a0000000-0000-0000-0000-000000000002',null,'Logistics','Ran the clue-prop side of OrientMate, printed way too many QR codes.'),
+('a0000000-0000-0000-0000-000000000003',null,'Data & Sensors','Wired up SmartCart''s obstacle sensors and logged way too many false positives on stray chairs.'),
+('a0000000-0000-0000-0000-000000000003',null,'Data Cleaning','Cleaned three years of messy nonprofit spreadsheets for a community data dashboard.'),
+('a0000000-0000-0000-0000-000000000004',null,'Systems Integration','Made sure SmartCart''s subsystems actually talked to each other, mostly.'),
+('a0000000-0000-0000-0000-000000000004',null,'Cloud Setup','Set up the hosting for an earlier portfolio-builder project, first time actually using AWS for something real.'),
+('a0000000-0000-0000-0000-000000000005',null,'Team Lead','Led an earlier AI study-buddy hackathon build, mostly kept the model training from eating our entire compute budget.'),
+('a0000000-0000-0000-0000-000000000005',null,'Team Lead','Ran MediMate through a healthcare hackathon on minimal sleep and worse coffee.'),
+('a0000000-0000-0000-0000-000000000006',null,'Team Lead','Led that same study-buddy build''s backend, spent way too long optimizing an endpoint that barely got called.'),
+('a0000000-0000-0000-0000-000000000006',null,'Backend & ML','Built OrientMate''s clue-matching logic overnight, first hackathon win.'),
+('a0000000-0000-0000-0000-000000000007',null,'Frontend & Design','Designed and built the study-buddy hackathon''s whole quiz UI in a weekend.'),
+('a0000000-0000-0000-0000-000000000007',null,'Visual Design','Made an earlier nonprofit data dashboard actually legible, staff said it was the first chart they''d understood all year.'),
+('a0000000-0000-0000-0000-000000000008',null,'ML Engineer','Trained a note-summarization model for that same hackathon build, still proud of the eval scores.'),
+('a0000000-0000-0000-0000-000000000008',null,'Team Lead','Led an earlier portfolio-builder side-project into something people actually used.'),
+('a0000000-0000-0000-0000-000000000009',null,'Team Lead','Led HackTheCity, coordinated four schools'' worth of sleep-deprived designers.'),
+('a0000000-0000-0000-0000-000000000009',null,'UX Design','Designed MediMate''s chat interface so it didn''t feel like talking to a form.'),
+('a0000000-0000-0000-0000-000000000010',null,'Design','Handled HackTheCity''s dashboard visuals, first time working with people outside SUTD.'),
+('a0000000-0000-0000-0000-000000000010',null,'Team Lead','Led OrientMate, the most sleep-deprived I''ve ever been and proudest of a build.'),
+('a0000000-0000-0000-0000-000000000011',null,'Data','Pulled and cleaned public transport data for HackTheCity''s dashboard.'),
+('a0000000-0000-0000-0000-000000000011',null,'Team Lead','Led an earlier community data build for a local nonprofit, they''re still using it which feels good.'),
+('a0000000-0000-0000-0000-000000000012',null,'Backend','Wired up HackTheCity''s data pipeline, my first proper cross-school team.'),
+('a0000000-0000-0000-0000-000000000012',null,'QA','Tested an earlier portfolio-builder project across three browsers so nobody else had to.'),
+('a0000000-0000-0000-0000-000000000013',null,'Frontend','Built CampusEats'' logging UI, first real app I shipped.'),
+('a0000000-0000-0000-0000-000000000013',null,'QA & Demo','Ran the live demo for MediMate at the hackathon showcase, nerve-wracking but fun.'),
+('a0000000-0000-0000-0000-000000000014',null,'Team Lead','Led CampusEats, model wasn''t perfect but the canteen operator actually adopted it.'),
+('a0000000-0000-0000-0000-000000000014',null,'ML Support','Helped tune OrientMate''s clue-matching thresholds at about 4am.'),
+('a0000000-0000-0000-0000-000000000015',null,'Design','Designed CampusEats'' portion-size icons so the logging felt less like a chore.'),
+('a0000000-0000-0000-0000-000000000015',null,'Visual Design','Helped polish an earlier community data dashboard''s charts for a nonprofit board presentation.');
 
 -- ------------------------------------------------------------
--- 9) Ratings — full cross-rating within each of the 8 Ended groups
---    (every member rates every other member once), so all 15 profiles
---    end up with 5-6 real ratings from actual former teammates.
+-- 9) Ratings — everyone's 5-6 real ratings from actual former
+--    teammates on prior (unlisted, freestanding) work, same as the
+--    past_projects above. Kept freestanding for the same reason.
 -- ------------------------------------------------------------
 insert into public.ratings (rater_id, ratee_id, project_id, group_id, stars, comment) values
--- EG1 SmartCart (Aiden, Nabila, Devi, Kai Zhi)
-('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',5,'Nabila rebuilt the chassis more times than I can count and never once complained.'),
-('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',5,'Aiden kept SmartCart from becoming five different half-finished ideas at once.'),
-('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',4,'Devi''s sensor work was solid, the false-positive rate on stray chairs was not her fault.'),
-('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',5,'Great lead, always had a clear next step for everyone.'),
-('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',5,'Kai Zhi''s systems integration saved us from three separate near-disasters.'),
-('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',4,'Solid lead, meetings occasionally ran long but always productive.'),
-('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',4,'Reliable, quiet but always delivered on time.'),
-('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',5,'Nabila''s patience with the chassis redesigns was honestly impressive.'),
-('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',5,'Kai Zhi''s the reason our subsystems didn''t fall apart at demo time.'),
-('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',4,'Good collaborator, very hands-on with the build.'),
-('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',5,'Kai Zhi caught integration bugs nobody else would''ve noticed.'),
-('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000001','c0000000-0000-0000-0000-000000000001',4,'Devi''s sensor calibration work was thorough, good documentation too.'),
--- EG2 NeuralCompanion (Jun Hao, Priya, Marcus, Farhana)
-('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Priya''s the reason the compute budget didn''t implode, great lead.'),
-('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Jun Hao''s backend work was rock solid, wish he joined more of the syncs though.'),
-('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Marcus built the whole UI in a weekend, insane turnaround.'),
-('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',4,'Solid backend, communication could''ve been a bit more frequent.'),
-('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Farhana''s summarization model eval scores were genuinely impressive.'),
-('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Jun Hao carried the ML infra side, legend.'),
-('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Marcus''s UI made the whole app feel like a real product, not a hackathon build.'),
-('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Best team lead I''ve had, super organized and always transparent about blockers.'),
-('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',4,'Farhana''s model work was solid, would''ve liked more frequent updates.'),
-('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Priya kept the whole project scoped and on track, great to work under.'),
-('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',4,'Good collaborator, model explanations were always clear even to a design person.'),
-('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000002','c0000000-0000-0000-0000-000000000002',5,'Marcus''s design sense elevated the whole product, would team up again anytime.'),
--- EG3 HackTheCity (Chloe, Wei Jian, Ryan, Aisyah)
-('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',5,'Wei Jian''s visuals made our dashboard stand out from every other team there.'),
-('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',5,'Chloe coordinated four schools'' worth of people without a single argument, impressive.'),
-('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',4,'Ryan''s transport data pull saved us hours, good technical instincts.'),
-('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',5,'Best cross-school lead I''ve worked with, kept four different schedules aligned.'),
-('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',4,'Aisyah''s data pipeline work was clean, first cross-school team for both of us.'),
-('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',5,'Chloe made a chaotic 36 hours feel organized, genuinely great leadership.'),
-('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',4,'Ryan''s data instincts were sharp even at 3am.'),
-('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',5,'Wei Jian''s design work is why our submission actually looked finished.'),
-('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',4,'Solid backend work, quiet but consistent.'),
-('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',5,'Wei Jian''s the reason our dashboard didn''t look like every other team''s.'),
-('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',4,'Good with the data pipeline, would team up again.'),
-('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000003','c0000000-0000-0000-0000-000000000003',5,'Ryan led the data side really well, made a messy dataset feel manageable.'),
--- EG4 CampusEats (Grace, Haziq, Ben) — 3-person group, 2 ratings each
-('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000004','c0000000-0000-0000-0000-000000000004',5,'Haziq''s logging UI made the whole app feel far less chore-like.'),
-('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000004','c0000000-0000-0000-0000-000000000004',5,'Grace led with a super clear scope even though the model wasn''t perfect.'),
-('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000004','c0000000-0000-0000-0000-000000000004',5,'Ben''s portion-size icons made logging genuinely painless.'),
-('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000004','c0000000-0000-0000-0000-000000000004',5,'Grace got the canteen operator to actually adopt this, rare for a module project.'),
-('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000004','c0000000-0000-0000-0000-000000000004',4,'Ben''s design instincts are sharp, good collaborator.'),
-('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000004','c0000000-0000-0000-0000-000000000004',4,'Haziq picked up the frontend fast for a Y1, solid work.'),
--- EG5 MediMate (Priya, Aiden, Chloe, Haziq)
-('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',4,'Aiden''s model tuning helped a lot given the tiny dataset we had.'),
-('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',5,'Priya ran a hackathon team like a pro, super calm under pressure.'),
-('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',5,'Chloe''s chat UI design made this feel like a real product, not a hackathon hack.'),
-('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',5,'Priya''s the best lead I''ve had, super organized even on zero sleep.'),
-('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',4,'Haziq ran a nerve-wracking live demo really well.'),
-('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',5,'Priya''s leadership made my first hackathon way less intimidating.'),
-('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',4,'Chloe''s UX instincts saved us from a clunky chat flow.'),
-('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',4,'Aiden picked up the ML side fast for someone from EPD, solid effort.'),
-('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',4,'Haziq handled the demo pressure better than I would have.'),
-('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',4,'Aiden''s tuning work was solid, good teammate under time pressure.'),
-('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',5,'Haziq''s energy kept the team going through the all-nighter.'),
-('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000005','c0000000-0000-0000-0000-000000000005',5,'Chloe''s design work is why judges actually remembered our demo.'),
--- EG6 OrientMate (Wei Jian, Nabila, Jun Hao, Grace)
-('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',5,'Nabila printed approximately a thousand QR codes without complaint, hero behavior.'),
-('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',5,'Wei Jian led us through the most sleep-deprived night of the semester, and we won.'),
-('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',5,'Jun Hao''s clue-matching logic just worked, first try, at 4am. Impressive.'),
-('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',5,'Wei Jian kept morale up when we were all running on fumes.'),
-('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',4,'Grace''s threshold tuning at 4am was better work than I could''ve done awake.'),
-('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000010','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',5,'Wei Jian''s the most sleep-deprived-but-still-organized lead I''ve worked with.'),
-('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',4,'Solid backend work, clue logic barely ever broke.'),
-('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',4,'Great with logistics, kept us all fed too somehow.'),
-('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',4,'Grace''s ML tweaks made a real difference to the clue accuracy.'),
-('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000002','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',4,'Nabila''s the reason we had props ready on time, underrated contribution.'),
-('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000014','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',5,'Grace''s model tuning at that hour was genuinely impressive.'),
-('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000006','b0000000-0000-0000-0000-000000000006','c0000000-0000-0000-0000-000000000006',5,'Jun Hao carried the technical side of this build, real MVP.'),
--- EG7 DataViz for Social Good (Ryan, Devi, Marcus, Ben)
-('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',5,'Devi cleaned three years of messy spreadsheets without a single complaint.'),
-('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',5,'Ryan led this really thoughtfully given it was for a real nonprofit, not a grade.'),
-('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',5,'Marcus made charts that a nonprofit board actually understood, rare skill.'),
-('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',4,'Good lead, kept the scope realistic for a weekend build.'),
-('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',4,'Ben''s chart polish for the board presentation was well done.'),
-('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000011','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',5,'Ryan''s the reason a real nonprofit is still using our tool months later.'),
-('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',5,'Marcus''s visual design work turned a boring dataset into something people wanted to look at.'),
-('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',4,'Thorough with the data, made my job a lot easier.'),
-('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',4,'Ben''s design eye elevated the whole dashboard.'),
-('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000003','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',4,'Devi''s data cleaning was thorough and well documented.'),
-('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',5,'Ben and I clicked on the visual direction immediately, great collaborator.'),
-('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000007','b0000000-0000-0000-0000-000000000007','c0000000-0000-0000-0000-000000000007',5,'Marcus''s design instincts made this the best-looking thing I''ve shipped.'),
--- EG8 PortfolioBuilder (Farhana, Kai Zhi, Aisyah) — 3-person group
-('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000008','c0000000-0000-0000-0000-000000000008',5,'Kai Zhi''s AWS setup was flawless, first time I''ve deployed something without a 2am panic.'),
-('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000008','c0000000-0000-0000-0000-000000000008',5,'Farhana led this from a side-project into something people actually use, great vision.'),
-('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000008','c0000000-0000-0000-0000-000000000008',4,'Aisyah caught bugs across three browsers so nobody else had to.'),
-('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000008','b0000000-0000-0000-0000-000000000008','c0000000-0000-0000-0000-000000000008',5,'Farhana''s design sense is why this actually looks like a real product.'),
-('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000012','b0000000-0000-0000-0000-000000000008','c0000000-0000-0000-0000-000000000008',4,'Aisyah''s QA work was thorough, caught things I definitely missed.'),
-('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000004','b0000000-0000-0000-0000-000000000008','c0000000-0000-0000-0000-000000000008',4,'Kai Zhi''s cloud setup made this so much less painful than expected.');
+-- prior team: Aiden, Nabila, Devi, Kai Zhi
+('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000002',null,null,5,'Nabila rebuilt the chassis more times than I can count and never once complained.'),
+('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000001',null,null,5,'Aiden kept SmartCart from becoming five different half-finished ideas at once.'),
+('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000003',null,null,4,'Devi''s sensor work was solid, the false-positive rate on stray chairs was not her fault.'),
+('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000001',null,null,5,'Great lead, always had a clear next step for everyone.'),
+('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000004',null,null,5,'Kai Zhi''s systems integration saved us from three separate near-disasters.'),
+('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000001',null,null,4,'Solid lead, meetings occasionally ran long but always productive.'),
+('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000003',null,null,4,'Reliable, quiet but always delivered on time.'),
+('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000002',null,null,5,'Nabila''s patience with the chassis redesigns was honestly impressive.'),
+('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000004',null,null,5,'Kai Zhi''s the reason our subsystems didn''t fall apart at demo time.'),
+('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000002',null,null,4,'Good collaborator, very hands-on with the build.'),
+('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000004',null,null,5,'Kai Zhi caught integration bugs nobody else would''ve noticed.'),
+('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000003',null,null,4,'Devi''s sensor calibration work was thorough, good documentation too.'),
+-- prior team: Jun Hao, Priya, Marcus, Farhana
+('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000005',null,null,5,'Priya''s the reason the compute budget didn''t implode, great lead.'),
+('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000006',null,null,5,'Jun Hao''s backend work was rock solid, wish he joined more of the syncs though.'),
+('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000007',null,null,5,'Marcus built the whole UI in a weekend, insane turnaround.'),
+('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000006',null,null,4,'Solid backend, communication could''ve been a bit more frequent.'),
+('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000008',null,null,5,'Farhana''s summarization model eval scores were genuinely impressive.'),
+('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000006',null,null,5,'Jun Hao carried the ML infra side, legend.'),
+('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000007',null,null,5,'Marcus''s UI made the whole app feel like a real product, not a hackathon build.'),
+('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000005',null,null,5,'Best team lead I''ve had, super organized and always transparent about blockers.'),
+('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000008',null,null,4,'Farhana''s model work was solid, would''ve liked more frequent updates.'),
+('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000005',null,null,5,'Priya kept the whole project scoped and on track, great to work under.'),
+('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000008',null,null,4,'Good collaborator, model explanations were always clear even to a design person.'),
+('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000007',null,null,5,'Marcus''s design sense elevated the whole product, would team up again anytime.'),
+-- prior team: Chloe, Wei Jian, Ryan, Aisyah
+('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000010',null,null,5,'Wei Jian''s visuals made our dashboard stand out from every other team there.'),
+('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000009',null,null,5,'Chloe coordinated four schools'' worth of people without a single argument, impressive.'),
+('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000011',null,null,4,'Ryan''s transport data pull saved us hours, good technical instincts.'),
+('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000009',null,null,5,'Best cross-school lead I''ve worked with, kept four different schedules aligned.'),
+('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000012',null,null,4,'Aisyah''s data pipeline work was clean, first cross-school team for both of us.'),
+('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000009',null,null,5,'Chloe made a chaotic 36 hours feel organized, genuinely great leadership.'),
+('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000011',null,null,4,'Ryan''s data instincts were sharp even at 3am.'),
+('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000010',null,null,5,'Wei Jian''s design work is why our submission actually looked finished.'),
+('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000012',null,null,4,'Solid backend work, quiet but consistent.'),
+('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000010',null,null,5,'Wei Jian''s the reason our dashboard didn''t look like every other team''s.'),
+('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000012',null,null,4,'Good with the data pipeline, would team up again.'),
+('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000011',null,null,5,'Ryan led the data side really well, made a messy dataset feel manageable.'),
+-- prior team: Grace, Haziq, Ben
+('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000013',null,null,5,'Haziq''s logging UI made the whole app feel far less chore-like.'),
+('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000014',null,null,5,'Grace led with a super clear scope even though the model wasn''t perfect.'),
+('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000015',null,null,5,'Ben''s portion-size icons made logging genuinely painless.'),
+('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000014',null,null,5,'Grace got the canteen operator to actually adopt this, rare for a module project.'),
+('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000015',null,null,4,'Ben''s design instincts are sharp, good collaborator.'),
+('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000013',null,null,4,'Haziq picked up the frontend fast for a Y1, solid work.'),
+-- prior team: Priya, Aiden, Chloe, Haziq
+('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000001',null,null,4,'Aiden''s model tuning helped a lot given the tiny dataset we had.'),
+('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000005',null,null,5,'Priya ran a hackathon team like a pro, super calm under pressure.'),
+('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000009',null,null,5,'Chloe''s chat UI design made this feel like a real product, not a hackathon hack.'),
+('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000005',null,null,5,'Priya''s the best lead I''ve had, super organized even on zero sleep.'),
+('a0000000-0000-0000-0000-000000000005','a0000000-0000-0000-0000-000000000013',null,null,4,'Haziq ran a nerve-wracking live demo really well.'),
+('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000005',null,null,5,'Priya''s leadership made my first hackathon way less intimidating.'),
+('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000009',null,null,4,'Chloe''s UX instincts saved us from a clunky chat flow.'),
+('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000001',null,null,4,'Aiden picked up the ML side fast for someone from EPD, solid effort.'),
+('a0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000013',null,null,4,'Haziq handled the demo pressure better than I would have.'),
+('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000001',null,null,4,'Aiden''s tuning work was solid, good teammate under time pressure.'),
+('a0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000013',null,null,5,'Haziq''s energy kept the team going through the all-nighter.'),
+('a0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000009',null,null,5,'Chloe''s design work is why judges actually remembered our demo.'),
+-- prior team: Wei Jian, Nabila, Jun Hao, Grace
+('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000002',null,null,5,'Nabila printed approximately a thousand QR codes without complaint, hero behavior.'),
+('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000010',null,null,5,'Wei Jian led us through the most sleep-deprived night of the semester, and we won.'),
+('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000006',null,null,5,'Jun Hao''s clue-matching logic just worked, first try, at 4am. Impressive.'),
+('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000010',null,null,5,'Wei Jian kept morale up when we were all running on fumes.'),
+('a0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000014',null,null,4,'Grace''s threshold tuning at 4am was better work than I could''ve done awake.'),
+('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000010',null,null,5,'Wei Jian''s the most sleep-deprived-but-still-organized lead I''ve worked with.'),
+('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000006',null,null,4,'Solid backend work, clue logic barely ever broke.'),
+('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000002',null,null,4,'Great with logistics, kept us all fed too somehow.'),
+('a0000000-0000-0000-0000-000000000002','a0000000-0000-0000-0000-000000000014',null,null,4,'Grace''s ML tweaks made a real difference to the clue accuracy.'),
+('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000002',null,null,4,'Nabila''s the reason we had props ready on time, underrated contribution.'),
+('a0000000-0000-0000-0000-000000000006','a0000000-0000-0000-0000-000000000014',null,null,5,'Grace''s model tuning at that hour was genuinely impressive.'),
+('a0000000-0000-0000-0000-000000000014','a0000000-0000-0000-0000-000000000006',null,null,5,'Jun Hao carried the technical side of this build, real MVP.'),
+-- prior team: Ryan, Devi, Marcus, Ben
+('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000003',null,null,5,'Devi cleaned three years of messy spreadsheets without a single complaint.'),
+('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000011',null,null,5,'Ryan led this really thoughtfully given it was for a real nonprofit, not a grade.'),
+('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000007',null,null,5,'Marcus made charts that a nonprofit board actually understood, rare skill.'),
+('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000011',null,null,4,'Good lead, kept the scope realistic for a weekend build.'),
+('a0000000-0000-0000-0000-000000000011','a0000000-0000-0000-0000-000000000015',null,null,4,'Ben''s chart polish for the board presentation was well done.'),
+('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000011',null,null,5,'Ryan''s the reason a real nonprofit is still using our tool months later.'),
+('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000007',null,null,5,'Marcus''s visual design work turned a boring dataset into something people wanted to look at.'),
+('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000003',null,null,4,'Thorough with the data, made my job a lot easier.'),
+('a0000000-0000-0000-0000-000000000003','a0000000-0000-0000-0000-000000000015',null,null,4,'Ben''s design eye elevated the whole dashboard.'),
+('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000003',null,null,4,'Devi''s data cleaning was thorough and well documented.'),
+('a0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000015',null,null,5,'Ben and I clicked on the visual direction immediately, great collaborator.'),
+('a0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000007',null,null,5,'Marcus''s design instincts made this the best-looking thing I''ve shipped.'),
+-- prior team: Farhana, Kai Zhi, Aisyah
+('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000004',null,null,5,'Kai Zhi''s AWS setup was flawless, first time I''ve deployed something without a 2am panic.'),
+('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000008',null,null,5,'Farhana led this from a side-project into something people actually use, great vision.'),
+('a0000000-0000-0000-0000-000000000008','a0000000-0000-0000-0000-000000000012',null,null,4,'Aisyah caught bugs across three browsers so nobody else had to.'),
+('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000008',null,null,5,'Farhana''s design sense is why this actually looks like a real product.'),
+('a0000000-0000-0000-0000-000000000004','a0000000-0000-0000-0000-000000000012',null,null,4,'Aisyah''s QA work was thorough, caught things I definitely missed.'),
+('a0000000-0000-0000-0000-000000000012','a0000000-0000-0000-0000-000000000004',null,null,4,'Kai Zhi''s cloud setup made this so much less painful than expected.');
 
 -- ------------------------------------------------------------
--- 10) Join requests — pending + one declined-with-reason, so
---     Applicants/Teams·Requested aren't empty.
+-- 10) Join requests — a few pending on the new groups, so Applicants /
+--     Teams·Requested aren't empty either. All against groups that are
+--     NOT the requester's own group.
 -- ------------------------------------------------------------
 insert into public.join_requests (group_id, user_id, status, note, comment, decline_reason, declined_at) values
-('c0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000010','declined', null, null, 'Looking for someone with hands-on embedded/electronics experience specifically for this one.', now() - interval '1 day'),
-('c0000000-0000-0000-0000-000000000010','a0000000-0000-0000-0000-000000000013','pending', 'Would love to help with the frontend, I''ve been picking up React.', 'Would love to help with the frontend, I''ve been picking up React.', null, null),
-('c0000000-0000-0000-0000-000000000017','a0000000-0000-0000-0000-000000000015','pending', null, null, null, null),
-('c0000000-0000-0000-0000-000000000015','a0000000-0000-0000-0000-000000000011','pending', 'Interested in the data side, have SQL experience from my degree.', 'Interested in the data side, have SQL experience from my degree.', null, null);
+('c0000000-0000-0000-0000-000000000001','a0000000-0000-0000-0000-000000000008','pending', 'I''ve got some PyTorch experience from a DAI module, would love to help on the model side.', 'I''ve got some PyTorch experience from a DAI module, would love to help on the model side.', null, null),
+('c0000000-0000-0000-0000-000000000007','a0000000-0000-0000-0000-000000000015','pending', null, null, null, null),
+('c0000000-0000-0000-0000-000000000013','a0000000-0000-0000-0000-000000000006','pending', 'Interested in the data side, have SQL experience.', 'Interested in the data side, have SQL experience.', null, null),
+('c0000000-0000-0000-0000-000000000009','a0000000-0000-0000-0000-000000000012','declined', null, null, 'Looking for someone with hands-on hardware/embedded experience specifically for this one.', now() - interval '1 day');
 
 -- ------------------------------------------------------------
 -- 11) Saved projects.
 -- ------------------------------------------------------------
 insert into public.project_favorites (user_id, project_id) values
-('a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000012'),
-('a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000018'),
-('a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000020'),
-('a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000010'),
-('a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000017');
+('a0000000-0000-0000-0000-000000000001','b0000000-0000-0000-0000-000000000006'),
+('a0000000-0000-0000-0000-000000000005','b0000000-0000-0000-0000-000000000003'),
+('a0000000-0000-0000-0000-000000000009','b0000000-0000-0000-0000-000000000010'),
+('a0000000-0000-0000-0000-000000000013','b0000000-0000-0000-0000-000000000008'),
+('a0000000-0000-0000-0000-000000000015','b0000000-0000-0000-0000-000000000004');
 
 -- ------------------------------------------------------------
 -- Done. Verify:
 --   select username, full_name, university, major from public.profiles order by university, major;
 --   select name, type, privacy, join_code from public.projects order by name;
+--   select p.name, count(g.id) as n_groups from public.projects p join public.groups g on g.project_id = p.id group by p.name;
 --   select ratee_id, count(*), round(avg(stars),1) from public.ratings group by ratee_id order by 2;
---   -- skill coverage check:
---   select s.name from public.skill_catalog s
---    where not exists (select 1 from public.projects p where s.name = any(p.skills_needed));
---   -- should return zero rows if coverage is complete.
 -- ------------------------------------------------------------
