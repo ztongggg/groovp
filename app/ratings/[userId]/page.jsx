@@ -1,5 +1,5 @@
-import Link from "next/link";
 import AppShell from "@/components/AppShell";
+import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 
 async function getData(userId) {
@@ -83,7 +83,7 @@ export default async function RatingsHistoryPage({ params }) {
     <AppShell>
       <div className="min-h-full pb-8" style={{ background: "#F9F8FB" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
-          <Link href={`/u/${params.userId}`} aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <BackButton fallbackHref={`/u/${params.userId}`} style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }} />
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Ratings</h1>
         </div>
 

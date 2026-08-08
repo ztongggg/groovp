@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
+import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 
 async function getData(id) {
@@ -65,7 +66,7 @@ export default async function PastProjectDetailPage({ params }) {
     <AppShell>
       <div className="min-h-full bg-white pb-10">
         <div style={{ position: "relative", height: 200, background: "linear-gradient(76deg, #4AC7B2 0%, #256359 100%)" }}>
-          <Link href="/profile" aria-label="Back" style={{ position: "absolute", left: 24, top: 48, width: 40, height: 40, borderRadius: 9999, background: "rgba(255,255,255,0.92)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <BackButton fallbackHref="/profile" style={{ position: "absolute", left: 24, top: 48, width: 40, height: 40, borderRadius: 9999, background: "rgba(255,255,255,0.92)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }} />
           <span style={{ position: "absolute", left: 24, top: 150, background: "#F3F1F8", borderRadius: 13, padding: "6px 12px", display: "inline-flex", alignItems: "center", gap: 6 }}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1D1B44" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m5 13 4 4L19 7" /></svg>
             <span style={{ fontSize: 10.5, fontWeight: 600, color: "#1D1B44" }}>{ongoing ? "In progress" : "Completed"}</span>

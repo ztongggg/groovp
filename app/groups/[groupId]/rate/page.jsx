@@ -1,6 +1,6 @@
-import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import RateTeammatesList from "@/components/RateTeammatesList";
+import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 
 // Standalone Rate Teammates — reachable by ANY former member of an ended
@@ -50,7 +50,7 @@ export default async function RateTeammatesPage({ params }) {
     <AppShell>
       <div className="min-h-full pb-8" style={{ background: "#F9F8FB" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
-          <Link href="/teams" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <BackButton fallbackHref="/teams" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }} />
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Rate your teammates</h1>
         </div>
         <p style={{ marginTop: 14, padding: "0 24px", fontSize: 12.5, color: "#757080", lineHeight: "18px" }}>

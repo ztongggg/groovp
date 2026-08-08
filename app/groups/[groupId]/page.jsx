@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import LeaveGroupButton from "@/components/LeaveGroupButton";
 import JoinGroupButton from "@/components/JoinGroupButton";
 import GroupRequestRow from "@/components/GroupRequestRow";
+import BackButton from "@/components/BackButton";
 import { computeMatch, STRONG_MATCH_THRESHOLD } from "@/lib/matching";
 
 async function getData(groupId) {
@@ -143,11 +144,10 @@ export default async function GroupInfoPage({ params }) {
       <div className="min-h-full bg-white pb-10">
 
         <div style={{ position: "relative", height: 42 }}>
-          <Link
-            href={isMember ? `/chat/${group.id}` : group.project_id ? `/project/${group.project_id}` : "/discover"}
-            aria-label="Back"
+          <BackButton
+            fallbackHref={isMember ? `/chat/${group.id}` : group.project_id ? `/project/${group.project_id}` : "/discover"}
             style={{ position: "absolute", left: 24, top: 0, width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}
-          >‹</Link>
+          />
           {isLeader && (
             <Link href={`/groups/${group.id}/edit`} aria-label="Edit group" style={{ position: "absolute", left: 338, top: -2, width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D1B44" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6" /><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z" /></svg>

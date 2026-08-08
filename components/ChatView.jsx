@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { sendMessage, sendDM } from "@/app/chat/actions";
+import BackButton from "@/components/BackButton";
 
 function fmtTime(iso) {
   if (!iso) return "";
@@ -75,7 +76,7 @@ export default function ChatView({
       {/* Header. Group Info is reached by tapping the title block — the Figma
           frame has no separate gear icon, the subtitle carries the chevron. */}
       <div style={{ height: 100, background: "#fff", borderBottom: "1px solid #F3F1F8", display: "flex", alignItems: "center", gap: 11, padding: "48px 16px 12px 24px" }}>
-        <Link href={backHref} aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44", flexShrink: 0 }}>‹</Link>
+        <BackButton fallbackHref={backHref} style={{ width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44", flexShrink: 0 }} />
 
         {avatars.length > 0 && (
           <span style={{ display: "flex", flexShrink: 0 }}>

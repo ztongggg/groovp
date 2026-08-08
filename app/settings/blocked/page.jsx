@@ -1,6 +1,6 @@
-import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import BlockedUserRow from "@/components/BlockedUserRow";
+import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 
 async function getBlocked() {
@@ -31,7 +31,7 @@ export default async function BlockedUsersPage() {
     <AppShell>
       <div className="min-h-full pb-8" style={{ background: "#f9f8fb" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
-          <Link href="/settings" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <BackButton fallbackHref="/settings" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }} />
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Blocked Users</h1>
         </div>
         <p style={{ marginTop: 14, padding: "0 24px", fontSize: 12, color: "#757080", lineHeight: "18px" }}>You won&apos;t see content from blocked users, and they can&apos;t contact you.</p>

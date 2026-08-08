@@ -7,6 +7,7 @@
 // and (indirectly) by server pages.
 
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 
 /* ---------------------------------------------------------------- icons -- */
 
@@ -50,7 +51,7 @@ export function ProfileBanner({ banner, backHref, rightAction, avatarUrl, name, 
       <div style={{ position: "absolute", left: 0, top: 0, width: "100%", height: 140, background: banner }} />
 
       {backHref && (
-        <Link href={backHref} aria-label="Back" style={{ position: "absolute", left: 24, top: 48, width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44", lineHeight: 1 }}>‹</Link>
+        <BackButton fallbackHref={backHref} style={{ position: "absolute", left: 24, top: 48, width: 40, height: 40, borderRadius: 9999, background: "#F3F1F8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44", lineHeight: 1 }} />
       )}
       {center && <div style={{ position: "absolute", left: 0, right: 0, top: 50, display: "flex", justifyContent: "center" }}>{center}</div>}
       {rightAction && <div style={{ position: "absolute", left: 338, top: 48, width: 40, height: 40 }}>{rightAction}</div>}

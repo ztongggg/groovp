@@ -1,6 +1,6 @@
-import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import DiscoverCard from "@/components/DiscoverCard";
+import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 import { getDiscoverItems } from "@/lib/discoverData";
 
@@ -29,7 +29,7 @@ export default async function SavedPage() {
     <AppShell>
       <div className="font-nunito min-h-full bg-white pb-6">
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
-          <Link href="/home" aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <BackButton fallbackHref="/home" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }} />
           <h1 style={{ fontSize: 24, fontWeight: 900, color: "#1E1B4B" }}>Saved Projects</h1>
         </div>
 

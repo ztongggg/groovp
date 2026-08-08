@@ -7,6 +7,7 @@ import JoinGroupButton from "@/components/JoinGroupButton";
 import FavoriteButton from "@/components/FavoriteButton";
 import MemberBlobs from "@/components/MemberBlobs";
 import DiscoverCard from "@/components/DiscoverCard";
+import BackButton from "@/components/BackButton";
 import { enrolInProject } from "@/app/join/actions";
 
 const AVATAR = ["#e8863b", "#34b9a8", "#f2a5bd", "#7c3aed", "#4ac7b2"];
@@ -78,9 +79,9 @@ export default function ProjectDetailView({ name, description, type, ownerUserna
           // eslint-disable-next-line @next/next/no-img-element
           <img src={coverImageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
         )}
-        <Link href="/discover" aria-label="Back" className="absolute flex items-center justify-center rounded-full bg-white" style={{ left: 24, top: 59, width: 31, height: 31 }}>
+        <BackButton fallbackHref="/discover" className="absolute flex items-center justify-center rounded-full bg-white" style={{ left: 24, top: 59, width: 31, height: 31 }}>
           <svg width="7" height="12" viewBox="0 0 8 14" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 1 1 7l6 6" /></svg>
-        </Link>
+        </BackButton>
         {isOwner && (
           <Link href={`/project/${projectId}/edit`} className="absolute flex items-center justify-center" style={{ left: 302, top: 16, width: 76, height: 32, borderRadius: 16, background: "rgba(255,255,255,0.92)", fontSize: 11.5, color: "#1d1b44", fontFamily: "Inter, sans-serif" }}>✎ Edit</Link>
         )}

@@ -1,7 +1,7 @@
-import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import RecruitingForm from "@/components/RecruitingForm";
 import InviteByUsername from "@/components/InviteByUsername";
+import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 
 async function getGroup(groupId) {
@@ -26,7 +26,7 @@ export default async function RecruitingPage({ params }) {
     <AppShell>
       <div className="min-h-full bg-white pb-6">
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
-          <Link href={g ? `/groups/${g.id}` : "/teams"} aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <BackButton fallbackHref={g ? `/groups/${g.id}` : "/teams"} style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }} />
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1D1B44" }}>Recruiting settings</h1>
         </div>
 

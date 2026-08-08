@@ -1,6 +1,6 @@
-import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import StartGroupForm from "@/components/StartGroupForm";
+import BackButton from "@/components/BackButton";
 import { createClient } from "@/lib/supabase/server";
 
 async function getProjectName(id) {
@@ -20,7 +20,7 @@ export default async function NewGroupPage({ params }) {
     <AppShell>
       <div className="min-h-full bg-white pb-8">
         <div style={{ display: "flex", alignItems: "center", gap: 11, padding: "0 24px" }}>
-          <Link href={`/project/${params.id}`} aria-label="Back" style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }}>‹</Link>
+          <BackButton fallbackHref={`/project/${params.id}`} style={{ width: 40, height: 40, borderRadius: 9999, background: "#fff", boxShadow: "0px 2px 8px rgba(26,20,51,0.10)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#1D1B44" }} />
           <h1 style={{ fontSize: 24, fontWeight: 800, color: "#1D1B44" }}>Start a New Group</h1>
         </div>
         <StartGroupForm projectId={params.id} projectName={projectName} />
