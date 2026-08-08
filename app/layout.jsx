@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import "./globals.css";
 import PhoneFrame from "@/components/PhoneFrame";
 import ExperimentTimerOverlay from "@/components/ExperimentTimerOverlay"; // EXPERIMENT: see lib/experiment.js
 import NotificationToast from "@/components/NotificationToast";
+import NavigationLoader from "@/components/NavigationLoader";
 
 export const metadata = {
   metadataBase: new URL("https://groovp.vercel.app"),
@@ -38,6 +40,9 @@ export default function RootLayout({ children }) {
           {children}
           <ExperimentTimerOverlay />
           <NotificationToast />
+          <Suspense fallback={null}>
+            <NavigationLoader />
+          </Suspense>
         </PhoneFrame>
       </body>
     </html>
