@@ -139,19 +139,6 @@ not replacements. `supabase/seed_showcase.sql` loads the demo dataset
 > wrapped `try/catch -> []` so pages still render, but real data only appears on
 > a deployed instance.
 
-## Credits
-
-Built by [Zhi Tong Lim](https://github.com/ztongggg) — the entire application:
-frontend, backend, data model, row-level security, matching, and the web
-experiment. Every commit in this repository is mine.
-
-Groovp was a five-person course project. The Figma visual design for **Home,
-Discover and the signup flow**, the personas, the paper prototype, the navigation
-diagram, the poster and the walkthrough videos were the work of my teammates
-Audrey Goh, Ray Teoh, Anna Sawit and Sheen Kong. Ray compiled the experiment
-results. Every other screen in the Figma file is mine, and all 90 were
-implemented here by me.
-
 ## License
 
 MIT — see [LICENSE](LICENSE).
